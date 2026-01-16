@@ -60,7 +60,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         intake = new Intake();
-        
+
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
         // implementations
@@ -166,7 +166,7 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     controller.rightTrigger().onTrue(intake.getSpinIntakeCommand(0.5));
-    }
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
