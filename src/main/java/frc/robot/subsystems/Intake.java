@@ -1,18 +1,19 @@
 package frc.robot.subsystems;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public class Intake implements Subsystem  {
-    TalonSRX intakeMotor = new TalonSRX(5);
-    
-    public Command getDriveForwardCommand(){
-        return Commands.runOnce(() -> intakeMotor.set(TalonSRXControlMode.PercentOutput, 0.5));
+public class Intake extends SubsystemBase{
+    private TalonSRX intakeMotor = new TalonSRX(5);
+
+    public Command getSpinIntakeCommand(double percent){
+        return Commands.runOnce(() -> intakeMotor.set(TalonSRXControlMode.PercentOutput, percent));
     }
-    public Command getStopCommand(){
+
+    public Command getStopIntakeCommand(){
         return Commands.runOnce(() -> intakeMotor.set(TalonSRXControlMode.PercentOutput, 0));
     }
 }
