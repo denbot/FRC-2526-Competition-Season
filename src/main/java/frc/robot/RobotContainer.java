@@ -166,7 +166,6 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     controller.rightTrigger().onTrue(intake.getSpinIntakeCommand(0.5));
-    controller.rightTrigger().onFalse(intake.getStopIntakeCommand());
   }
 
   /**
