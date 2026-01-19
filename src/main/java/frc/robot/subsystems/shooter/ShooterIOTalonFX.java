@@ -24,34 +24,62 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 
 public class ShooterIOTalonFX implements ShooterIO {
-    private final TalonFX spinnerMotor =
-        new TalonFX(ShooterConstants.SPINNER_MOTOR_ID);
+    private final TalonFX leftSpinnerMotor =
+        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID);
+
+    private final TalonFX rightSpinnerMotor =
+        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID);
     
     private final TalonFX kickerMotor =
         new TalonFX(ShooterConstants.KICKER_MOTOR_ID);
 
-    private final Debouncer spinnerMotorDebounce = new Debouncer(0.5);
+    private final Debouncer leftSpinnerMotorDebounce = new Debouncer(0.5);
+    private final Debouncer rightSpinnerMotorDebounce = new Debouncer(0.5);
     private final Debouncer kickerMotorDebounce = new Debouncer(0.5);
 
-    private static final VelocityTorqueCurrentFOC spinnerFOC =
+    private static final VelocityTorqueCurrentFOC leftSpinnerFOC =
+        new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.spinnerAcceleration);
+    private static final VelocityTorqueCurrentFOC rightSpinnerFOC =
         new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.spinnerAcceleration);
     private static final VelocityTorqueCurrentFOC kickerFOC =
         new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.kickerAcceleration);
 
-    private final StatusSignal<AngularVelocity> spinnerVelocity = spinnerMotor.getVelocity();
-    private final StatusSignal<Current> spinnerCurrentAmps = spinnerMotor.getSupplyCurrent();
+    private final StatusSignal<AngularVelocity> leftSpinnerVelocity = leftSpinnerMotor.getVelocity();
+    private final StatusSignal<Current> leftSpinnerCurrentAmps = leftSpinnerMotor.getSupplyCurrent();
 
-    private final StatusSignal<AngularVelocity> kickerVelocity = spinnerMotor.getVelocity();
-    private final StatusSignal<Current> kickerCurrentAmps = spinnerMotor.getSupplyCurrent();
+    private final StatusSignal<AngularVelocity> rightSpinnerVelocity = rightSpinnerMotor.getVelocity();
+    private final StatusSignal<Current> rightSpinnerCurrentAmps = rightSpinnerMotor.getSupplyCurrent();
 
-    private final StatusSignal<Angle> spinnerPositionRot = spinnerMotor.getPosition();
-    private final StatusSignal<Double> spinnerClosedLoopError = spinnerMotor.getClosedLoopError();
+    private final StatusSignal<AngularVelocity> kickerVelocity = kickerMotor.getVelocity();
+    private final StatusSignal<Current> kickerCurrentAmps = kickerMotor.getSupplyCurrent();
+
+    private final StatusSignal<Angle> leftSpinnerPositionRot = leftSpinnerMotor.getPosition();
+    private final StatusSignal<Double> leftSpinnerClosedLoopError = leftSpinnerMotor.getClosedLoopError();
+
+    private final StatusSignal<Angle> rightSpinnerPositionRot = rightSpinnerMotor.getPosition();
+    private final StatusSignal<Double> rightSpinnerClosedLoopError = rightSpinnerMotor.getClosedLoopError();
 
     private final StatusSignal<Angle> kickerPositionRot = kickerMotor.getPosition();
     private final StatusSignal<Double> kickerClosedLoopError = kickerMotor.getClosedLoopError();
 
     public ShooterIOTalonFX() {
-        var spinnerMotorConfig =
+        var leftSpinnerMotorConfig =
+        new TalonFXConfiguration()
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimitEnable(true)
+                    .withStatorCurrentLimit(70))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(45)
+                    .withKD(0)
+                    .withKG(0.2));
+
+        var rightSpinnerMotorConfig =
         new TalonFXConfiguration()
             .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
             .withCurrentLimits(
@@ -84,15 +112,22 @@ public class ShooterIOTalonFX implements ShooterIO {
                     .withKG(0.2));
 
 
-        spinnerMotor.setNeutralMode(NeutralModeValue.Coast);
+        leftSpinnerMotor.setNeutralMode(NeutralModeValue.Coast);
+        rightSpinnerMotor.setNeutralMode(NeutralModeValue.Coast);
         kickerMotor.setNeutralMode(NeutralModeValue.Coast);
-        tryUntilOk(5, () -> spinnerMotor.getConfigurator().apply(spinnerMotorConfig, 0.25));
+        tryUntilOk(5, () -> leftSpinnerMotor.getConfigurator().apply(leftSpinnerMotorConfig, 0.25));
+        tryUntilOk(5, () -> rightSpinnerMotor.getConfigurator().apply(rightSpinnerMotorConfig, 0.25));
         tryUntilOk(5, () -> kickerMotor.getConfigurator().apply(kickerMotorConfig, 0.25));
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-            spinnerMotor.getIsProLicensed().getValue() ? 200 : 50, 
-            spinnerVelocity, 
-            spinnerCurrentAmps);
+            leftSpinnerMotor.getIsProLicensed().getValue() ? 200 : 50, 
+            leftSpinnerVelocity, 
+            leftSpinnerCurrentAmps);
+        
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            rightSpinnerMotor.getIsProLicensed().getValue() ? 200 : 50, 
+            rightSpinnerVelocity, 
+            rightSpinnerCurrentAmps);
             
         BaseStatusSignal.setUpdateFrequencyForAll(
             kickerMotor.getIsProLicensed().getValue() ? 200 : 50, 
@@ -102,34 +137,48 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs){
-        var spinnerMotorStatus = BaseStatusSignal.refreshAll(spinnerVelocity, spinnerCurrentAmps);
+        var leftSpinnerMotorStatus = BaseStatusSignal.refreshAll(leftSpinnerVelocity, leftSpinnerCurrentAmps);
+        var rightSpinnerMotorStatus = BaseStatusSignal.refreshAll(rightSpinnerVelocity, rightSpinnerCurrentAmps);
         var kickerMotorStatus = BaseStatusSignal.refreshAll(kickerVelocity, kickerCurrentAmps);
 
-        inputs.spinnerMotorConnected = spinnerMotorDebounce.calculate(spinnerMotorStatus.isOK());
+        inputs.leftSpinnerMotorConnected = leftSpinnerMotorDebounce.calculate(leftSpinnerMotorStatus.isOK());
+        inputs.rightSpinnerMotorConnected = rightSpinnerMotorDebounce.calculate(rightSpinnerMotorStatus.isOK());
         inputs.kickerMotorConnected = kickerMotorDebounce.calculate(kickerMotorStatus.isOK());
 
-        inputs.spinnerRotationSpeed = spinnerVelocity.getValue();
+        inputs.leftSpinnerRotationSpeed = leftSpinnerVelocity.getValue();
+        inputs.rightSpinnerRotationSpeed = rightSpinnerVelocity.getValue();
         inputs.kickerRotationSpeed = kickerVelocity.getValue();
 
-        inputs.spinnerPositionRots = spinnerPositionRot.getValue();
+        inputs.leftSpinnerPositionRots = leftSpinnerPositionRot.getValue();
+        inputs.rightSpinnerPositionRots = rightSpinnerPositionRot.getValue();
         inputs.kickerPositionRots = kickerPositionRot.getValue();
 
-        inputs.spinnerClosedLoopError = spinnerClosedLoopError.getValueAsDouble();
+        inputs.leftSpinnerClosedLoopError = leftSpinnerClosedLoopError.getValueAsDouble();
+        inputs.rightSpinnerClosedLoopError = rightSpinnerClosedLoopError.getValueAsDouble();
         inputs.kickerClosedLoopError = kickerClosedLoopError.getValueAsDouble();
 
-        inputs.spinnerCurrentAmps = spinnerCurrentAmps.getValue();
+        inputs.leftSpinnerCurrentAmps = leftSpinnerCurrentAmps.getValue();
+        inputs.rightSpinnerCurrentAmps = rightSpinnerCurrentAmps.getValue();
         inputs.kickerCurrentAmps = kickerCurrentAmps.getValue();
     }
 
-    public void setSpinnerVelocity(AngularVelocity velocity){
-        spinnerMotor.setControl(new VelocityVoltage(velocity));
+    public void setLeftSpinnerVelocity(AngularVelocity velocity){
+        leftSpinnerMotor.setControl(new VelocityVoltage(velocity));
     }
-    public void stopSpinner(AngularVelocity velocity){
-        spinnerMotor.setControl(new CoastOut());
+    public void setRightSpinnerVelocity(AngularVelocity velocity){
+        rightSpinnerMotor.setControl(new VelocityVoltage(velocity));
     }
 
+    public void stopLeftSpinner(AngularVelocity velocity){
+        leftSpinnerMotor.setControl(new CoastOut());
+    }
+    public void stopRightSpinner(AngularVelocity velocity){
+        rightSpinnerMotor.setControl(new CoastOut());
+    }
+
+
     public void setKickerVelocity(AngularVelocity velocity){
-        spinnerMotor.setControl(new VelocityVoltage(velocity));
+        kickerMotor.setControl(new VelocityVoltage(velocity));
     }
     public void stopKicker(AngularVelocity velocity){
         kickerMotor.setControl(new CoastOut());

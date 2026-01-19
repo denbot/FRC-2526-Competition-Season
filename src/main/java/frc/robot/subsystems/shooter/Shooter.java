@@ -27,16 +27,21 @@ public class Shooter extends SubsystemBase{
     public void periodic(){
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
-        Logger.recordOutput("Spinner Connected", inputs.spinnerMotorConnected);
+        Logger.recordOutput("Left Spinner Connected", inputs.leftSpinnerMotorConnected);
+        Logger.recordOutput("Right Spinner Connected", inputs.rightSpinnerMotorConnected);
         Logger.recordOutput("Kicker Connected", inputs.kickerMotorConnected);
-        Logger.recordOutput("Spinner Velocity", inputs.spinnerRotationSpeed);
+        Logger.recordOutput("Left Spinner Velocity", inputs.leftSpinnerRotationSpeed);
+        Logger.recordOutput("Right Spinner Velocity", inputs.rightSpinnerRotationSpeed);
         Logger.recordOutput("Kicker Velocity", inputs.kickerRotationSpeed);
-        Logger.recordOutput("Spinner Position", inputs.spinnerPositionRots);
+        Logger.recordOutput("Left Spinner Position", inputs.leftSpinnerPositionRots);
+        Logger.recordOutput("Right Spinner Position", inputs.rightSpinnerPositionRots);
         Logger.recordOutput("Kicker Position", inputs.kickerPositionRots);
-        Logger.recordOutput("Spinner Closed Loop Error", inputs.spinnerClosedLoopError);
+        Logger.recordOutput("Left Spinner Closed Loop Error", inputs.leftSpinnerClosedLoopError);
+        Logger.recordOutput("Right Spinner Closed Loop Error", inputs.rightSpinnerClosedLoopError);
         Logger.recordOutput("Kicker Closed Loop Error", inputs.kickerClosedLoopError);
-        Logger.recordOutput("Spinner Current", inputs.spinnerCurrentAmps);
-        Logger.recordOutput("Kicker Current", inputs.spinnerCurrentAmps);
+        Logger.recordOutput("Left Spinner Current", inputs.leftSpinnerCurrentAmps);
+        Logger.recordOutput("Right Spinner Current", inputs.rightSpinnerCurrentAmps);
+        Logger.recordOutput("Kicker Current", inputs.kickerCurrentAmps);
     }
 
     public void setSpinnerSpeed(AngularVelocity Speed){
@@ -74,36 +79,51 @@ public class Shooter extends SubsystemBase{
         return kickerVelocitySetpoint;
     }
 
-    public boolean getSpinnerConnected(){
-        return inputs.spinnerMotorConnected;
+    public boolean getLeftSpinnerConnected(){
+        return inputs.leftSpinnerMotorConnected;
+    }
+    public boolean getRightSpinnerConnected(){
+        return inputs.rightSpinnerMotorConnected;
     }
     public boolean getKickerConnected(){
         return inputs.kickerMotorConnected;
     }
 
-    public AngularVelocity getSpinnerVelocity(){
-        return inputs.spinnerRotationSpeed;
+    public AngularVelocity getLeftSpinnerVelocity(){
+        return inputs.leftSpinnerRotationSpeed;
+    }
+    public AngularVelocity getRightSpinnerVelocity(){
+        return inputs.rightSpinnerRotationSpeed;
     }
     public AngularVelocity getkickerVelocity(){
         return inputs.kickerRotationSpeed;
     }
 
-    public Angle getSpinnerPosition(){
-        return inputs.spinnerPositionRots;
+    public Angle getLeftSpinnerPosition(){
+        return inputs.leftSpinnerPositionRots;
+    }
+    public Angle getRightSpinnerPosition(){
+        return inputs.rightSpinnerPositionRots;
     }
     public Angle getkickerPosition(){
         return inputs.kickerPositionRots;
     }
 
-    public Double getSpinnerClosedLoopError(){
-        return inputs.spinnerClosedLoopError;
+    public Double getLeftSpinnerClosedLoopError(){
+        return inputs.leftSpinnerClosedLoopError;
+    }
+    public Double getRightSpinnerClosedLoopError(){
+        return inputs.rightSpinnerClosedLoopError;
     }
     public Double getKickerClosedLoopError(){
         return inputs.kickerClosedLoopError;
     }
 
-    public Current getSpinnerCurrent(){
-        return inputs.spinnerCurrentAmps;
+    public Current getLeftSpinnerCurrent(){
+        return inputs.leftSpinnerCurrentAmps;
+    }
+    public Current getRightSpinnerCurrent(){
+        return inputs.rightSpinnerCurrentAmps;
     }
     public Current getKickerCurrent(){
         return inputs.kickerCurrentAmps;
