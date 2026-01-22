@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,11 +28,13 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
+//import frc.robot.subsystems.shooter.ShooterConstants.OperatorConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -177,12 +180,12 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller.rightTrigger().whileTrue(intake.getSpinIntakeCommand(1).andThen(intake.getStopIntakeCommand()));
-    controller.rightBumper().whileTrue(intake.getSpinIntakeCommand(-1).andThen(intake.getStopIntakeCommand()));
+    controller.rightTrigger().whileTrue(intake.getSpinIntakeCommand(1));//.andThen(intake.getStopIntakeCommand()));
+    controller.rightBumper().whileTrue(intake.getSpinIntakeCommand(-1));//.andThen(intake.getStopIntakeCommand()));
 
     // Run Shooter at half speed for testing
-    controller.leftTrigger().whileTrue(shooter.runSpinnerAtSpeed(RadiansPerSecond.of(30.0)).andThen(shooter.stopSpinner()));
-    controller.leftBumper().whileTrue(shooter.runKickerAtSpeed(RadiansPerSecond.of(30.0)).andThen(shooter.stopKicker()));
+    controller.leftTrigger().whileTrue(shooter.runSpinnerAtSpeed(RotationsPerSecond.of(5.0)).andThen(shooter.stopSpinner()));
+    controller.leftBumper().whileTrue(shooter.runKickerAtSpeed(RotationsPerSecond.of(5.0)).andThen(shooter.stopKicker()));
 }
 
   /**

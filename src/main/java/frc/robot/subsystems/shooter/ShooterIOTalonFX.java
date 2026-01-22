@@ -24,13 +24,15 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+//import frc.robot.subsystems.shooter.ShooterConstants.OperatorConstants;
+import frc.robot.subsystems.shooter.ShooterConstants.OperatorConstants;
 
 public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX leftSpinnerMotor =
-        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID);
+        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
 
     private final TalonFX rightSpinnerMotor =
-        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID);
+        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
     
     private final TalonFX kickerMotor =
         new TalonFX(ShooterConstants.KICKER_MOTOR_ID);

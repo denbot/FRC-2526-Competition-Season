@@ -47,14 +47,14 @@ public class Shooter extends SubsystemBase{
     }
 
     public Command runSpinnerAtSpeed(AngularVelocity speed){
-        return Commands.run(() -> this.io.setSpinnerVelocity(speed));
+        return Commands.runOnce(() -> this.io.setSpinnerVelocity(speed));
     }
     public Command stopSpinner(){
         return Commands.runOnce(() -> this.io.stopSpinner());
     }
 
     public Command runKickerAtSpeed(AngularVelocity speed){
-        return Commands.run(() -> this.io.setSpinnerVelocity(speed));
+        return Commands.runOnce(() -> this.io.setSpinnerVelocity(speed));
     }
     public Command stopKicker(){
         return Commands.runOnce(() -> this.io.stopKicker());
