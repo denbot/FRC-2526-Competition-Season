@@ -29,17 +29,17 @@ public class ShooterIOSim implements ShooterIO{
     public ShooterIOSim(){
         leftSpinnerMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(leftSpinnerMotor, 0.1, 0.1), 
+            LinearSystemId.createDCMotorSystem(leftSpinnerMotor, 0.0002, 1), 
             leftSpinnerMotor);   
         
         rightSpinnerMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(rightSpinnerMotor, 0.1, 0.1), 
+            LinearSystemId.createDCMotorSystem(rightSpinnerMotor, 0.0002, 1), 
             rightSpinnerMotor);   
         
         kickerMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(kickerMotor, 0.1, 0.1), 
+            LinearSystemId.createDCMotorSystem(kickerMotor, 0.0002, 1), 
             kickerMotor);   
     }
 
@@ -78,18 +78,15 @@ public class ShooterIOSim implements ShooterIO{
         inputs.kickerClosedLoopError = kickerController.getError();
     }
 
-    public void setLeftSpinnerVelocity(AngularVelocity velocity){
+    public void setSpinnerVelocity(AngularVelocity velocity){
         leftSpinnerController.setSetpoint(velocity.in(RotationsPerSecond));
-    }
-    public void setRightSpinnerVelocity(AngularVelocity velocity){
         rightSpinnerController.setSetpoint(velocity.in(RotationsPerSecond));
     }
-    public void stopLeftSpinner(){
+    public void stopSpinner(){
+        rightSpinnerController.setSetpoint(0);
         leftSpinnerController.setSetpoint(0);
     }
-    public void stopRightSpinner(){
-        rightSpinnerController.setSetpoint(0);
-    }
+
     public void setKickerVelocity(AngularVelocity velocity){
         kickerController.setSetpoint(velocity.in(RotationsPerSecond));
     }

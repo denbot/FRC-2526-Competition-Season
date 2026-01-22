@@ -10,11 +10,13 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 //import frc.robot.Constants.OperatorConstants;
@@ -37,12 +39,14 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final Debouncer rightSpinnerMotorDebounce = new Debouncer(0.5);
     private final Debouncer kickerMotorDebounce = new Debouncer(0.5);
 
+    /* Unused FOC Tuning
     private static final VelocityTorqueCurrentFOC leftSpinnerFOC =
         new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.spinnerAcceleration);
     private static final VelocityTorqueCurrentFOC rightSpinnerFOC =
         new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.spinnerAcceleration);
     private static final VelocityTorqueCurrentFOC kickerFOC =
         new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.kickerAcceleration);
+    */
 
     private final StatusSignal<AngularVelocity> leftSpinnerVelocity = leftSpinnerMotor.getVelocity();
     private final StatusSignal<Current> leftSpinnerCurrentAmps = leftSpinnerMotor.getSupplyCurrent();
@@ -75,13 +79,13 @@ public class ShooterIOTalonFX implements ShooterIO {
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(45)
-                    .withKD(0)
-                    .withKG(0.2));
+                    .withKP(.001)
+                    .withKS(0.0703125)
+                    .withKV(0.11500000059604645));
 
         var rightSpinnerMotorConfig =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -91,9 +95,9 @@ public class ShooterIOTalonFX implements ShooterIO {
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(45)
-                    .withKD(0)
-                    .withKG(0.2));
+                    .withKP(.001)
+                    .withKS(0.0703125)
+                    .withKV(0.11500000059604645));
 
         var kickerMotorConfig =
         new TalonFXConfiguration()
@@ -133,6 +137,8 @@ public class ShooterIOTalonFX implements ShooterIO {
             kickerMotor.getIsProLicensed().getValue() ? 200 : 50, 
             kickerVelocity, 
             kickerCurrentAmps);
+    
+        rightSpinnerMotor.setControl(new Follower(leftSpinnerMotor.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     @Override
@@ -162,20 +168,13 @@ public class ShooterIOTalonFX implements ShooterIO {
         inputs.kickerCurrentAmps = kickerCurrentAmps.getValue();
     }
 
-    public void setLeftSpinnerVelocity(AngularVelocity velocity){
+    public void setSpinnerVelocity(AngularVelocity velocity){
         leftSpinnerMotor.setControl(new VelocityVoltage(velocity));
     }
-    public void setRightSpinnerVelocity(AngularVelocity velocity){
-        rightSpinnerMotor.setControl(new VelocityVoltage(velocity));
-    }
 
-    public void stopLeftSpinner(AngularVelocity velocity){
+    public void stopSpinner(AngularVelocity velocity){
         leftSpinnerMotor.setControl(new CoastOut());
     }
-    public void stopRightSpinner(AngularVelocity velocity){
-        rightSpinnerMotor.setControl(new CoastOut());
-    }
-
 
     public void setKickerVelocity(AngularVelocity velocity){
         kickerMotor.setControl(new VelocityVoltage(velocity));

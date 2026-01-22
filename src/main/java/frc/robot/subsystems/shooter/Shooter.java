@@ -25,23 +25,11 @@ public class Shooter extends SubsystemBase{
 
     @Override
     public void periodic(){
+        // Log key variables
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
-        Logger.recordOutput("Left Spinner Connected", inputs.leftSpinnerMotorConnected);
-        Logger.recordOutput("Right Spinner Connected", inputs.rightSpinnerMotorConnected);
-        Logger.recordOutput("Kicker Connected", inputs.kickerMotorConnected);
-        Logger.recordOutput("Left Spinner Velocity", inputs.leftSpinnerRotationSpeed);
-        Logger.recordOutput("Right Spinner Velocity", inputs.rightSpinnerRotationSpeed);
-        Logger.recordOutput("Kicker Velocity", inputs.kickerRotationSpeed);
-        Logger.recordOutput("Left Spinner Position", inputs.leftSpinnerPositionRots);
-        Logger.recordOutput("Right Spinner Position", inputs.rightSpinnerPositionRots);
-        Logger.recordOutput("Kicker Position", inputs.kickerPositionRots);
-        Logger.recordOutput("Left Spinner Closed Loop Error", inputs.leftSpinnerClosedLoopError);
-        Logger.recordOutput("Right Spinner Closed Loop Error", inputs.rightSpinnerClosedLoopError);
-        Logger.recordOutput("Kicker Closed Loop Error", inputs.kickerClosedLoopError);
-        Logger.recordOutput("Left Spinner Current", inputs.leftSpinnerCurrentAmps);
-        Logger.recordOutput("Right Spinner Current", inputs.rightSpinnerCurrentAmps);
-        Logger.recordOutput("Kicker Current", inputs.kickerCurrentAmps);
+        Logger.recordOutput("Spinner Velocity Setpoing", spinnerVelocitySetpoint);
+        Logger.recordOutput("Kicker Velocity Setpoing", kickerVelocitySetpoint);
     }
 
     public void setSpinnerSpeed(AngularVelocity Speed){
@@ -58,20 +46,21 @@ public class Shooter extends SubsystemBase{
         kickerVelocitySetpoint = RotationsPerSecond.of(Speed);
     }
 
-    public Command runSpinnerAtSpeed(){
-        return Commands.runOnce(() -> setSpinnerSpeed(60.0));
+    public Command runSpinnerAtSpeed(AngularVelocity speed){
+        return Commands.run(() -> this.io.setSpinnerVelocity(speed));
     }
     public Command stopSpinner(){
-        return Commands.runOnce(() -> setSpinnerSpeed(20.0));
+        return Commands.runOnce(() -> this.io.stopSpinner());
     }
 
-    public Command runKickerAtSpeed(){
-        return Commands.runOnce(() -> setSpinnerSpeed(60.0));
+    public Command runKickerAtSpeed(AngularVelocity speed){
+        return Commands.run(() -> this.io.setSpinnerVelocity(speed));
     }
     public Command stopKicker(){
-        return Commands.runOnce(() -> setSpinnerSpeed(20.0));
+        return Commands.runOnce(() -> this.io.stopKicker());
     }
 
+    // Getters for private IO Variables    
     public AngularVelocity getSpinnerVelocitySetpoint(){
         return spinnerVelocitySetpoint;
     }

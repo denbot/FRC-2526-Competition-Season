@@ -12,6 +12,7 @@ import edu.wpi.first.units.measure.Angle;
 
 
 public interface ShooterIO {
+
     @AutoLog
     public static class ShooterIOInputs {
         public boolean leftSpinnerMotorConnected = false;
