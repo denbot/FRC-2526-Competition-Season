@@ -7,11 +7,9 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,7 +31,6 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -184,8 +181,11 @@ public class RobotContainer {
     controller.rightBumper().whileTrue(intake.getSpinIntakeCommand(-1));//.andThen(intake.getStopIntakeCommand()));
 
     // Run Shooter at half speed for testing
-    controller.leftTrigger().whileTrue(shooter.runSpinnerAtSpeed(RotationsPerSecond.of(5.0)).andThen(shooter.stopSpinner()));
-    controller.leftBumper().whileTrue(shooter.runKickerAtSpeed(RotationsPerSecond.of(5.0)).andThen(shooter.stopKicker()));
+    controller.leftTrigger().whileTrue(shooter.runSpinner());
+    controller.leftBumper().whileTrue(shooter.runKicker());
+
+    controller.povUp().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
+    controller.povDown().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
 }
 
   /**

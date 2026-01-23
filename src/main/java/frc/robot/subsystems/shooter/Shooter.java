@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.Logger;
@@ -16,8 +15,8 @@ public class Shooter extends SubsystemBase{
     private final ShooterIO io;
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    private AngularVelocity spinnerVelocitySetpoint = RadiansPerSecond.zero();
-    private AngularVelocity kickerVelocitySetpoint = RadiansPerSecond.zero();
+    private AngularVelocity spinnerVelocitySetpoint = RotationsPerSecond.of(60);
+    private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
 
     public Shooter(ShooterIO io){
         this.io = io;
@@ -32,29 +31,23 @@ public class Shooter extends SubsystemBase{
         Logger.recordOutput("Kicker Velocity Setpoing", kickerVelocitySetpoint);
     }
 
-    public void setSpinnerSpeed(AngularVelocity Speed){
-        spinnerVelocitySetpoint = Speed;
+    public void setSpinnerVelocitySetpoint(AngularVelocity speed){
+        spinnerVelocitySetpoint = speed;
     }
-    public void setSpinnerSpeed(Double Speed){
-        spinnerVelocitySetpoint = RotationsPerSecond.of(Speed);
-    }
-
-    public void setKickerSpeed(AngularVelocity Speed){
-        kickerVelocitySetpoint = Speed;
-    }
-    public void setKickerSpeed(Double Speed){
-        kickerVelocitySetpoint = RotationsPerSecond.of(Speed);
+    
+    public void stepSpinnerVelocitySetpoint(AngularVelocity speed){
+        spinnerVelocitySetpoint = spinnerVelocitySetpoint.plus(speed);
     }
 
-    public Command runSpinnerAtSpeed(AngularVelocity speed){
-        return Commands.runOnce(() -> this.io.setSpinnerVelocity(speed));
+    public Command runSpinner(){
+        return Commands.runEnd(() -> this.io.setSpinnerVelocity(spinnerVelocitySetpoint), () -> this.io.stopSpinner());
     }
     public Command stopSpinner(){
         return Commands.runOnce(() -> this.io.stopSpinner());
     }
 
-    public Command runKickerAtSpeed(AngularVelocity speed){
-        return Commands.runOnce(() -> this.io.setSpinnerVelocity(speed));
+    public Command runKicker(){
+        return Commands.runEnd(() -> this.io.setKickerVelocity(kickerVelocitySetpoint), () -> this.io.stopKicker());
     }
     public Command stopKicker(){
         return Commands.runOnce(() -> this.io.stopKicker());
@@ -63,9 +56,6 @@ public class Shooter extends SubsystemBase{
     // Getters for private IO Variables    
     public AngularVelocity getSpinnerVelocitySetpoint(){
         return spinnerVelocitySetpoint;
-    }
-    public AngularVelocity getKickerVelocitySetpoint(){
-        return kickerVelocitySetpoint;
     }
 
     public boolean getLeftSpinnerConnected(){
