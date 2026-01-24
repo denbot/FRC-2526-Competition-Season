@@ -5,10 +5,8 @@ import static edu.wpi.first.units.Units.Degree;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 
-public enum OnTheFlyOffsets {
-    // Trench Offsets
+public enum onTheFlyOffsets {
     TRENCH_OFFSET(0, 0, 0),
-    // Ramp Offsets
     RAMP_OFFSET(0, 0, 0),
     // Neutral Zone Offsets
     NEUTRAL_OFF_CENTER(0, 0, 0),
@@ -16,9 +14,7 @@ public enum OnTheFlyOffsets {
     // Climb Offsets
     CLIMB_LEFT(0, 0, 0),
     CLIMB_RIGHT(0, 0, 0),
-    // Human Player Offset
     HUMAN_PLAYER(0, 0, 0),
-    // Depot Offset
     DEPOT(0, 0, 0),
     // Default Score Location Offsets
     SCORE_OFF_CENTER(0, 0, 0),
@@ -26,7 +22,7 @@ public enum OnTheFlyOffsets {
 
     public final Transform2d transform;
 
-    OnTheFlyOffsets(double x, double y, double angle){
+    onTheFlyOffsets(double x, double y, double angle){
         this.transform = new Transform2d(x, y, new Rotation2d(Degree.of(angle)));
     }
 }
