@@ -6,32 +6,27 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 
 public enum onTheFlyOffsets {
-    TRENCH_LEFT(0, 0, 0),
-    TRENCH_RIGHT(0, 0, 0),
-
-    CLOSE_TOP(neutralOffsets.CLOSE.value, neutralOffsets.TOP.value, 0),
-    CLOSE_MID(neutralOffsets.CLOSE.value, neutralOffsets.MID.value, 0),
-    CLOSE_BOTTOM(neutralOffsets.CLOSE.value, neutralOffsets.BOTTOM.value, 0),
-    CENTER_TOP(neutralOffsets.CENTER.value, neutralOffsets.TOP.value, 0),
-    CENTER_MID(neutralOffsets.CENTER.value, neutralOffsets.MID.value, 0),
-    CENTER_BOTTOM(neutralOffsets.CENTER.value, neutralOffsets.BOTTOM.value, 0),
-    FAR_TOP(neutralOffsets.FAR.value, neutralOffsets.TOP.value, 180),
-    FAR_MID(neutralOffsets.FAR.value, neutralOffsets.MID.value, 180),
-    FAR_BOTTOM(neutralOffsets.FAR.value, neutralOffsets.BOTTOM.value, 180);
-
-    private enum neutralOffsets{
-        CLOSE(0),
-        CENTER(0),
-        FAR(0),
-        TOP(0),
-        MID(0),
-        BOTTOM(0);
-
-        public final double value;
-        neutralOffsets(double value){
-            this.value = value;
-        }
-    }
+    // Trench Offsets
+    TRENCH_FAR(0, 0, 0),
+    TRENCH_CLOSE(0, 0, 0),
+    // Ramp Offsets
+    RAMP_CLOSE(0, 0, 0),
+    RAMP_FAR(0, 0, 0),
+    // Neutral Zone Offsets
+    NEUTRAL_CLOSE(0, 0, 0),
+    NEUTRAL_CENTER(0, 0, 0),
+    NEUTRAL_FAR(0, 0, 0),
+    // Climb Offsets
+    CLIMB_LEFT(0, 0, 0),
+    CLIMB_RIGHT(0, 0, 0),
+    // Human Player Offset
+    HUMAN_PLAYER(0, 0, 0),
+    // Depot Offset
+    DEPOT(0, 0, 0),
+    // Default Score Location Offsets
+    SCORE_LEFT(0, 0, 0),
+    SCORE_CENTER(0, 0, 0),
+    SCORE_RIGHT(0, 0, 0);
 
     public final Transform2d transform;
 
