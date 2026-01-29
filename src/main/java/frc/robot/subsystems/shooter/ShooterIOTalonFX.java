@@ -24,7 +24,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 //import frc.robot.subsystems.shooter.ShooterConstants.OperatorConstants;
-import frc.robot.subsystems.shooter.ShooterConstants.OperatorConstants;
+import frc.robot.Constants.OperatorConstants;
 
 public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX leftSpinnerMotor =
