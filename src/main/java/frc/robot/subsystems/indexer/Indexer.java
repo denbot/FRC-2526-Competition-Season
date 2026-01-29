@@ -15,7 +15,7 @@ public class Indexer extends SubsystemBase{
     private final IndexerIO io;
     private final IndexerIOInputsAutoLogged inputs = new IndexerIOInputsAutoLogged();
 
-    private AngularVelocity indexMotorSpeedSetpoint = RotationsPerSecond.zero();
+    private AngularVelocity indexMotorSpeedSetpoint = RotationsPerSecond.of(30);
 
     public Indexer(IndexerIO io){
         this.io = io;
@@ -39,10 +39,6 @@ public class Indexer extends SubsystemBase{
 
     public void setIndexMotorSpeedSetpoint(AngularVelocity speed){
         indexMotorSpeedSetpoint = speed;
-    }
-
-    public void stepIndexMotorSpeedSetpoint(AngularVelocity speed){
-        indexMotorSpeedSetpoint = indexMotorSpeedSetpoint.plus(speed);
     }
 
     public Boolean getIndexMotorConnected(){

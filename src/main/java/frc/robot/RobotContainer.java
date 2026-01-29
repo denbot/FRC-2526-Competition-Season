@@ -25,6 +25,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.indexer.IndexerIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 //import frc.robot.subsystems.shooter.ShooterConstants.OperatorConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
@@ -45,6 +48,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private Intake intake;
+  private Indexer indexer;
   private Shooter shooter;
 
   // Controller
@@ -69,6 +73,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         intake = new Intake();
+        indexer = new Indexer(new IndexerIOTalonFX());
         shooter = new Shooter(new ShooterIOTalonFX());
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
@@ -100,6 +105,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         shooter = new Shooter(new ShooterIOSim());
+        indexer = new Indexer(new IndexerIOSim());
+        intake = new Intake();
         break;
 
       default:
@@ -177,12 +184,11 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller.rightTrigger().whileTrue(intake.getSpinIntakeCommand(1));//.andThen(intake.getStopIntakeCommand()));
-    controller.rightBumper().whileTrue(intake.getSpinIntakeCommand(-1));//.andThen(intake.getStopIntakeCommand()));
+    controller.leftTrigger().whileTrue(intake.getSpinIntakeCommand(1));//.andThen(intake.getStopIntakeCommand()));
 
-    // Run Shooter at half speed for testing
-    controller.leftTrigger().whileTrue(shooter.runSpinner());
-    controller.leftBumper().whileTrue(shooter.runKicker());
+    controller.rightTrigger().whileTrue(shooter.runSpinner());
+    controller.rightBumper().whileTrue(shooter.runKicker());
+    controller.rightBumper().whileTrue(indexer.runIndexer());
 
     controller.povUp().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
     controller.povDown().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));

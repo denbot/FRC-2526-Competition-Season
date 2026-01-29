@@ -20,6 +20,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 
 public class IndexerIOTalonFX implements IndexerIO{
     private final TalonFX indexMotor = 
@@ -31,6 +32,7 @@ public class IndexerIOTalonFX implements IndexerIO{
     private final StatusSignal<Current> indexMotorCurrentAmps = indexMotor.getSupplyCurrent();
     private final StatusSignal<Angle> indexMotorPositionRots = indexMotor.getPosition();
     private final StatusSignal<Double> indexMotorClosedLoopError = indexMotor.getClosedLoopError();
+    private final StatusSignal<Temperature> indexMotorTemperature = indexMotor.getDeviceTemp();
     
     public IndexerIOTalonFX() {
         var indexMotorConfig =
@@ -39,7 +41,7 @@ public class IndexerIOTalonFX implements IndexerIO{
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(70))
+                    .withStatorCurrentLimit(40))
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
@@ -68,6 +70,7 @@ public class IndexerIOTalonFX implements IndexerIO{
         inputs.indexMotorPositionRots = indexMotorPositionRots.getValue();
         inputs.indexMotorClosedLoopError = indexMotorClosedLoopError.getValueAsDouble();
         inputs.indexMotorCurrentAmps = indexMotorCurrentAmps.getValue();
+        inputs.indexMotorTemperature = indexMotorTemperature.getValue();
     }
 
     public void runIndexerAtSpeed(AngularVelocity speed){
