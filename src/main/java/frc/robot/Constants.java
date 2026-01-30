@@ -7,9 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -20,8 +17,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-
-  public static final AngularVelocity intakeSpeed = RadiansPerSecond.of(2 * Math.PI);
 
   public static enum Mode {
     /** Running on a real robot. */

@@ -31,26 +31,23 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Intake Extension Setpoint", intakeExtensionSetpoint);
   }
 
-  public void setIntakeVelocitySetpoint(AngularVelocity speed) {
-    intakeVelocitySetpoint = speed;
-  }
-
-  public void setIntakeExtensionSetpoint(Distance length) {
-    intakeExtensionSetpoint = length;
-  }
-
-  public Command runIntake() {
+  public Command runIntake(AngularVelocity speed) {
     return Commands.runEnd(
-        () -> this.io.setIntakeVelocity(intakeVelocitySetpoint), () -> this.io.stopIntake());
+        () -> {
+          intakeVelocitySetpoint = speed;
+          this.io.setIntakeVelocity(speed);}, 
+          () -> this.io.stopIntake());
   }
 
   public Command stopIntake() {
     return Commands.runOnce(() -> this.io.stopIntake());
   }
 
-  public Command runIntakeExtension() {
+  public Command runIntakeExtension(Distance length) {
     return Commands.runEnd(
-        () -> this.io.setIntakeExtensionLength(intakeExtensionSetpoint),
+        () -> {
+          intakeExtensionSetpoint = length;
+          this.io.setIntakeExtensionLength(length);},
         () -> this.io.stopIntakeExtension());
   }
 
@@ -101,13 +98,5 @@ public class Intake extends SubsystemBase {
 
   public Distance getIntakeExtensionLength() {
     return inputs.intakeExtensionLength;
-  }
-
-  public boolean isDeployedDetected() {
-    return inputs.intakeDeployedSwitch;
-  }
-
-  public boolean isRetractionDetected() {
-    return inputs.intakeRetractedSwitch;
   }
 }

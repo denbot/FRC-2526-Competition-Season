@@ -29,6 +29,7 @@ import frc.robot.subsystems.indexer.IndexerIOSim;
 import frc.robot.subsystems.indexer.IndexerIOTalonFX;
 
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
@@ -191,10 +192,7 @@ public class RobotContainer {
 
     controller.rightTrigger().whileTrue(shooter.runSpinner());
     controller.rightBumper().whileTrue(shooter.runKicker());
-    controller.rightBumper().whileTrue(indexer.runIndexer());
-    // controller.rightTrigger().onTrue(intake.setIntakeVelocitySetpoint(Constants.intakeSpeed));
-    //controller.rightTrigger().whileTrue(intake.getSpinIntakeCommand(1));//.andThen(intake.getStopIntakeCommand()));
-    //controller.rightBumper().whileTrue(intake.getSpinIntakeCommand(-1));//.andThen(intake.getStopIntakeCommand()));
+    controller.leftBumper().whileTrue((intake.runIntake(IntakeConstants.intakeSpeed).alongWith(indexer.runIndexer())).andThen(intake.stopIntake().alongWith(indexer.stopIndexer())));
 
     // Run Shooter at half speed for testing
     controller.leftTrigger().whileTrue(shooter.runSpinner());
