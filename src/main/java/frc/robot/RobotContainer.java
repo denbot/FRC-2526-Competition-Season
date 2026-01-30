@@ -194,10 +194,6 @@ public class RobotContainer {
     controller.rightBumper().whileTrue(shooter.runKicker());
     controller.leftBumper().whileTrue((intake.runIntake(IntakeConstants.intakeSpeed).alongWith(indexer.runIndexer())).andThen(intake.stopIntake().alongWith(indexer.stopIndexer())));
 
-    // Run Shooter at half speed for testing
-    controller.leftTrigger().whileTrue(shooter.runSpinner());
-    controller.leftBumper().whileTrue(shooter.runKicker());
-
     controller.povUp().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
     controller.povDown().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
 }

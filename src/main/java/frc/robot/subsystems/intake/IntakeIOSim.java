@@ -21,8 +21,8 @@ public class IntakeIOSim implements IntakeIO {
     private DCMotorSim rackMotorSim;
 
     private SimpleMotorFeedforward spinnFeedforwards = new SimpleMotorFeedforward(0, 0); // TODO
-    private PIDController intakeController = new PIDController(0, 0, 0); // TODO
-    private PIDController rackController = new PIDController(0, 0, 0); // TODO
+    private PIDController intakeController = new PIDController(1, 0, 0); // TODO
+    private PIDController rackController = new PIDController(1, 0, 0); // TODO
 
     private double intakeAppliedVolts = 0.0;
     private double rackAppliedVolts = 0.0;
@@ -30,12 +30,12 @@ public class IntakeIOSim implements IntakeIO {
     public IntakeIOSim(){
         intakeMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(intakeMotor, 0, 1), // TODO
+            LinearSystemId.createDCMotorSystem(intakeMotor, 0.2, 1), // TODO
             intakeMotor);   
         
         rackMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(rackMotor, 0, 1), // TODO
+            LinearSystemId.createDCMotorSystem(rackMotor, 0.2, 1), // TODO
             rackMotor);   
     }
 
