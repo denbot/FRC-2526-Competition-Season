@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.util.PhoenixUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -34,7 +35,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
     
     private final TalonFX kickerMotor =
-        new TalonFX(ShooterConstants.KICKER_MOTOR_ID);
+        new TalonFX(ShooterConstants.KICKER_MOTOR_ID, OperatorConstants.canivoreSerial);
 
     private final Debouncer leftSpinnerMotorDebounce = new Debouncer(0.5);
     private final Debouncer rightSpinnerMotorDebounce = new Debouncer(0.5);
@@ -102,7 +103,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
         var kickerMotorConfig =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -112,9 +113,10 @@ public class ShooterIOTalonFX implements ShooterIO {
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(45)
+                    .withKP(0.1)
                     .withKD(0)
-                    .withKG(0.2));
+                    .withKS(0.25)
+                    .withKV(0.09));
 
 
         leftSpinnerMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -180,7 +182,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     public void setKickerVelocity(AngularVelocity velocity){
         kickerMotor.setControl(new VelocityVoltage(velocity));
     }
+
     public void stopKicker(){
-        kickerMotor.setControl(new CoastOut());
+        kickerMotor.setControl(new VelocityVoltage(RotationsPerSecond.of(-15)));
     }
 }
