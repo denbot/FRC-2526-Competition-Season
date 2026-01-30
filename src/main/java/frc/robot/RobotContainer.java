@@ -24,8 +24,13 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.indexer.IndexerIOTalonFX;
 
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 
 import frc.robot.subsystems.shooter.Shooter;
@@ -47,6 +52,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private Intake intake;
+  private Indexer indexer;
   private Shooter shooter;
 
   // Controller
@@ -70,6 +76,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
+        indexer = new Indexer(new IndexerIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX());
         shooter = new Shooter(new ShooterIOTalonFX());
 
@@ -102,6 +109,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         shooter = new Shooter(new ShooterIOSim());
+        indexer = new Indexer(new IndexerIOSim());
+        intake = new Intake(new IntakeIOSim());
         break;
 
       default:
@@ -114,6 +123,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         shooter = new Shooter(new ShooterIO() {});
+        intake = new Intake(new IntakeIO() {});
         break;
     }
 
@@ -179,6 +189,9 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+    controller.rightTrigger().whileTrue(shooter.runSpinner());
+    controller.rightBumper().whileTrue(shooter.runKicker());
+    controller.rightBumper().whileTrue(indexer.runIndexer());
     // controller.rightTrigger().onTrue(intake.setIntakeVelocitySetpoint(Constants.intakeSpeed));
     //controller.rightTrigger().whileTrue(intake.getSpinIntakeCommand(1));//.andThen(intake.getStopIntakeCommand()));
     //controller.rightBumper().whileTrue(intake.getSpinIntakeCommand(-1));//.andThen(intake.getStopIntakeCommand()));
