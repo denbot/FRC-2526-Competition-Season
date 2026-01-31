@@ -6,18 +6,27 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 
 public enum onTheFlyOffsets {
-    TRENCH_OFFSET(0, 0, 0),
-    RAMP_OFFSET(0, 0, 0),
+    TRENCH_OFFSET_NEUTRAL(1.75, 0, 90),
+    TRENCH_OFFSET_ALLIANCE(1.75, 0, -90),
+    RAMP_OFFSET_NEGATIVE_NEUTRAL(1.75, -1.8, 180),
+    RAMP_OFFSET_NEGATIVE_ALLIANCE(1.75, -1.8, 0),
+    RAMP_OFFSET_POSITIVE_NEUTRAL(1.75, 1.8, 180),
+    RAMP_OFFSET_POSITIVE_ALLIANCE(1.75, 1.8, 0),
     // Neutral Zone Offsets
-    NEUTRAL_OFF_CENTER(0, 0, 0),
-    NEUTRAL_CENTER(0, 0, 0),
+    NEUTRAL_EDGE_MID(2.5, 0, 0),
+    NEUTRAL_EDGE_LEFT(2.5, -2.5, 0),
+    NEUTRAL_EDGE_RIGHT(2.5, 2.5, 0),
+    NEUTRAL_CENTER_MID(3, 0, 0),
+    NEUTRAL_CENTER_LEFT(3, -2.5, 0),
+    NEUTRAL_CENTER_RIGHT(3, 2.5, 0),
     // Climb Offsets
     CLIMB_LEFT(0, 0, 0),
     CLIMB_RIGHT(0, 0, 0),
     HUMAN_PLAYER(0, 0, 0),
     DEPOT(0, 0, 0),
     // Default Score Location Offsets
-    SCORE_OFF_CENTER(0, 0, 0),
+    SCORE_LEFT(0, 0, 0),
+    SCORE_RIGHT(0, 0, 0),
     SCORE_CENTER(0, 0, 0);
 
     public final Transform2d transform;

@@ -8,37 +8,34 @@ public enum onTheFlySetpoints {
     // All directions are assumed relative to driver station (left far is to the left side of the field, furthest from the driver in their aliance)
 
     // Trench Locations
-    TRENCH_LEFT_FAR(6, 28, onTheFlyOffsets.TRENCH_OFFSET),
-    TRENCH_LEFT_CLOSE(7, 17, onTheFlyOffsets.TRENCH_OFFSET),
-    TRENCH_RIGHT_FAR(1, 23, onTheFlyOffsets.TRENCH_OFFSET),
-    TRENCH_RIGHT_CLOSE(12, 22, onTheFlyOffsets.TRENCH_OFFSET),
+    TRENCH_LEFT_NEUTRAL(6, 17, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
+    TRENCH_LEFT_ALLIANCE(7, 28, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
+    TRENCH_RIGHT_NEUTRAL(1, 22, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
+    TRENCH_RIGHT_ALLIANCE(12, 23, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
     // Ramp Locations
-    RAMP_LEFT_FAR(5, 22, onTheFlyOffsets.RAMP_OFFSET),
-    RAMP_LEFT_CLOSE(8, 23, onTheFlyOffsets.RAMP_OFFSET),
-    RAMP_RIGHT_FAR(2, 17, onTheFlyOffsets.RAMP_OFFSET),
-    RAMP_RIGHT_CLOSE(12, 28, onTheFlyOffsets.RAMP_OFFSET),
+    RAMP_LEFT_NEUTRAL(6, 17, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_NEUTRAL),
+    RAMP_LEFT_ALIANCE(7, 28, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_ALLIANCE),
+    RAMP_RIGHT_NEUTRAL(1, 22, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_NEUTRAL),
+    RAMP_RIGHT_ALIANCE(12, 23, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_ALLIANCE),
     // Neutral Zone Locations
     // Closest April Tag Alignment handles Y offset, only X offset is required
-    NEUTRAL_CLOSE_TOP(6, 17, onTheFlyOffsets.NEUTRAL_OFF_CENTER),
-    NEUTRAL_CLOSE_MID(4, 20, onTheFlyOffsets.NEUTRAL_OFF_CENTER),
-    NEUTRAL_CLOSE_BOTTOM(1, 22, onTheFlyOffsets.NEUTRAL_OFF_CENTER),
-    NEUTRAL_CENTER_TOP(6, 17, onTheFlyOffsets.NEUTRAL_CENTER),
-    NEUTRAL_CENTER_MID(4, 20, onTheFlyOffsets.NEUTRAL_CENTER),
-    NEUTRAL_CENTER_BOTTOM(1, 22, onTheFlyOffsets.NEUTRAL_CENTER),
-    NEUTRAL_FAR_TOP(17, 6, onTheFlyOffsets.NEUTRAL_OFF_CENTER),
-    NEUTRAL_FAR_MID(20, 4, onTheFlyOffsets.NEUTRAL_OFF_CENTER),
-    NEUTRAL_FAR_BOTTOM(22, 1, onTheFlyOffsets.NEUTRAL_OFF_CENTER),
+    NEUTRAL_EDGE_LEFT(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_LEFT),
+    NEUTRAL_EDGE_MID(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_MID),
+    NEUTRAL_EDGE_RIGHT(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_RIGHT),
+    NEUTRAL_CENTER_LEFT(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_LEFT),
+    NEUTRAL_CENTER_MID(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_MID),
+    NEUTRAL_CENTER_RIGHT(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_RIGHT),
     // Climb Locations
-    CLIMB_LEFT(16, 32, onTheFlyOffsets.CLIMB_LEFT),
+    CLIMB_LEFT(15, 31, onTheFlyOffsets.CLIMB_LEFT),
     CLIMB_RIGHT(15, 31, onTheFlyOffsets.CLIMB_RIGHT),
     // Human Player Locations
     HUMAN_PLAYER(13, 29, onTheFlyOffsets.HUMAN_PLAYER),
     // Depot Player Locations
     DEPOT(7, 23, onTheFlyOffsets.DEPOT),
     // Default Score Location Offsets
-    SCORE_LEFT(8, 24, onTheFlyOffsets.SCORE_OFF_CENTER),
-    SCORE_CENTER(9, 25, onTheFlyOffsets.SCORE_CENTER),
-    SCORE_RIGHT(11, 27, onTheFlyOffsets.SCORE_OFF_CENTER);
+    SCORE_LEFT(10, 26, onTheFlyOffsets.SCORE_LEFT),
+    SCORE_CENTER(10, 26, onTheFlyOffsets.SCORE_CENTER),
+    SCORE_RIGHT(10, 26, onTheFlyOffsets.SCORE_RIGHT);
 
     public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
