@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.units.measure.Angle;
@@ -13,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
-  private final IntakeIO io;
+  public final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(60);
@@ -48,6 +49,22 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeExtensionSetpoint = length;
           this.io.setIntakeExtensionLength(length);},
+        () -> this.io.stopIntakeExtension());
+  }
+
+  public Command setIntakeMaxLength() {
+    return Commands.runEnd(
+        () -> {
+          intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength);
+          this.io.setIntakeMaxLength();},
+        () -> this.io.stopIntakeExtension());
+  }
+
+  public Command setIntakeMinLength() {
+    return Commands.runEnd(
+        () -> {
+          intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength);
+          this.io.setIntakeMinLength();},
         () -> this.io.stopIntakeExtension());
   }
 

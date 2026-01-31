@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AutoAimCommandHelper;
@@ -42,6 +43,7 @@ import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -168,42 +170,72 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
+    // Lock to 0° when right stick button is held
+    controller.rightStick()
+        .whileTrue(DriveCommands.joystickDriveAtAngle(
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> Rotation2d.kZero));
+    
+    // Reset gyro to 0° when start button is pressed
+    controller.start()
+        .onTrue(Commands.runOnce(() -> 
+                drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),drive)
+        .ignoringDisable(true));
+
+    // Spin up when A is held (use this if you don't want to lock position)
+    controller.rightBumper()
+        .whileTrue(shooter.runSpinner());
+
+    // Climb/cancel climb when B button is pressed
+    // TODO: implement climbing
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller.x()
+        .onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+    // Outtake when Y button is held
+    controller.y()
+        .whileTrue((intake.runIntake(IntakeConstants.intakeSpeed.times(-1))
+        .alongWith(indexer.reverseIndexer()))
+        .andThen(intake.stopIntake()
+        .alongWith(indexer.stopIndexer())));
 
-    controller.rightTrigger().whileTrue(shooter.runSpinner().alongWith(DriveCommands.joystickDriveAtAngle(
+    // Spinup and aim when right bumper is held
+    controller.rightBumper()
+        .whileTrue(shooter.runSpinner()
+        .alongWith(DriveCommands.joystickDriveAtAngle(
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0))));
-    controller.rightBumper().whileTrue(shooter.runKicker());
-    controller.leftBumper().whileTrue((intake.runIntake(IntakeConstants.intakeSpeed).alongWith(indexer.runIndexer())).andThen(intake.stopIntake().alongWith(indexer.stopIndexer())));
 
-    controller.povRight().onTrue(drive.getTestAllPointsCommand());
+    // Shoot when right trigger is held
+    controller.rightTrigger()
+        .whileTrue(shooter.runKicker());
 
-    controller.povUp().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
-    controller.povDown().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
+    // Toggle intake when left bumper is pressed
+    controller.leftBumper()
+        .onTrue(new ConditionalCommand(intake.setIntakeMaxLength(), intake.setIntakeMinLength(), () -> intake.getIntakeDeployedSwitch()));
+
+    // Run intake when left trigger is held
+    controller.leftTrigger()
+        .whileTrue((intake.runIntake(IntakeConstants.intakeSpeed)
+        .alongWith(indexer.runIndexer()))
+        .andThen(intake.stopIntake()
+        .alongWith(indexer.stopIndexer())));
+
+    controller.povRight()
+        .onTrue(drive.getTestAllPointsCommand());
+
+    controller.povUp()
+        .onTrue(Commands.runOnce(() -> 
+                shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
+    
+    controller.povDown()
+        .onTrue(Commands.runOnce(() -> 
+                shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
 }
 
 public Pose2d getRobotPosition(){

@@ -113,7 +113,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     public void setIntakeVelocity(AngularVelocity velocity) {
-            intakeMotor.setControl(new VelocityVoltage(velocity));
+        intakeMotor.setControl(new VelocityVoltage(velocity));
     }
 
     public void setIntakeExtensionLength(Distance length) {
