@@ -7,7 +7,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
+
+import static edu.wpi.first.units.Units.Meters;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -28,8 +32,13 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final String canivoreSerial = "D75CCE723353385320202034111303FF";
+  }
+
+  public static class PointsOfInterest {
+    public static final Pose2d centerOfHub = new Pose2d(Meters.of(4.625594), Meters.of(4.034536), new Rotation2d(0)); // Point of center of hub, in meters
   }
 }
