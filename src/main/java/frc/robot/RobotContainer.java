@@ -178,16 +178,6 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> Rotation2d.kZero));
 
-    // Point at hub when Y button is held
-    controller
-        .y()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)));
-
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -202,7 +192,11 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller.rightTrigger().whileTrue(shooter.runSpinner());
+    controller.rightTrigger().whileTrue(shooter.runSpinner().alongWith(DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0))));
     controller.rightBumper().whileTrue(shooter.runKicker());
     controller.leftBumper().whileTrue((intake.runIntake(IntakeConstants.intakeSpeed).alongWith(indexer.runIndexer())).andThen(intake.stopIntake().alongWith(indexer.stopIndexer())));
 
