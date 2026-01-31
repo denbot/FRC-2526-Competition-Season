@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class AutoAimCommandHelper {
-    private AutoAimCommandHelper() {}
+    public AutoAimCommandHelper() {}
 
     public Rotation2d findAngleForShooting(Pose2d pose) {
         Distance positionX = pose.getMeasureX();

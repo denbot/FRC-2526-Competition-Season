@@ -56,7 +56,7 @@ public class RobotContainer {
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
-  private AutoAimCommandHelper autoAimCommandHelper;
+  private AutoAimCommandHelper autoAimCommandHelper = new AutoAimCommandHelper();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
