@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -38,7 +39,13 @@ public final class Constants {
     public static final String canivoreSerial = "D75CCE723353385320202034111303FF";
   }
 
+  public static class FieldDimensions {
+    public static final Distance fieldWidth = Meters.of(16.54);
+    public static final Distance fieldLength = Meters.of(8.07);
+  }
+
   public static class PointsOfInterest {
-    public static final Pose2d centerOfHub = new Pose2d(Meters.of(4.625594), Meters.of(4.034536), new Rotation2d(0)); // Point of center of hub, in meters
+    public static final Pose2d centerOfHubBlue = new Pose2d(Meters.of(4.625594), Meters.of(4.034536), new Rotation2d(0)); // Point of center of hub, in meters for blue
+    public static final Pose2d centerOfHubRed = new Pose2d(Meters.of(11.914406), Meters.of(4.034536), new Rotation2d(0)); // Point of center of hub, in meters for red
   }
 }
