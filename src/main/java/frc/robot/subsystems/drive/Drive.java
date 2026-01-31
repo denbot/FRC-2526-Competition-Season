@@ -14,6 +14,7 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -32,16 +33,19 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.auto.onTheFlySetpoints;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -355,5 +359,19 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
+  }
+
+  public Command getAutoAlignmentCommand(Pose2d targetPosition){
+     return AutoBuilder.pathfindToPose(
+      targetPosition,
+      new PathConstraints(6.0, 6.0, Units.degreesToRadians(540), Units.degreesToRadians(720)));
+  }
+
+  public Command getTestAllPointsCommand(){
+    return new SequentialCommandGroup(
+      getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_LEFT_SETUP.blueAlignmentPose),
+      getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_LEFT_FINISH.blueAlignmentPose),
+      getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_RIGHT_SETUP.blueAlignmentPose),
+      getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_RIGHT_FINISH.blueAlignmentPose));
   }
 }
