@@ -31,6 +31,7 @@ public class Shooter extends SubsystemBase{
         Logger.recordOutput("Kicker Velocity Setpoint", kickerVelocitySetpoint);
     }
 
+    //TODO move this to be implemented in the runSpinner command, refference intake.java for example
     public void setSpinnerVelocitySetpoint(AngularVelocity speed){
         spinnerVelocitySetpoint = speed;
     }
