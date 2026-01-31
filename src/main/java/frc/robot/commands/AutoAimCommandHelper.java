@@ -20,7 +20,7 @@ public class AutoAimCommandHelper {
         Distance deltaY;
 
         if(isBlue()) {
-            if (positionX.minus(PointsOfInterest.centerOfHubBlue.getMeasureX()).in(Meters) > 0) { // If we are in the neutural zone
+            if (positionX.minus(PointsOfInterest.centerOfHubBlue.getMeasureX()).in(Meters) > 0) { // If we are not in our zone
                 if (positionY.minus(PointsOfInterest.centerOfHubBlue.getMeasureY()).in(Meters) > 0) { // If we are in the north half of the field
                     deltaX = PointsOfInterest.cornerNW.getMeasureX().minus(positionX);
                     deltaY = PointsOfInterest.cornerNW.getMeasureY().minus(positionY);
@@ -33,7 +33,7 @@ public class AutoAimCommandHelper {
                 deltaY = PointsOfInterest.centerOfHubBlue.getMeasureY().minus(positionY);
             }
         } else {
-            if (positionX.minus(PointsOfInterest.centerOfHubRed.getMeasureX()).in(Meters) < 0) { // If we are in the neutural zone
+            if (positionX.minus(PointsOfInterest.centerOfHubRed.getMeasureX()).in(Meters) < 0) { // If we are not in our zone
                 if (positionY.minus(PointsOfInterest.centerOfHubRed.getMeasureY()).in(Meters) > 0) { // If we are in the north half of the field
                     deltaX = PointsOfInterest.cornerNE.getMeasureX().minus(positionX);
                     deltaY = PointsOfInterest.cornerNE.getMeasureY().minus(positionY);
