@@ -26,18 +26,18 @@ public enum onTheFlySetpoints {
     NEUTRAL_CENTER_MID(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_MID),
     NEUTRAL_CENTER_RIGHT(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_RIGHT),
     // Climb Locations
-    CLIMB_LEFT(15, 31, onTheFlyOffsets.CLIMB_LEFT),
-    CLIMB_RIGHT(15, 31, onTheFlyOffsets.CLIMB_RIGHT),
+    CLIMB_LEFT_SETUP(15, 31, onTheFlyOffsets.CLIMB_LEFT_SETUP),
+    CLIMB_LEFT_FINISH(15, 31, onTheFlyOffsets.CLIMB_LEFT_FINISH),
+    CLIMB_RIGHT_SETUP(15, 31, onTheFlyOffsets.CLIMB_RIGHT_SETUP),
+    CLIMB_RIGHT_FINISH(15, 31, onTheFlyOffsets.CLIMB_RIGHT_FINISH),
     // Human Player Locations
     HUMAN_PLAYER(13, 29, onTheFlyOffsets.HUMAN_PLAYER),
-    // Depot Player Locations
-    DEPOT(7, 23, onTheFlyOffsets.DEPOT),
     // Default Score Location Offsets
     SCORE_LEFT(10, 26, onTheFlyOffsets.SCORE_LEFT),
     SCORE_CENTER(10, 26, onTheFlyOffsets.SCORE_CENTER),
     SCORE_RIGHT(10, 26, onTheFlyOffsets.SCORE_RIGHT);
 
-    public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
+    private final AprilTagFieldLayout fieldLayout;
 
     public final int redAprilTag;
     public final int blueAprilTag;
@@ -46,6 +46,7 @@ public enum onTheFlySetpoints {
     public final Pose2d blueAlignmentPose;
 
     onTheFlySetpoints(int redAprilTag, int blueAprilTag, onTheFlyOffsets offset){
+        this.fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
         this.redAprilTag = redAprilTag;
         this.blueAprilTag = blueAprilTag;
         this.offset = offset;
@@ -53,7 +54,7 @@ public enum onTheFlySetpoints {
         this.blueAlignmentPose = getAlignmentPose(blueAprilTag, this.offset);
     }
 
-    private static Pose2d getAlignmentPose(int apriltag, onTheFlyOffsets offset){
-        return fieldLayout.getTagPose(apriltag).get().toPose2d().transformBy(offset.transform);
+    private Pose2d getAlignmentPose(int apriltag, onTheFlyOffsets offset){
+        return this.fieldLayout.getTagPose(apriltag).get().toPose2d().transformBy(offset.transform);
     }
 }
