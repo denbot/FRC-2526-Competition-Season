@@ -187,7 +187,7 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.5)));
+                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
