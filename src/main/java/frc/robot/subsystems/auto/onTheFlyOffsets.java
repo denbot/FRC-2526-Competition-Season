@@ -21,9 +21,9 @@ public enum onTheFlyOffsets {
     NEUTRAL_CENTER_LEFT(3, 2.75, -90),
     NEUTRAL_CENTER_RIGHT(3, -2.75, 90),
     // Climb Offsets
-    CLIMB_LEFT_SETUP(2.2, 0.4, 0),
+    CLIMB_LEFT_SETUP(2.5, 0.4, 0),
     CLIMB_LEFT_FINISH(1.65, 0.4, 0),
-    CLIMB_RIGHT_SETUP(2.2, -0.4, 0),
+    CLIMB_RIGHT_SETUP(2.5, -0.4, 0),
     CLIMB_RIGHT_FINISH(1.65, -0.4, 0),
     HUMAN_PLAYER(0.5, 0, 0),
     // Default Score Location Offsets
