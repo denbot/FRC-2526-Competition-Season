@@ -193,7 +193,8 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     controller.x()
-        .onTrue(Commands.runOnce(drive::stopWithX, drive));
+        .whileTrue(indexer.reverseIndexer()
+        .andThen(indexer.stopIndexer()));
 
     // Outtake when Y button is held
     controller.y()
