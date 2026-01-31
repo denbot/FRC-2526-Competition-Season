@@ -14,20 +14,21 @@ public enum onTheFlyOffsets {
     RAMP_OFFSET_POSITIVE_ALLIANCE(1.75, 1.8, 0),
     // Neutral Zone Offsets
     NEUTRAL_EDGE_MID(2.5, 0, 0),
-    NEUTRAL_EDGE_LEFT(2.5, -2.5, 0),
-    NEUTRAL_EDGE_RIGHT(2.5, 2.5, 0),
+    NEUTRAL_EDGE_LEFT(2.5, 2.5, 90),
+    NEUTRAL_EDGE_RIGHT(2.5, -2.5, -90),
     NEUTRAL_CENTER_MID(3, 0, 0),
-    NEUTRAL_CENTER_LEFT(3, -2.5, 0),
-    NEUTRAL_CENTER_RIGHT(3, 2.5, 0),
+    NEUTRAL_CENTER_LEFT(3, 2.5, 90),
+    NEUTRAL_CENTER_RIGHT(3, -2.5, -90),
     // Climb Offsets
-    CLIMB_LEFT(0, 0, 0),
-    CLIMB_RIGHT(0, 0, 0),
-    HUMAN_PLAYER(0, 0, 0),
-    DEPOT(0, 0, 0),
+    CLIMB_LEFT_SETUP(1.5, 0.5, 180),
+    CLIMB_LEFT_FINISH(1, 0.5, 180),
+    CLIMB_RIGHT_SETUP(1.5, -0.5, 180),
+    CLIMB_RIGHT_FINISH(1, -0.5, 180),
+    HUMAN_PLAYER(0.5, 0, 0),
     // Default Score Location Offsets
-    SCORE_LEFT(0, 0, 0),
-    SCORE_RIGHT(0, 0, 0),
-    SCORE_CENTER(0, 0, 0);
+    SCORE_LEFT(2, -2, 45),
+    SCORE_RIGHT(2, 2, -45),
+    SCORE_CENTER(2, 0, 0);
 
     public final Transform2d transform;
 
