@@ -33,6 +33,10 @@ public class Indexer extends SubsystemBase{
         return Commands.runEnd(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint), ()-> this.io.stopIntake());
     }
 
+    public Command reverseIndexer(){
+        return Commands.runEnd(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint.times(-1)), ()-> this.io.stopIntake());
+    }
+
     public Command stopIndexer(){
         return Commands.runOnce(()-> this.io.stopIntake());
     }
