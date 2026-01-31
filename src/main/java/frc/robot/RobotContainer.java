@@ -194,8 +194,14 @@ public class RobotContainer {
     controller.rightBumper().whileTrue(shooter.runKicker());
     controller.leftBumper().whileTrue((intake.runIntake(IntakeConstants.intakeSpeed).alongWith(indexer.runIndexer())).andThen(intake.stopIntake().alongWith(indexer.stopIndexer())));
 
+    controller.povRight().onTrue(drive.getTestAllPointsCommand());
+
     controller.povUp().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
     controller.povDown().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
+}
+
+public Pose2d getRobotPosition(){
+    return drive.getPose();
 }
 
   /**
