@@ -40,12 +40,17 @@ public final class Constants {
   }
 
   public static class FieldDimensions {
-    public static final Distance fieldWidth = Meters.of(16.54);
-    public static final Distance fieldLength = Meters.of(8.07);
+    public static final Distance fieldLength = Meters.of(16.54);
+    public static final Distance fieldWidth = Meters.of(8.07);
+    public static final Distance distanceFromCorner = Meters.of(0.665988);
   }
 
   public static class PointsOfInterest {
     public static final Pose2d centerOfHubBlue = new Pose2d(Meters.of(4.625594), Meters.of(4.034536), new Rotation2d(0)); // Point of center of hub, in meters for blue
     public static final Pose2d centerOfHubRed = new Pose2d(Meters.of(11.914406), Meters.of(4.034536), new Rotation2d(0)); // Point of center of hub, in meters for red
+    public static final Pose2d cornerSW = new Pose2d(FieldDimensions.distanceFromCorner, FieldDimensions.distanceFromCorner, new Rotation2d(0));
+    public static final Pose2d cornerNW = new Pose2d(FieldDimensions.distanceFromCorner, FieldDimensions.fieldWidth.minus(FieldDimensions.distanceFromCorner), new Rotation2d(0));
+    public static final Pose2d cornerSE = new Pose2d(FieldDimensions.fieldLength.minus(FieldDimensions.distanceFromCorner), FieldDimensions.distanceFromCorner, new Rotation2d(0));
+    public static final Pose2d cornerNE = new Pose2d(FieldDimensions.fieldLength.minus(FieldDimensions.distanceFromCorner), FieldDimensions.fieldWidth.minus(FieldDimensions.distanceFromCorner), new Rotation2d(0));
   }
 }
