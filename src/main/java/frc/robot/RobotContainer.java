@@ -22,7 +22,6 @@ import frc.robot.commands.AutoAimCommandHelper;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
-import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -213,12 +212,6 @@ public class RobotContainer {
 
     controller.povUp().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
     controller.povDown().onTrue(Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
-    AutoRoutineBuilder.addExitAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);
-    AutoRoutineBuilder.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_CENTER);
-    AutoRoutineBuilder.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);
-    AutoRoutineBuilder.addScoreCommand(autoOptions.SHOOT_CENTER);
-    AutoRoutineBuilder.addClimbCommand(autoOptions.CLIMB_LEFT);
-    AutoRoutineBuilder.addHumanPlayerCommand(autoOptions.SHOOT_RIGHT);
 }
 
 public Pose2d getRobotPosition(){
@@ -231,6 +224,6 @@ public Pose2d getRobotPosition(){
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoRoutineBuilder.getAutoRoutine();
+    return autoChooser.get();
   }
 }

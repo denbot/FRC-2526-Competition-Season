@@ -1,198 +1,58 @@
 package frc.robot.subsystems.auto;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class AutoRoutineBuilder {
-    private static ArrayList<Command> autoRoutine = new ArrayList<>();
-    private static ArrayList<onTheFlySetpoints> currentMovementList = new ArrayList<>();
 
-    public enum autoOptions{
-        BORDER_LEFT,
-        BORDER_RIGHT,
-        TRENCH,
-        RAMP,
-        SWEEP_EDGE,
-        SWEEP_CENTER,
-        CLIMB_LEFT,
-        CLIMB_RIGHT,
-        SHOOT_LEFT,
-        SHOOT_CENTER,
-        SHOOT_RIGHT;
+    private ArrayList<autoAction> actions = new ArrayList<>();
+    private Intake intake;
+    private Shooter shooter;
+    private Indexer indexer;
+
+    public AutoRoutineBuilder(Intake intake, Shooter shooter, Indexer indexer){
+        this.intake = intake;
+        this.shooter = shooter;
+        this.indexer = indexer;
     }
 
-    public static void addExitAlliance(autoOptions exitSide, autoOptions exitLocation){
-        if(exitSide == autoOptions.BORDER_LEFT){
-            if(exitLocation == autoOptions.TRENCH){
-                currentMovementList.add(onTheFlySetpoints.TRENCH_LEFT_ALLIANCE);
-                currentMovementList.add(onTheFlySetpoints.TRENCH_LEFT_NEUTRAL);
-            
-            }
-            else{
-                currentMovementList.add(onTheFlySetpoints.RAMP_LEFT_ALLIANCE);
-                currentMovementList.add(onTheFlySetpoints.RAMP_LEFT_NEUTRAL);
-            }
-        }
-        else{
-            if(exitLocation == autoOptions.TRENCH){
-                currentMovementList.add(onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE);
-                currentMovementList.add(onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL);
-            
-            }
-            else{
-                currentMovementList.add(onTheFlySetpoints.RAMP_RIGHT_ALLIANCE);
-                currentMovementList.add(onTheFlySetpoints.RAMP_RIGHT_NEUTRAL);
-            }
-        }
-    }
-    
-    public static void addSweep(autoOptions startSide, autoOptions sweepAlignment){
-        //addMovementList();
-        //TODO add run intake command
-        if(startSide == autoOptions.BORDER_LEFT){
-            if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                currentMovementList.add(onTheFlySetpoints.NEUTRAL_EDGE_LEFT);
-                currentMovementList.add(onTheFlySetpoints.NEUTRAL_EDGE_MID);
-            
-            }
-            else{
-                currentMovementList.add(onTheFlySetpoints.NEUTRAL_CENTER_LEFT);
-                currentMovementList.add(onTheFlySetpoints.NEUTRAL_CENTER_MID);
-            }
-        }
-        else{
-            if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                currentMovementList.add(onTheFlySetpoints.NEUTRAL_EDGE_RIGHT);
-                currentMovementList.add(onTheFlySetpoints.NEUTRAL_EDGE_MID);
-            
-            }
-            else{
-                currentMovementList.add(onTheFlySetpoints.NEUTRAL_CENTER_RIGHT);
-                currentMovementList.add(onTheFlySetpoints.NEUTRAL_CENTER_MID);
-            }
-        }
+    public enum actionType{
+        ALIGN,
+        SHOOTER,
+        INTAKE,
+        INDEXER;
     }
 
-    public static void addReturnAlliance(autoOptions returnSide, autoOptions returnLocation){
-        if(returnSide == autoOptions.BORDER_LEFT){
-            if(returnLocation == autoOptions.TRENCH){
-                currentMovementList.add(onTheFlySetpoints.TRENCH_LEFT_NEUTRAL);
-                currentMovementList.add(onTheFlySetpoints.TRENCH_LEFT_ALLIANCE);
-            
-            }
-            else{
-                currentMovementList.add(onTheFlySetpoints.RAMP_LEFT_NEUTRAL);
-                currentMovementList.add(onTheFlySetpoints.RAMP_LEFT_ALLIANCE);
-            }
-        }
-        else{
-            if(returnLocation == autoOptions.TRENCH){
-                currentMovementList.add(onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL);
-                currentMovementList.add(onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE);
-            
-            }
-            else{
-                currentMovementList.add(onTheFlySetpoints.RAMP_RIGHT_NEUTRAL);
-                currentMovementList.add(onTheFlySetpoints.RAMP_RIGHT_ALLIANCE);
-            }
-        }
+    private class autoAction{
         
-    }
+        public actionType type;
+        public Command command;
 
-    public static void addScoreCommand(autoOptions scoreLocation){
-        addMovementList();
-        switch (scoreLocation) {
-            case SHOOT_LEFT:
-                autoRoutine.add(
-                    getAutoAlignmentCommand(onTheFlySetpoints.SCORE_LEFT));
-                break;
-
-            case SHOOT_RIGHT:
-                autoRoutine.add(
-                    getAutoAlignmentCommand(onTheFlySetpoints.SCORE_RIGHT));
-                break;
-            
-            case SHOOT_CENTER:
-                autoRoutine.add(
-                    getAutoAlignmentCommand(onTheFlySetpoints.SCORE_CENTER));
-                break;
-            default:
-                break;
-        }
-        //TODO add aim and shoot commands
-        //autoRoutine.add(AimCommand)
-        //autoRoutine.add(ShootCommand)
-    }
-    
-    public static void addFeedCommand(){
-        addMovementList();
-        //TODO add aim and shoot commands
-        //autoRoutine.add(AimCommand)
-        //autoRoutine.add(ShootCommand)
-    }
-
-    public static void addHumanPlayerCommand(autoOptions endScorePosition){
-        addMovementList();
-        autoRoutine.add(
-            getAutoAlignmentCommand(onTheFlySetpoints.HUMAN_PLAYER));
-        addScoreCommand(endScorePosition);
-    }
-
-    public static void addClimbCommand(autoOptions climbSide){
-        addMovementList();
-        // TODO add climb command
-        if(climbSide == autoOptions.CLIMB_LEFT){
-            autoRoutine.add(getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_LEFT_SETUP));
-            autoRoutine.add(getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_LEFT_FINISH));
-                // add climb command
-        }
-        else {
-            autoRoutine.add(getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_RIGHT_SETUP));
-            autoRoutine.add(getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_RIGHT_FINISH));
-            // add climb command
+        public autoAction(actionType type, Command command){
+            this.type = type;
+            this.command = command;
         }
     }
 
-    public static void clearRoutine(){
-        autoRoutine.clear();
-    }
-    
-    public static void removeLast(){
-        autoRoutine.remove(autoRoutine.size()-1);
-    }
-
-    private static Command getAutoAlignmentCommand(onTheFlySetpoints setpoint){
-        Optional<Alliance> alliance = DriverStation.getAlliance();
-        Pose2d targetPose;
-        if(alliance.isPresent() && alliance.get() == Alliance.Red) targetPose = setpoint.redAlignmentPose;
-        else targetPose = setpoint.blueAlignmentPose;
-
-        return AutoBuilder.pathfindToPose(
-            targetPose,
-            new PathConstraints(6.0, 6.0, Units.degreesToRadians(540), Units.degreesToRadians(720)));
-    }
-
-    private static void addMovementList(){
-        if(currentMovementList.size() == 0) return;
-        onTheFlySetpoints[] setpoints = new onTheFlySetpoints[currentMovementList.size()];
-        currentMovementList.toArray(setpoints);
-        autoRoutine.add(ConcurrentPathGenerator.getConcurrentPath(setpoints));
-        currentMovementList.clear();
-    }
-
-    public static Command getAutoRoutine(){
-        Command[] commands = new Command[autoRoutine.size()];
-        autoRoutine.toArray(commands);
-        return new SequentialCommandGroup(commands);
+    public Command getAutoRoutine(){
+        SequentialCommandGroup finalRoutine = new SequentialCommandGroup();
+        ParallelCommandGroup newCommand = new ParallelCommandGroup();
+        for(autoAction action: actions){
+            if(action.type == actionType.ALIGN){
+                finalRoutine.addCommands(newCommand);
+                newCommand = new ParallelCommandGroup(action.command);
+            }            
+            else{
+                newCommand.addCommands(action.command);
+            }
+        }
+        finalRoutine.addCommands(newCommand);
+        return newCommand;
     }
 }
