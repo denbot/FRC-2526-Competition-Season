@@ -25,5 +25,5 @@ public interface IndexerIO {
 
     public default void updateInputs(IndexerIOInputs inputs){}
     public default void runIndexerAtSpeed(AngularVelocity speed){}
-    public default void stopIntake(){}
+    public default void stopIndexer(){}
 }

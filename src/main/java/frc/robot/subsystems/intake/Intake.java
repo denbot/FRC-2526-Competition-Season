@@ -45,31 +45,24 @@ public class Intake extends SubsystemBase {
   }
 
   public Command runIntakeExtension(Distance length) {
-    return Commands.runEnd(
+    return Commands.runOnce(
         () -> {
           intakeExtensionSetpoint = length;
-          this.io.setIntakeExtensionLength(length);},
-        () -> this.io.stopIntakeExtension());
+          this.io.setIntakeExtensionLength(length);});
   }
 
   public Command setIntakeMaxLength() {
-    return Commands.runEnd(
+    return Commands.runOnce(
         () -> {
           intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength);
-          this.io.setIntakeMaxLength();},
-        () -> this.io.stopIntakeExtension());
+          this.io.setIntakeMaxLength();});
   }
 
   public Command setIntakeMinLength() {
-    return Commands.runEnd(
+    return Commands.runOnce(
         () -> {
           intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength);
-          this.io.setIntakeMinLength();},
-        () -> this.io.stopIntakeExtension());
-  }
-
-  public Command stopIntakeExtension() {
-    return Commands.runOnce(() -> this.io.stopIntakeExtension());
+          this.io.setIntakeMinLength();});
   }
 
   // Getters for private IO variables

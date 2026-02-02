@@ -185,16 +185,17 @@ public class RobotContainer {
         .ignoringDisable(true));
 
     // Spin up when A is held (use this if you don't want to lock position)
-    controller.rightBumper()
+    controller.a()
         .whileTrue(shooter.runSpinner());
 
     // Climb/cancel climb when B button is pressed
     // TODO: implement climbing
+    // controller.b()
+    //    .onTrue(new ConditionalCommand(climber.retract(), climber.extend(), () -> climber.getClimberExtended()));
 
     // Switch to X pattern when X button is pressed
     controller.x()
-        .whileTrue(indexer.reverseIndexer()
-        .andThen(indexer.stopIndexer()));
+        .whileTrue(indexer.reverseIndexer());
 
     // Outtake when Y button is held
     controller.y()
@@ -218,17 +219,14 @@ public class RobotContainer {
 
     // Toggle intake when left bumper is pressed
     controller.leftBumper()
-        .onTrue(new ConditionalCommand(intake.setIntakeMaxLength(), intake.setIntakeMinLength(), () -> intake.getIntakeDeployedSwitch()));
+        .onTrue(new ConditionalCommand(intake.setIntakeMinLength(), intake.setIntakeMaxLength(), () -> intake.getIntakeDeployedSwitch()));
 
     // Run intake when left trigger is held
     controller.leftTrigger()
         .whileTrue((intake.runIntake(IntakeConstants.intakeSpeed)
         .alongWith(indexer.runIndexer()))
-        .andThen(intake.stopIntake()
-        .alongWith(indexer.stopIndexer())));
-
-    controller.povRight()
-        .onTrue(drive.getTestAllPointsCommand());
+        .alongWith(shooter.reverseKicker()));
+        
 
     controller.povUp()
         .onTrue(Commands.runOnce(() -> 
