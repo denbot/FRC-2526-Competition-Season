@@ -40,6 +40,4 @@ public interface IntakeIO {
 
   public default void stopIntake() {}
 
-  public default void stopIntakeExtension() {}
-
 }

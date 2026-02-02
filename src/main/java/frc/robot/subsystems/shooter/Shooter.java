@@ -50,6 +50,9 @@ public class Shooter extends SubsystemBase{
     public Command runKicker(){
         return Commands.runEnd(() -> this.io.setKickerVelocity(kickerVelocitySetpoint), () -> this.io.stopKicker());
     }
+    public Command reverseKicker(){
+        return Commands.runEnd(() -> this.io.setKickerVelocity(kickerVelocitySetpoint.times(-0.25)), () -> this.io.stopKicker());
+    }
     public Command stopKicker(){
         return Commands.runOnce(() -> this.io.stopKicker());
     }
