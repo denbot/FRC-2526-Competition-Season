@@ -17,17 +17,16 @@ public enum onTheFlySetpoints {
     // All directions are assumed relative to driver station (left far is to the left side of the field, furthest from the driver in their aliance)
 
     // Trench Locations
-    TRENCH_LEFT_NEUTRAL(6, 17, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
-    TRENCH_LEFT_ALLIANCE(7, 28, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
-    TRENCH_RIGHT_NEUTRAL(1, 22, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
-    TRENCH_RIGHT_ALLIANCE(12, 23, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
+    TRENCH_LEFT_NEUTRAL(6, 22, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
+    TRENCH_LEFT_ALLIANCE(7, 23, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
+    TRENCH_RIGHT_NEUTRAL(1, 17, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
+    TRENCH_RIGHT_ALLIANCE(12, 28, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
     // Ramp Locations
     RAMP_LEFT_NEUTRAL(6, 17, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_NEUTRAL),
-    RAMP_LEFT_ALIANCE(7, 28, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_ALLIANCE),
+    RAMP_LEFT_ALLIANCE(7, 28, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_ALLIANCE),
     RAMP_RIGHT_NEUTRAL(1, 22, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_NEUTRAL),
-    RAMP_RIGHT_ALIANCE(12, 23, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_ALLIANCE),
+    RAMP_RIGHT_ALLIANCE(12, 23, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_ALLIANCE),
     // Neutral Zone Locations
-    // Closest April Tag Alignment handles Y offset, only X offset is required
     NEUTRAL_EDGE_LEFT(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_LEFT),
     NEUTRAL_EDGE_MID(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_MID),
     NEUTRAL_EDGE_RIGHT(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_RIGHT),

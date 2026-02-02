@@ -10,15 +10,19 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AutoAimCommandHelper;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -59,9 +63,12 @@ public class RobotContainer {
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
+  private AutoAimCommandHelper autoAimCommandHelper = new AutoAimCommandHelper();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandGenericHID controller1 = new CommandGenericHID(1);
+  private final CommandGenericHID controller2 = new CommandGenericHID(2);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -135,6 +142,9 @@ public class RobotContainer {
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
+    // Mute controller disconnected warnings
+    DriverStation.silenceJoystickConnectionWarning(true);
+
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -194,7 +204,11 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller.rightTrigger().whileTrue(shooter.runSpinner());
+    controller.rightTrigger().whileTrue(shooter.runSpinner().alongWith(DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0))));
     controller.rightBumper().whileTrue(shooter.runKicker());
     controller.leftBumper().whileTrue((intake.runIntake(IntakeConstants.intakeSpeed).alongWith(indexer.runIndexer())).andThen(intake.stopIntake().alongWith(indexer.stopIndexer())));
 
