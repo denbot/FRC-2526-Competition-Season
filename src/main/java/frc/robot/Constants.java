@@ -30,6 +30,6 @@ public final class Constants {
   }
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-    public static final String canivoreSerial = "D75CCE723353385320202034111303FF";
+    public static final String canivoreSerial = "33ED01F9463847532020204B451D0DFF";
   }
 }

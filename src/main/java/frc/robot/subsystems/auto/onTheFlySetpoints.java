@@ -1,8 +1,17 @@
 package frc.robot.subsystems.auto;
 
+import java.util.Optional;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public enum onTheFlySetpoints {
     // All directions are assumed relative to driver station (left far is to the left side of the field, furthest from the driver in their aliance)
@@ -57,4 +66,34 @@ public enum onTheFlySetpoints {
     private Pose2d getAlignmentPose(int apriltag, onTheFlyOffsets offset){
         return this.fieldLayout.getTagPose(apriltag).get().toPose2d().transformBy(offset.transform);
     }
+
+    private static Command getOnTheFlyCommands(onTheFlySetpoints targetPose) {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+         Pose2d targetPose2d;
+            if(alliance.isPresent() && alliance.get() == Alliance.Red) targetPose2d = targetPose.redAlignmentPose;
+            else targetPose2d = targetPose.blueAlignmentPose;
+        return AutoBuilder.pathfindToPose(
+            targetPose2d,
+            new PathConstraints(4.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720)));
+        }
+        
+    public static Command alignLeftClimb() {
+        return getOnTheFlyCommands(CLIMB_LEFT_SETUP);
+    }
+    public static Command alignClimbRight() {
+        return getOnTheFlyCommands(CLIMB_RIGHT_SETUP);
+    }
+    public static Command alignHumanPlayer() {
+        return getOnTheFlyCommands(HUMAN_PLAYER);
+    }
+    public static Command alignScoreLeft() {
+        return getOnTheFlyCommands(SCORE_LEFT);
+    }
+    public static Command alignScoreRight() {
+        return getOnTheFlyCommands(SCORE_RIGHT);
+    }
+    public static Command alignScoreCenter() {
+        return getOnTheFlyCommands(SCORE_CENTER);
+    }
 }
+    
