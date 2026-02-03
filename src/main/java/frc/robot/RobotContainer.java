@@ -25,6 +25,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
+import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -66,6 +67,7 @@ public class RobotContainer {
   private Indexer indexer;
   private Shooter shooter;
   private AutoAimCommandHelper autoAimCommandHelper = new AutoAimCommandHelper();
+  private AutoRoutineBuilder autoBuilder;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -141,7 +143,9 @@ public class RobotContainer {
         break;
     }
 
+
     // Set up auto routines
+    autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive, autoAimCommandHelper);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Mute controller disconnected warnings
@@ -239,6 +243,12 @@ public class RobotContainer {
         .alongWith(indexer.runIndexer()))
         .alongWith(shooter.reverseKicker()));
         
+    autoBuilder.addExitAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);
+    autoBuilder.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
+    autoBuilder.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.RAMP);
+    //autoBuilder.addScoreCommand(autoOptions.SHOOT_CENTER);
+    autoBuilder.addHumanPlayerCommand(autoOptions.SHOOT_LEFT);
+    autoBuilder.addClimbCommand(autoOptions.CLIMB_LEFT);
 
     controller.povUp()
         .onTrue(Commands.runOnce(() -> 
@@ -259,6 +269,6 @@ public Pose2d getRobotPosition(){
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return autoBuilder.getAutoRoutine();
   }
 }

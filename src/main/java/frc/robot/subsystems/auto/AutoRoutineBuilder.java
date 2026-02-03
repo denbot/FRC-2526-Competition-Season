@@ -1,6 +1,7 @@
 package frc.robot.subsystems.auto;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -91,22 +92,23 @@ public class AutoRoutineBuilder {
     }
     
     public void addSweep(autoOptions startSide, autoOptions sweepAlignment){
-        addAction(actionTypes.INTAKE, this.intake.runIntake(RotationsPerSecond.of(60)));
         if(startSide == autoOptions.BORDER_LEFT){
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(actionTypes.ALIGN, ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID));
             }
             else{
-                addAction(actionTypes.ALIGN, ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID));
+                addAction(actionTypes.ALIGN, 
+                    ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID)
+                    .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))));
             }
         }
         else{
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(actionTypes.ALIGN, ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID));
-            
             }
             else{
-                addAction(actionTypes.ALIGN, ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID));
+                addAction(actionTypes.ALIGN, ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID)
+                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))));
             }
         }
     }
@@ -154,10 +156,8 @@ public class AutoRoutineBuilder {
                 drive,
                 () -> 0,
                 () -> 0,
-                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)));
-        addAction(actionTypes.INDEX, indexer.runIndexer());
-        addAction(actionTypes.INDEX, shooter.runKicker());
-        addAction(actionTypes.SHOOT, shooter.runSpinner());
+                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)).withTimeout(Seconds.of(1)));
+        addAction(actionTypes.SHOOT, new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
         }
     
     public void addFeedCommand(){
@@ -166,10 +166,8 @@ public class AutoRoutineBuilder {
                 drive,
                 () -> 0,
                 () -> 0,
-                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)));
-        addAction(actionTypes.INDEX, indexer.runIndexer());
-        addAction(actionTypes.INDEX, shooter.runKicker());
-        addAction(actionTypes.SHOOT, shooter.runSpinner());
+                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)).withTimeout(Seconds.of(1)));
+        addAction(actionTypes.SHOOT, new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
     }
 
     public void addHumanPlayerCommand(autoOptions endScorePosition){
@@ -222,7 +220,9 @@ public class AutoRoutineBuilder {
                 autoRoutine.addCommands(currentGroupCommand);
                 currentGroupCommand = new ParallelCommandGroup(action.command);
             }
-            else currentGroupCommand.addCommands(action.command);
+            else {
+                currentGroupCommand.addCommands(action.command);
+            }
         }
 
         autoRoutine.addCommands(currentGroupCommand);
