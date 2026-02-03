@@ -39,7 +39,23 @@ public class ConcurrentPathGenerator {
         }
         return finalPath;
     }
+    public static Command getConcurrentPath(onTheFlySetpoints... setpoints){
+        SequentialCommandGroup finalPath = new SequentialCommandGroup();
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+
+        for(int i = 0; i < setpoints.length; i++){
+            Pose2d targetPose;
+            if(alliance.isPresent() && alliance.get() == Alliance.Red) targetPose = setpoints[i].redAlignmentPose;
+            else targetPose = setpoints[i].blueAlignmentPose;
+
+            finalPath.addCommands(
+                AutoBuilder.pathfindToPose(targetPose,
+                pathConstraints));
+        }
+        return finalPath;
+    }
     
+    /* Possible chaining of auto alignments using waypoints
     public static Command getConcurrentPath(onTheFlySetpoints[] setpoints){
         Optional<Alliance> alliance = DriverStation.getAlliance();
         Pose2d[] poses = new Pose2d[setpoints.length];
@@ -60,4 +76,5 @@ public class ConcurrentPathGenerator {
                 
         return AutoBuilder.pathfindThenFollowPath(path, pathConstraints);
     }
+    */
 }
