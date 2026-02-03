@@ -153,6 +153,19 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
+  public static Command autoJoystickDriveAtAngle(Drive drive) {
+    Supplier<Double> currentPosition = () -> 180 + drive.getPose().getRotation().getDegrees();
+    Supplier<Double> targetPosition = () -> 180 + drive.findAngleForShooting(drive.getPose()).getDegrees();
+    System.out.println(currentPosition + "   " + targetPosition);
+
+    return joystickDriveAtAngle(drive,
+        () -> 0,
+        () -> 0,
+        () -> drive.findAngleForShooting(drive.getPose()))
+        .until(() -> Math.abs(drive.getPose().getRotation().relativeTo(drive.findAngleForShooting(drive.getPose())).getDegrees()) < 3) // If current rotation is within 3 degrees of target
+        .andThen(Commands.runOnce(() -> drive.stopWithX())); 
+  }
+                
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *

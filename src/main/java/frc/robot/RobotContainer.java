@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoAimCommandHelper;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -58,7 +57,6 @@ public class RobotContainer {
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
-  private AutoAimCommandHelper autoAimCommandHelper = new AutoAimCommandHelper();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -211,7 +209,7 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0))));
+                () -> drive.findAngleForShooting(drive.getPose()))));
 
     // Shoot when right trigger is held
     controller.rightTrigger()
@@ -226,7 +224,6 @@ public class RobotContainer {
         .whileTrue((intake.runIntake(IntakeConstants.intakeSpeed)
         .alongWith(indexer.runIndexer()))
         .alongWith(shooter.reverseKicker()));
-        
 
     controller.povUp()
         .onTrue(Commands.runOnce(() -> 
