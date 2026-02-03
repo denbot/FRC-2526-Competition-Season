@@ -1,5 +1,7 @@
 package frc.robot.subsystems.auto;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -13,6 +15,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.AutoAimCommandHelper;
+import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
@@ -23,11 +28,15 @@ public class AutoRoutineBuilder {
     private Intake intake;
     private Shooter shooter;
     private Indexer indexer;
+    private Drive drive;
+    AutoAimCommandHelper autoAimCommandHelper;
 
-    public AutoRoutineBuilder(Intake intake, Shooter shooter, Indexer indexer){
+    public AutoRoutineBuilder(Intake intake, Shooter shooter, Indexer indexer, Drive drive, AutoAimCommandHelper autoAimCommandHelper){
         this.intake = intake;
         this.shooter = shooter;
         this.indexer = indexer;
+        this.drive = drive;
+        this.autoAimCommandHelper = autoAimCommandHelper;
         this.actions = new ArrayList<>();
     }
 
@@ -82,8 +91,7 @@ public class AutoRoutineBuilder {
     }
     
     public void addSweep(autoOptions startSide, autoOptions sweepAlignment){
-        //addMovementList();
-        //TODO add run intake command
+        addAction(actionTypes.INTAKE, this.intake.runIntake(RotationsPerSecond.of(60)));
         if(startSide == autoOptions.BORDER_LEFT){
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(actionTypes.ALIGN, ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID));
@@ -141,15 +149,27 @@ public class AutoRoutineBuilder {
             default:
                 break;
         }
-        //TODO add aim and shoot commands
-        //autoRoutine.add(AimCommand)
-        //autoRoutine.add(ShootCommand)
-    }
+        // TODO TEMP FUNCTION FOR INDEX AND SHOOT
+        addAction(actionTypes.ALIGN, DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> 0,
+                () -> 0,
+                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)));
+        addAction(actionTypes.INDEX, indexer.runIndexer());
+        addAction(actionTypes.INDEX, shooter.runKicker());
+        addAction(actionTypes.SHOOT, shooter.runSpinner());
+        }
     
     public void addFeedCommand(){
-        //TODO add aim and shoot commands
-        //autoRoutine.add(AimCommand)
-        //autoRoutine.add(ShootCommand)
+        // TODO TEMP FUNCTION FOR INDEX AND SHOOT
+        addAction(actionTypes.ALIGN, DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> 0,
+                () -> 0,
+                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)));
+        addAction(actionTypes.INDEX, indexer.runIndexer());
+        addAction(actionTypes.INDEX, shooter.runKicker());
+        addAction(actionTypes.SHOOT, shooter.runSpinner());
     }
 
     public void addHumanPlayerCommand(autoOptions endScorePosition){
