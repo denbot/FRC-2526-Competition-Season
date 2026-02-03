@@ -56,6 +56,9 @@ public class AutoRoutineBuilder {
     }
 
     public void addExitAlliance(autoOptions exitSide, autoOptions exitLocation){
+
+        // TODO exiting through Ramp currently broken, unknown reason
+
         if(exitSide == autoOptions.BORDER_LEFT){
             if(exitLocation == autoOptions.TRENCH){
                 addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.TRENCH_LEFT_ALLIANCE, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL));
@@ -98,6 +101,9 @@ public class AutoRoutineBuilder {
     }
 
     public void addReturnAlliance(autoOptions returnSide, autoOptions returnLocation){
+
+        // TODO returning through Ramp currently broken, unknown reason
+
         if(returnSide == autoOptions.BORDER_LEFT){
             if(returnLocation == autoOptions.TRENCH){
                 addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.TRENCH_LEFT_NEUTRAL, onTheFlySetpoints.TRENCH_LEFT_ALLIANCE));

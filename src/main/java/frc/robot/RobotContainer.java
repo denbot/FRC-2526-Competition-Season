@@ -243,12 +243,8 @@ public class RobotContainer {
         .alongWith(indexer.runIndexer()))
         .alongWith(shooter.reverseKicker()));
         
-    autoBuilder.addExitAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);
-    autoBuilder.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
-    autoBuilder.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.RAMP);
-    //autoBuilder.addScoreCommand(autoOptions.SHOOT_CENTER);
-    autoBuilder.addHumanPlayerCommand(autoOptions.SHOOT_LEFT);
-    autoBuilder.addClimbCommand(autoOptions.CLIMB_LEFT);
+    autoBuilder.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_CENTER);
+    autoBuilder.addFeedCommand();
 
     controller.povUp()
         .onTrue(Commands.runOnce(() -> 
