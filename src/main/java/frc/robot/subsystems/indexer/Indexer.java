@@ -30,11 +30,15 @@ public class Indexer extends SubsystemBase{
     }
 
     public Command runIndexer(){
-        return Commands.runEnd(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint), ()-> this.io.stopIntake());
+        return Commands.runEnd(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint), ()-> this.io.stopIndexer());
+    }
+
+    public Command reverseIndexer(){
+        return Commands.runEnd(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint.times(-1)), ()-> this.io.stopIndexer());
     }
 
     public Command stopIndexer(){
-        return Commands.runOnce(()-> this.io.stopIntake());
+        return Commands.runOnce(()-> this.io.stopIndexer());
     }
 
     public void setIndexMotorSpeedSetpoint(AngularVelocity speed){

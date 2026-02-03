@@ -10,7 +10,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -113,7 +112,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     public void setIntakeVelocity(AngularVelocity velocity) {
-            intakeMotor.setControl(new VelocityVoltage(velocity));
+        intakeMotor.setControl(new VelocityVoltage(velocity));
     }
 
     public void setIntakeExtensionLength(Distance length) {
@@ -130,9 +129,5 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     public void stopIntake() {
         intakeMotor.setControl(new CoastOut());
-    }
-
-    public void stopIntakeExtension() {
-        intakeMotor.setControl(new StaticBrake());
     }
 }

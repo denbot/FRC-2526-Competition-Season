@@ -90,8 +90,4 @@ public class IntakeIOSim implements IntakeIO {
     public void stopIntake() {
         intakeController.setSetpoint(0);
     }
-
-    public void stopIntakeExtension() {
-        rackController.setSetpoint(0);
-    }
 }
