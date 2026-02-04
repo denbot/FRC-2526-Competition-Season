@@ -13,13 +13,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class ConcurrentPathGenerator {
+public class SequentialPathGenerator {
 
     private static PathConstraints pathConstraints = 
         new PathConstraints(6.0, 6.0, Units.degreesToRadians(540), Units.degreesToRadians(720)); 
 
 
-    public static Command getConcurrentPath(onTheFlySetpoints[] setpoints, Double[] angles){
+    public static Command getSequentialPath(onTheFlySetpoints[] setpoints, Double[] angles){
         SequentialCommandGroup finalPath = new SequentialCommandGroup();
         Optional<Alliance> alliance = DriverStation.getAlliance();
 
@@ -34,7 +34,7 @@ public class ConcurrentPathGenerator {
         }
         return finalPath;
     }
-    public static Command getConcurrentPath(onTheFlySetpoints... setpoints){
+    public static Command getSequentialPath(onTheFlySetpoints... setpoints){
         SequentialCommandGroup finalPath = new SequentialCommandGroup();
         Optional<Alliance> alliance = DriverStation.getAlliance();
 

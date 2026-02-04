@@ -52,77 +52,64 @@ public class AutoRoutineBuilder {
         SHOOT_RIGHT;
     }
 
-    public void addExitAlliance(autoOptions exitSide, autoOptions exitLocation){
-
-        // TODO exiting through Ramp currently broken, unknown reason
-
-        if(exitSide == autoOptions.BORDER_LEFT){
-            if(exitLocation == autoOptions.TRENCH){
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.TRENCH_LEFT_ALLIANCE, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL));
-            }
-            else{
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.RAMP_LEFT_ALLIANCE, onTheFlySetpoints.RAMP_LEFT_NEUTRAL));
-            }
-        }
-        else{
-            if(exitLocation == autoOptions.TRENCH){
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL));
-            
-            }
-            else{
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.RAMP_RIGHT_ALLIANCE, onTheFlySetpoints.RAMP_RIGHT_NEUTRAL));
-            }
-        }
+    public void addExitAlliance(autoOptions exitSide){
+        if(exitSide == autoOptions.BORDER_LEFT) addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.TRENCH_LEFT_ALLIANCE, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL));
+        else addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL));
     }
     
     public void addSweep(autoOptions startSide, autoOptions sweepAlignment){
         if(startSide == autoOptions.BORDER_LEFT){
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID));
+                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID)
+                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))).andThen(this.intake.stopIntake()));
             }
             else{
                 addAction(
-                    ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID)
-                    .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))));
+                    SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID)
+                    .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))).andThen(this.intake.stopIntake()));
             }
         }
         else{
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID));
+                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID)
+                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))).andThen(this.intake.stopIntake()));
             }
             else{
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID)
-                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))));
+                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID)
+                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))).andThen(this.intake.stopIntake()));
             }
         }
     }
 
     public void addReturnAlliance(autoOptions returnSide, autoOptions returnLocation){
-
-        // TODO returning through Ramp currently broken, unknown reason
-
         if(returnSide == autoOptions.BORDER_LEFT){
             if(returnLocation == autoOptions.TRENCH){
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.TRENCH_LEFT_NEUTRAL, onTheFlySetpoints.TRENCH_LEFT_ALLIANCE));
+                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.TRENCH_LEFT_NEUTRAL, onTheFlySetpoints.TRENCH_LEFT_ALLIANCE));
             
             }
             else{
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.RAMP_LEFT_NEUTRAL, onTheFlySetpoints.RAMP_LEFT_ALLIANCE));
+                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.RAMP_LEFT_NEUTRAL, onTheFlySetpoints.RAMP_LEFT_ALLIANCE));
             }
         }
         else{
             if(returnLocation == autoOptions.TRENCH){
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL, onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE));
+                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL, onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE));
             
             }
             else{
-                addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.RAMP_RIGHT_NEUTRAL, onTheFlySetpoints.RAMP_RIGHT_ALLIANCE));
+                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.RAMP_RIGHT_NEUTRAL, onTheFlySetpoints.RAMP_RIGHT_ALLIANCE));
             }
         }
         
     }
 
-    public void addScoreCommand(autoOptions scoreLocation){
+    public void addScoreCommand(){
+        // TODO TEMP FUNCTION FOR INDEX AND SHOOT
+        addAction(DriveCommands.autoJoystickDriveAtAngle(drive));
+        addAction(new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
+        }
+
+    public void addAlignScorePosition(autoOptions scoreLocation){
         switch (scoreLocation) {
             case SHOOT_LEFT:
                 addAction(getAutoAlignmentCommand(onTheFlySetpoints.SCORE_LEFT));
@@ -138,47 +125,35 @@ public class AutoRoutineBuilder {
             default:
                 break;
         }
-        // TODO TEMP FUNCTION FOR INDEX AND SHOOT
-        addAction(DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> 0,
-                () -> 0,
-                () -> drive.findAngleForShooting(drive.getPose()).times(1.0)).withTimeout(Seconds.of(1)));
-        addAction(new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
-        }
+    }
     
     public void addFeedCommand(){
         // TODO TEMP FUNCTION FOR INDEX AND SHOOT
-        addAction(DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> 0,
-                () -> 0,
-                () -> drive.findAngleForShooting(drive.getPose()).times(1.0)).withTimeout(Seconds.of(1)));
+        addAction(DriveCommands.autoJoystickDriveAtAngle(drive));
         addAction(new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
     }
 
     public void addHumanPlayerCommand(autoOptions endScorePosition){
         addAction(getAutoAlignmentCommand(onTheFlySetpoints.HUMAN_PLAYER));
-        addScoreCommand(endScorePosition);
+        addAlignScorePosition(endScorePosition);
+        addScoreCommand();
     }
 
     public void addClimbCommand(autoOptions climbSide){
         // TODO add climb command
         if(climbSide == autoOptions.CLIMB_LEFT){
-            addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
+            addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
             // add climb command
         }
         else {
-            addAction(ConcurrentPathGenerator.getConcurrentPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH));
+            addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH));
             // add climb command
         }
     }
 
     public void testAll(){
-        this.addExitAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);
-        this.addExitAlliance(autoOptions.BORDER_LEFT, autoOptions.RAMP);
-        this.addExitAlliance(autoOptions.BORDER_RIGHT, autoOptions.TRENCH);
-        this.addExitAlliance(autoOptions.BORDER_RIGHT, autoOptions.RAMP);
+        this.addExitAlliance(autoOptions.BORDER_LEFT);
+        this.addExitAlliance(autoOptions.BORDER_RIGHT);
 
         this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_CENTER);
         this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
@@ -192,9 +167,11 @@ public class AutoRoutineBuilder {
         this.addReturnAlliance(autoOptions.BORDER_RIGHT, autoOptions.TRENCH);
         this.addReturnAlliance(autoOptions.BORDER_RIGHT, autoOptions.RAMP);
 
-        this.addScoreCommand(autoOptions.SHOOT_LEFT);
-        this.addScoreCommand(autoOptions.SHOOT_CENTER);
-        this.addScoreCommand(autoOptions.SHOOT_RIGHT);
+        this.addAlignScorePosition(autoOptions.SHOOT_LEFT);
+        this.addAlignScorePosition(autoOptions.SHOOT_CENTER);
+        this.addAlignScorePosition(autoOptions.SHOOT_RIGHT);
+        
+        this.addScoreCommand();
 
         this.addClimbCommand(autoOptions.CLIMB_LEFT);
         this.addClimbCommand(autoOptions.CLIMB_RIGHT);

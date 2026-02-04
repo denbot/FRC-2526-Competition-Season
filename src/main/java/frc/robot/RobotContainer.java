@@ -69,8 +69,8 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandGenericHID controller1 = new CommandGenericHID(1);
-  private final CommandGenericHID controller2 = new CommandGenericHID(2);
+  private final CommandGenericHID operatorController1 = new CommandGenericHID(1);
+  private final CommandGenericHID operatorController2 = new CommandGenericHID(2);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
