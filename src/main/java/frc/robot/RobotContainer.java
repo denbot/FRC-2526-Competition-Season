@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoAimCommandHelper;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
@@ -66,7 +65,6 @@ public class RobotContainer {
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
-  private AutoAimCommandHelper autoAimCommandHelper = new AutoAimCommandHelper();
   private AutoRoutineBuilder autoBuilder;
 
   // Controller
@@ -145,7 +143,7 @@ public class RobotContainer {
 
 
     // Set up auto routines
-    autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive, autoAimCommandHelper);
+    autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Mute controller disconnected warnings
@@ -227,7 +225,7 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0))));
+                () -> drive.findAngleForShooting(drive.getPose()))));
 
     // Shoot when right trigger is held
     controller.rightTrigger()

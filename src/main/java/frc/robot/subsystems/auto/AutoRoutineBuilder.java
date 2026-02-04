@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.AutoAimCommandHelper;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
@@ -30,14 +29,12 @@ public class AutoRoutineBuilder {
     private Shooter shooter;
     private Indexer indexer;
     private Drive drive;
-    AutoAimCommandHelper autoAimCommandHelper;
 
-    public AutoRoutineBuilder(Intake intake, Shooter shooter, Indexer indexer, Drive drive, AutoAimCommandHelper autoAimCommandHelper){
+    public AutoRoutineBuilder(Intake intake, Shooter shooter, Indexer indexer, Drive drive){
         this.intake = intake;
         this.shooter = shooter;
         this.indexer = indexer;
         this.drive = drive;
-        this.autoAimCommandHelper = autoAimCommandHelper;
         this.commands = new ArrayList<>();
     }
 
@@ -146,7 +143,7 @@ public class AutoRoutineBuilder {
                 drive,
                 () -> 0,
                 () -> 0,
-                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)).withTimeout(Seconds.of(1)));
+                () -> drive.findAngleForShooting(drive.getPose()).times(1.0)).withTimeout(Seconds.of(1)));
         addAction(new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
         }
     
@@ -156,7 +153,7 @@ public class AutoRoutineBuilder {
                 drive,
                 () -> 0,
                 () -> 0,
-                () -> autoAimCommandHelper.findAngleForShooting(drive.getPose()).times(1.0)).withTimeout(Seconds.of(1)));
+                () -> drive.findAngleForShooting(drive.getPose()).times(1.0)).withTimeout(Seconds.of(1)));
         addAction(new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
     }
 
