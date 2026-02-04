@@ -7,15 +7,14 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
@@ -197,7 +196,7 @@ public class AutoRoutineBuilder {
 
         return AutoBuilder.pathfindToPose(
             targetPose,
-            new PathConstraints(6.0, 6.0, Units.degreesToRadians(540), Units.degreesToRadians(720)));
+            OperatorConstants.pathfindingConstraints);
     }
 
     private void addAction(Command command){
@@ -207,13 +206,9 @@ public class AutoRoutineBuilder {
     public Command getAutoRoutine(){
         SequentialCommandGroup autoRoutine = new SequentialCommandGroup();
         
-        ParallelCommandGroup currentGroupCommand = new ParallelCommandGroup();
-
         for(Command command: this.commands){
             autoRoutine.addCommands(command);
         }
-
-        autoRoutine.addCommands(currentGroupCommand);
 
         return autoRoutine;
     }

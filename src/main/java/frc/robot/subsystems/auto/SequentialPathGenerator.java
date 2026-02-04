@@ -3,22 +3,16 @@ package frc.robot.subsystems.auto;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.OperatorConstants;
 
 public class SequentialPathGenerator {
-
-    private static PathConstraints pathConstraints = 
-        new PathConstraints(6.0, 6.0, Units.degreesToRadians(540), Units.degreesToRadians(720)); 
-
-
     public static Command getSequentialPath(onTheFlySetpoints[] setpoints, Double[] angles){
         SequentialCommandGroup finalPath = new SequentialCommandGroup();
         Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -30,7 +24,7 @@ public class SequentialPathGenerator {
 
             finalPath.addCommands(
                 AutoBuilder.pathfindToPose(new Pose2d(targetPose.getX(), targetPose.getY(), new Rotation2d(angles[i])),
-                pathConstraints));
+                OperatorConstants.pathfindingConstraints));
         }
         return finalPath;
     }
@@ -45,7 +39,7 @@ public class SequentialPathGenerator {
 
             finalPath.addCommands(
                 AutoBuilder.pathfindToPose(targetPose,
-                pathConstraints));
+                OperatorConstants.pathfindingConstraints));
         }
         return finalPath;
     }
