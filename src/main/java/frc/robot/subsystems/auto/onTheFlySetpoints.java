@@ -1,29 +1,39 @@
 package frc.robot.subsystems.auto;
 
+import java.util.Optional;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public enum onTheFlySetpoints {
     // All directions are assumed relative to driver station (left far is to the left side of the field, furthest from the driver in their aliance)
 
     // Trench Locations
-    TRENCH_LEFT_NEUTRAL(6, 17, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
-    TRENCH_LEFT_ALLIANCE(7, 28, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
-    TRENCH_RIGHT_NEUTRAL(1, 22, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
-    TRENCH_RIGHT_ALLIANCE(12, 23, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
+    TRENCH_LEFT_NEUTRAL(6, 22, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
+    TRENCH_LEFT_ALLIANCE(7, 23, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
+    TRENCH_RIGHT_NEUTRAL(1, 17, onTheFlyOffsets.TRENCH_OFFSET_NEUTRAL),
+    TRENCH_RIGHT_ALLIANCE(12, 28, onTheFlyOffsets.TRENCH_OFFSET_ALLIANCE),
     // Ramp Locations
-    RAMP_LEFT_NEUTRAL(6, 17, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_NEUTRAL),
-    RAMP_LEFT_ALIANCE(7, 28, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_ALLIANCE),
-    RAMP_RIGHT_NEUTRAL(1, 22, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_NEUTRAL),
-    RAMP_RIGHT_ALIANCE(12, 23, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_ALLIANCE),
+    RAMP_LEFT_NEUTRAL(6, 22, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_NEUTRAL),
+    RAMP_LEFT_ALLIANCE(7, 23, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_ALLIANCE),
+    RAMP_RIGHT_NEUTRAL(1, 17, onTheFlyOffsets.RAMP_OFFSET_POSITIVE_NEUTRAL),
+    RAMP_RIGHT_ALLIANCE(12, 28, onTheFlyOffsets.RAMP_OFFSET_NEGATIVE_ALLIANCE),
     // Neutral Zone Locations
-    // Closest April Tag Alignment handles Y offset, only X offset is required
     NEUTRAL_EDGE_LEFT(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_LEFT),
-    NEUTRAL_EDGE_MID(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_MID),
+    NEUTRAL_EDGE_MID_FROM_LEFT(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_MID_FROM_LEFT),
+    NEUTRAL_EDGE_MID_FROM_RIGHT(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_MID_FROM_RIGHT),
     NEUTRAL_EDGE_RIGHT(4, 20, onTheFlyOffsets.NEUTRAL_EDGE_RIGHT),
     NEUTRAL_CENTER_LEFT(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_LEFT),
-    NEUTRAL_CENTER_MID(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_MID),
+    NEUTRAL_CENTER_MID_FROM_LEFT(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_MID_FROM_LEFT),
+    NEUTRAL_CENTER_MID_FROM_RIGHT(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_MID_FROM_RIGHT),
     NEUTRAL_CENTER_RIGHT(4, 20, onTheFlyOffsets.NEUTRAL_CENTER_RIGHT),
     // Climb Locations
     CLIMB_LEFT_SETUP(15, 31, onTheFlyOffsets.CLIMB_LEFT_SETUP),
@@ -57,4 +67,34 @@ public enum onTheFlySetpoints {
     private Pose2d getAlignmentPose(int apriltag, onTheFlyOffsets offset){
         return this.fieldLayout.getTagPose(apriltag).get().toPose2d().transformBy(offset.transform);
     }
+
+    private static Command getOnTheFlyCommands(onTheFlySetpoints targetPose) {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+         Pose2d targetPose2d;
+            if(alliance.isPresent() && alliance.get() == Alliance.Red) targetPose2d = targetPose.redAlignmentPose;
+            else targetPose2d = targetPose.blueAlignmentPose;
+        return AutoBuilder.pathfindToPose(
+            targetPose2d,
+            new PathConstraints(4.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720)));
+        }
+        
+    public static Command alignLeftClimb() {
+        return getOnTheFlyCommands(CLIMB_LEFT_SETUP);
+    }
+    public static Command alignClimbRight() {
+        return getOnTheFlyCommands(CLIMB_RIGHT_SETUP);
+    }
+    public static Command alignHumanPlayer() {
+        return getOnTheFlyCommands(HUMAN_PLAYER);
+    }
+    public static Command alignScoreLeft() {
+        return getOnTheFlyCommands(SCORE_LEFT);
+    }
+    public static Command alignScoreRight() {
+        return getOnTheFlyCommands(SCORE_RIGHT);
+    }
+    public static Command alignScoreCenter() {
+        return getOnTheFlyCommands(SCORE_CENTER);
+    }
 }
+    
