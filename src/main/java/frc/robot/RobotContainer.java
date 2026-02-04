@@ -243,8 +243,8 @@ public class RobotContainer {
         .alongWith(indexer.runIndexer()))
         .alongWith(shooter.reverseKicker()));
         
-    autoBuilder.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_CENTER);
-    autoBuilder.addFeedCommand();
+    autoBuilder.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.RAMP);
+    autoBuilder.addReturnAlliance(autoOptions.BORDER_RIGHT, autoOptions.RAMP);
 
     controller.povUp()
         .onTrue(Commands.runOnce(() -> 
