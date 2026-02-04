@@ -174,6 +174,36 @@ public class AutoRoutineBuilder {
         }
     }
 
+    public void testAll(){
+        this.addExitAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);
+        this.addExitAlliance(autoOptions.BORDER_LEFT, autoOptions.RAMP);
+        this.addExitAlliance(autoOptions.BORDER_RIGHT, autoOptions.TRENCH);
+        this.addExitAlliance(autoOptions.BORDER_RIGHT, autoOptions.RAMP);
+
+        this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_CENTER);
+        this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
+        this.addSweep(autoOptions.BORDER_RIGHT, autoOptions.SWEEP_CENTER);
+        this.addSweep(autoOptions.BORDER_RIGHT, autoOptions.SWEEP_EDGE);
+
+        this.addFeedCommand();
+
+        this.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);
+        this.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.RAMP);
+        this.addReturnAlliance(autoOptions.BORDER_RIGHT, autoOptions.TRENCH);
+        this.addReturnAlliance(autoOptions.BORDER_RIGHT, autoOptions.RAMP);
+
+        this.addScoreCommand(autoOptions.SHOOT_LEFT);
+        this.addScoreCommand(autoOptions.SHOOT_CENTER);
+        this.addScoreCommand(autoOptions.SHOOT_RIGHT);
+
+        this.addClimbCommand(autoOptions.CLIMB_LEFT);
+        this.addClimbCommand(autoOptions.CLIMB_RIGHT);
+
+        this.addHumanPlayerCommand(autoOptions.SHOOT_LEFT);
+        this.addHumanPlayerCommand(autoOptions.SHOOT_CENTER);
+        this.addHumanPlayerCommand(autoOptions.SHOOT_RIGHT);
+    }
+
     public void clearRoutine(){
         this.commands.clear();
     }

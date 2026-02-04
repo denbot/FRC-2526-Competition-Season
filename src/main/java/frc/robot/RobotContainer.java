@@ -241,8 +241,7 @@ public class RobotContainer {
         .alongWith(indexer.runIndexer()))
         .alongWith(shooter.reverseKicker()));
         
-    autoBuilder.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.RAMP);
-    autoBuilder.addReturnAlliance(autoOptions.BORDER_RIGHT, autoOptions.RAMP);
+    autoBuilder.testAll();
 
     controller.povUp()
         .onTrue(Commands.runOnce(() -> 
