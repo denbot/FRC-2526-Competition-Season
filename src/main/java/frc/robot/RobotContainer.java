@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
 import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
@@ -69,8 +70,6 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandGenericHID operatorController1 = new CommandGenericHID(1);
-  private final CommandGenericHID operatorController2 = new CommandGenericHID(2);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -143,6 +142,7 @@ public class RobotContainer {
 
 
     // Set up auto routines
+    OperatorController.defineAutoBindings(autoBuilder);
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
