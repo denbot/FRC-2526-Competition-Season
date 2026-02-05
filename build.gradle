@@ -12,6 +12,15 @@ java {
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
+repositories {
+    maven {
+        url 'https://jitpack.io'
+        content {
+            "bot.den"
+        }
+    }
+}
+
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
@@ -96,6 +105,9 @@ dependencies {
 
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
+
+    implementation 'bot.den.FoxFlow:foxflow:v1.3.0'
+    annotationProcessor 'bot.den.FoxFlow:foxflow-annotations:v1.3.0'
 }
 
 test {
