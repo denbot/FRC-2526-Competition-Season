@@ -60,22 +60,21 @@ public class AutoRoutineBuilder {
         if(startSide == autoOptions.BORDER_LEFT){
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_LEFT)
-                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))).andThen(this.intake.stopIntake()));
+                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60)).alongWith(this.indexer.runIndexer()).alongWith(this.shooter.reverseKicker())));
             }
             else{
-                addAction(
-                    SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
-                    .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))).andThen(this.intake.stopIntake()));
+                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
+                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60)).alongWith(this.indexer.runIndexer()).alongWith(this.shooter.reverseKicker())));
             }
         }
         else{
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_RIGHT)
-                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))).andThen(this.intake.stopIntake()));
+                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60)).alongWith(this.indexer.runIndexer()).alongWith(this.shooter.reverseKicker())));
             }
             else{
                 addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_RIGHT)
-                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60))).andThen(this.intake.stopIntake()));
+                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60)).alongWith(this.indexer.runIndexer()).alongWith(this.shooter.reverseKicker())));
             }
         }
     }
@@ -102,10 +101,9 @@ public class AutoRoutineBuilder {
         
     }
 
-    public void addScoreCommand(){
-        // TODO TEMP FUNCTION FOR INDEX AND SHOOT
+    public void addShootCommand(){
         addAction(DriveCommands.autoJoystickDriveAtAngle(drive));
-        addAction(new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
+        addAction(new ParallelCommandGroup(this.indexer.runIndexer(), this.shooter.runKicker(), this.shooter.runSpinner()).withTimeout(Seconds.of(3)));
         }
 
     public void addAlignScorePosition(autoOptions scoreLocation){
@@ -126,16 +124,10 @@ public class AutoRoutineBuilder {
         }
     }
     
-    public void addFeedCommand(){
-        // TODO TEMP FUNCTION FOR INDEX AND SHOOT
-        addAction(DriveCommands.autoJoystickDriveAtAngle(drive));
-        addAction(new ParallelCommandGroup(indexer.runIndexer(), shooter.runKicker(), shooter.runSpinner()).withTimeout(Seconds.of(3)));
-    }
-
     public void addHumanPlayerCommand(autoOptions endScorePosition){
         addAction(getAutoAlignmentCommand(onTheFlySetpoints.HUMAN_PLAYER));
         addAlignScorePosition(endScorePosition);
-        addScoreCommand();
+        addShootCommand();
     }
 
     public void addClimbCommand(autoOptions climbSide){
@@ -159,7 +151,7 @@ public class AutoRoutineBuilder {
         this.addSweep(autoOptions.BORDER_RIGHT, autoOptions.SWEEP_CENTER);
         this.addSweep(autoOptions.BORDER_RIGHT, autoOptions.SWEEP_EDGE);
 
-        this.addFeedCommand();
+        this.addShootCommand();
 
         this.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);
         this.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.RAMP);
@@ -170,7 +162,7 @@ public class AutoRoutineBuilder {
         this.addAlignScorePosition(autoOptions.SHOOT_CENTER);
         this.addAlignScorePosition(autoOptions.SHOOT_RIGHT);
         
-        this.addScoreCommand();
+        this.addShootCommand();
 
         this.addClimbCommand(autoOptions.CLIMB_LEFT);
         this.addClimbCommand(autoOptions.CLIMB_RIGHT);

@@ -147,8 +147,6 @@ public class RobotContainer {
         break;
     }
 
-
-
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
     operatorController = new OperatorController(autoBuilder);
