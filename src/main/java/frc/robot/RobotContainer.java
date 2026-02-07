@@ -11,17 +11,24 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Control.OperatorController;
+import frc.robot.subsystems.auto.AutoRoutineBuilder;
+import frc.robot.subsystems.auto.ShuffleBoardInputs;
+import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
 import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
@@ -68,9 +75,8 @@ public class RobotContainer {
   private AutoRoutineBuilder autoBuilder;
 
   // Controller
+  private OperatorController operatorController;
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandGenericHID operatorController1 = new CommandGenericHID(1);
-  private final CommandGenericHID operatorController2 = new CommandGenericHID(2);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -142,8 +148,10 @@ public class RobotContainer {
     }
 
 
+
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
+    operatorController = new OperatorController(autoBuilder);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Mute controller disconnected warnings
@@ -241,8 +249,6 @@ public class RobotContainer {
         .alongWith(indexer.runIndexer()))
         .alongWith(shooter.reverseKicker()));
         
-    autoBuilder.testAll();
-
     controller.povUp()
         .onTrue(Commands.runOnce(() -> 
                 shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
@@ -250,6 +256,7 @@ public class RobotContainer {
     controller.povDown()
         .onTrue(Commands.runOnce(() -> 
                 shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
+
 }
 
 public Pose2d getRobotPosition(){
