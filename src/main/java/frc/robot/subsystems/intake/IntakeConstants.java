@@ -10,7 +10,7 @@ public class IntakeConstants {
   // intake (rack). Units to be determined.
   public static final double intakeMaxExtensionLength = 12; // TODO: find extension max
   public static final double intakeMinExtensionLength = 0; // TODO: find extension min
-  public static int INTAKE_MOTOR_ID = 5;
+  public static int INTAKE_MOTOR_ID = 40;
   public static int RACK_MOTOR_ID = 34;
   public static int DEPLOYED_DIO_PORT = 0; // TODO: find port
   public static int RETRACTED_DIO_PORT = 1; // TODO: find port
