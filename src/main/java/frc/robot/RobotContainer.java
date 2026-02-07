@@ -68,7 +68,7 @@ public class RobotContainer {
   // Subsystems
   private final ShuffleBoardInputs shuffleBoardInputs = new ShuffleBoardInputs();
 
-  private final Drive drive;
+  public final Drive drive;
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
