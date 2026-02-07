@@ -66,15 +66,48 @@ public enum HubState {
             }
         } else { // If we do not have an alliance or there was no message
             // Activate all shifts
-            for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_2, MatchState.SHIFT_3, MatchState.SHIFT_4)) {
-                // Activate shift 1, 2, 3 & 4 if we won the auto points
-                stateMachine
-                        .state(shift, HubState.INACTIVE)
-                        .to(HubState.ACTIVE)
-                        .transitionWhen(() -> true);
-            }
+            // for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_2, MatchState.SHIFT_3, MatchState.SHIFT_4)) {
+            //     // Activate shift 1, 2, 3 & 4 if we won the auto points
+            //     stateMachine
+            //             .state(shift, HubState.INACTIVE)
+            //             .to(HubState.ACTIVE)
+            //             .transitionWhen(() -> true);
+            // }
+
+            // No need to activate if there is no deactivation?
         }
         
+    }
+
+    public static void configureShifts(RebuiltStateMachine stateMachine, boolean autoWin) {
+        // Game state during shifts
+        for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_3)) {
+            // Deactivate shift 1 & 3 if we won the auto points
+            stateMachine
+                    .state(shift, HubState.ACTIVE)
+                    .to(HubState.INACTIVE)
+                    .transitionWhen(() -> autoWin);
+
+            // Activate shift 1 & 3 if we lost the auto points
+            stateMachine
+                    .state(shift, HubState.INACTIVE)
+                    .to(HubState.ACTIVE)
+                    .transitionWhen(() -> ! autoWin);
+        }
+
+        for(var shift : Set.of(MatchState.SHIFT_2, MatchState.SHIFT_4)) {
+            // Activate shift 2 & 4 if we won the auto points
+            stateMachine
+                    .state(shift, HubState.INACTIVE)
+                    .to(HubState.ACTIVE)
+                    .transitionWhen(() -> autoWin);
+
+            // Deactivate shift 2 & 4 if we lost the auto points
+            stateMachine
+                    .state(shift, HubState.ACTIVE)
+                    .to(HubState.INACTIVE)
+                    .transitionWhen(() -> ! autoWin);
+        }
     }
 
     private static boolean autoWinConverter(AutoWin autoWin) {
