@@ -37,13 +37,13 @@ public enum HubState {
             stateMachine
                     .state(shift, HubState.ACTIVE)
                     .to(HubState.INACTIVE)
-                    .transitionWhen(() -> (hubStateShiftsConfigurable()? weWonTheAutoPoints(): (hubStateShiftsFixed? false: weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically)));
+                    .transitionWhen(() -> (hubStateShiftsConfigurable()? weWonTheAutoPoints(): (hubStateShiftsFixed? weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically: false)));
 
             // Activate shift 1 & 3 if we lost the auto points
             stateMachine
                     .state(shift, HubState.INACTIVE)
                     .to(HubState.ACTIVE)
-                    .transitionWhen(() -> (hubStateShiftsConfigurable()? !weWonTheAutoPoints(): (hubStateShiftsFixed? false: !weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically)));
+                    .transitionWhen(() -> (hubStateShiftsConfigurable()? !weWonTheAutoPoints(): (hubStateShiftsFixed? !weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically: false)));
         }
 
         for(var shift : Set.of(MatchState.SHIFT_2, MatchState.SHIFT_4)) {
@@ -51,13 +51,13 @@ public enum HubState {
             stateMachine
                     .state(shift, HubState.INACTIVE)
                     .to(HubState.ACTIVE)
-                    .transitionWhen(() -> (hubStateShiftsConfigurable()? weWonTheAutoPoints(): (hubStateShiftsFixed? false: weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically)));
+                    .transitionWhen(() -> (hubStateShiftsConfigurable()? weWonTheAutoPoints(): (hubStateShiftsFixed? weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically: false)));
 
             // Deactivate shift 2 & 4 if we lost the auto points
             stateMachine
                     .state(shift, HubState.ACTIVE)
                     .to(HubState.INACTIVE)
-                    .transitionWhen(() -> (hubStateShiftsConfigurable()? !weWonTheAutoPoints(): (hubStateShiftsFixed? false: !weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically)));
+                    .transitionWhen(() -> (hubStateShiftsConfigurable()? !weWonTheAutoPoints(): (hubStateShiftsFixed? !weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically: false)));
         }
     }
 
@@ -92,6 +92,7 @@ public enum HubState {
         } else {
             String gameSpecificMessage = DriverStation.getGameSpecificMessage();
             if (DriverStation.getAlliance().isEmpty() || (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B"))) { // If we don't have an alliance or there was not a game specific message
+                System.out.println("iwbnfiewnrifew3rf");
                 SmartDashboard.putString("CAN'T CONFIGURE HUBSTATE SHIFTS", DriverStation.getAlliance().isEmpty() ? "Issue: no alliance found": "Issue: Game-specific message not given");
                 return false;
             }

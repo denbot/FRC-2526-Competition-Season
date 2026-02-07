@@ -121,6 +121,56 @@ public class HubStateTest {
         assertEquals(shiftOneIsOurs, machine.currentState().hubState() == HubState.INACTIVE, "Shift 4 is incorrect");
     }
 
+    @Test
+    void whenHubStateNotConfigurableHubAlwaysActive() {
+        var machine = new RebuiltStateMachine();
+        HubState.setup(machine);
+        setGameSpecificMessage(null);
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
+        machine.poll();
+
+        assertEquals(MatchState.AUTO, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.TRANSITION_SHIFT));
+        machine.poll();
+
+        assertEquals(MatchState.TRANSITION_SHIFT, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_1));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_1, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_2));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_2, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_3));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_3, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_4));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_4, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.END_GAME));
+        machine.poll();
+
+        assertEquals(MatchState.END_GAME, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+    }
+
+
     private static Stream<Arguments> matchSetups() {
         return Arrays.stream(Alliance.values())
                 .flatMap(a -> Arrays.stream(Alliance.values())
