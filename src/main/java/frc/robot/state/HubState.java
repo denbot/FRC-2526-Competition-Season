@@ -11,11 +11,8 @@ public enum HubState {
     @DefaultState INACTIVE,
     ACTIVE;
 
-    private enum AutoWin {
-        TRUE,
-        FALSE,
-        NONE;
-    }
+    private static boolean hubStateShiftsFixed = false;
+    private static boolean weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically = false;
 
     public static void setup(RebuiltStateMachine stateMachine) {
         // Auto
@@ -34,65 +31,19 @@ public enum HubState {
             stateMachine.state(matchState).to(MatchState.NONE).transitionTo(HubState.INACTIVE);
         }
 
-        if (!weWonTheAutoPoints().equals(AutoWin.NONE)) { // If we either won the auto or did not win the auto
-
-            // Game state during shifts
-            for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_3)) {
-                // Deactivate shift 1 & 3 if we won the auto points
-                stateMachine
-                        .state(shift, HubState.ACTIVE)
-                        .to(HubState.INACTIVE)
-                        .transitionWhen(HubState::weWonAuto);
-
-                // Activate shift 1 & 3 if we lost the auto points
-                stateMachine
-                        .state(shift, HubState.INACTIVE)
-                        .to(HubState.ACTIVE)
-                        .transitionWhen(() -> ! weWonAuto());
-            }
-
-            for(var shift : Set.of(MatchState.SHIFT_2, MatchState.SHIFT_4)) {
-                // Activate shift 2 & 4 if we won the auto points
-                stateMachine
-                        .state(shift, HubState.INACTIVE)
-                        .to(HubState.ACTIVE)
-                        .transitionWhen(HubState::weWonAuto);
-
-                // Deactivate shift 2 & 4 if we lost the auto points
-                stateMachine
-                        .state(shift, HubState.ACTIVE)
-                        .to(HubState.INACTIVE)
-                        .transitionWhen(() -> ! weWonAuto());
-            }
-        } else { // If we do not have an alliance or there was no message
-            // Activate all shifts
-            // for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_2, MatchState.SHIFT_3, MatchState.SHIFT_4)) {
-            //     // Activate shift 1, 2, 3 & 4 if we won the auto points
-            //     stateMachine
-            //             .state(shift, HubState.INACTIVE)
-            //             .to(HubState.ACTIVE)
-            //             .transitionWhen(() -> true);
-            // }
-
-            // No need to activate if there is no deactivation?
-        }
-        
-    }
-
-    public static void configureShifts(RebuiltStateMachine stateMachine, boolean autoWin) {
         // Game state during shifts
         for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_3)) {
             // Deactivate shift 1 & 3 if we won the auto points
             stateMachine
                     .state(shift, HubState.ACTIVE)
                     .to(HubState.INACTIVE)
-                    .transitionWhen(() -> autoWin);
+                    .transitionWhen(HubState::autoWinAndStatesConfigurable);
 
             // Activate shift 1 & 3 if we lost the auto points
             stateMachine
                     .state(shift, HubState.INACTIVE)
                     .to(HubState.ACTIVE)
-                    .transitionWhen(() -> ! autoWin);
+                    .transitionWhen(() -> ! autoWinAndStatesConfigurable());
         }
 
         for(var shift : Set.of(MatchState.SHIFT_2, MatchState.SHIFT_4)) {
@@ -100,51 +51,62 @@ public enum HubState {
             stateMachine
                     .state(shift, HubState.INACTIVE)
                     .to(HubState.ACTIVE)
-                    .transitionWhen(() -> autoWin);
+                    .transitionWhen(HubState::autoWinAndStatesConfigurable);
 
             // Deactivate shift 2 & 4 if we lost the auto points
             stateMachine
                     .state(shift, HubState.ACTIVE)
                     .to(HubState.INACTIVE)
-                    .transitionWhen(() -> ! autoWin);
+                    .transitionWhen(() -> (!autoWinAndStatesConfigurable() && hubStateShiftsConfigurable()));
         }
     }
 
-    private static boolean autoWinConverter(AutoWin autoWin) {
-        switch(autoWin) {
-            case TRUE:
+    public static void configureShifts(boolean weWonAutoPoints) {
+        hubStateShiftsFixed = true;
+        weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically = weWonAutoPoints;
+    }
+
+    private static boolean autoWinAndStatesConfigurable() { // Returns the fixed "weWonAutoPoints" if it is fixed, else return the weWonTheAutoPoints() method if there were no errors solving the driverstation. 
+        if (hubStateShiftsFixed) {
+            return (weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically);
+        } else {
+            if (hubStateShiftsConfigurable()) {
+                return weWonTheAutoPoints();
+            }
+            return false;
+        }
+    }
+
+    private static boolean weWonTheAutoPoints() {
+        try {
+            String gameSpecificMessage = DriverStation.getGameSpecificMessage();
+            var alliance = DriverStation.getAlliance().get();
+
+            if (alliance == Alliance.Red && gameSpecificMessage.equals("R")) {
                 return true;
-            case FALSE:
+            } else if (alliance == Alliance.Red && gameSpecificMessage.equals("B")) {
                 return false;
-            case NONE: // Unreachable
+            } else if (alliance == Alliance.Blue && gameSpecificMessage.equals("R")) {
                 return false;
-            default: // Unreachable
-                return false;
+            } else {
+                return (alliance == Alliance.Blue && gameSpecificMessage.equals("B"));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getStackTrace());
         }
+        return false;
     }
 
-    private static boolean weWonAuto() {
-        return autoWinConverter(weWonTheAutoPoints());
-    }
-
-    private static AutoWin weWonTheAutoPoints() {
-        String gameSpecificMessage = DriverStation.getGameSpecificMessage();
-        var alliance = DriverStation.getAlliance().get();
-
-        if (DriverStation.getAlliance().isEmpty() || (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B"))) { // If we don't have an alliance or there was not a game specific message
-            SmartDashboard.putString("CAN'T CONFIGURE HUBSTATE SHIFTS", DriverStation.getAlliance().isEmpty() ? "Issue: no alliance found": "Issue: Game-specific message not given");
-            return AutoWin.NONE;
+    private static boolean hubStateShiftsConfigurable() {
+        if (hubStateShiftsFixed) {
+            return true;
+        } else {
+            String gameSpecificMessage = DriverStation.getGameSpecificMessage();
+            if (DriverStation.getAlliance().isEmpty() || (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B"))) { // If we don't have an alliance or there was not a game specific message
+                SmartDashboard.putString("CAN'T CONFIGURE HUBSTATE SHIFTS", DriverStation.getAlliance().isEmpty() ? "Issue: no alliance found": "Issue: Game-specific message not given");
+                return false;
+            }
+            return true;
         }
-
-        if (alliance == Alliance.Red && gameSpecificMessage.equals("R")) {
-            return AutoWin.TRUE;
-        } else if (alliance == Alliance.Red && gameSpecificMessage.equals("B")) {
-            return AutoWin.FALSE;
-        } else if (alliance == Alliance.Blue && gameSpecificMessage.equals("R")) {
-            return AutoWin.FALSE;
-        } else if (alliance == Alliance.Blue && gameSpecificMessage.equals("B")) {
-            return AutoWin.TRUE;
-        }
-        return AutoWin.NONE;
     }
 }
