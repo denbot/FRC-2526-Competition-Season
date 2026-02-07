@@ -3,6 +3,7 @@ package frc.robot.subsystems.Control;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.state.HubState;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
 
@@ -18,7 +19,8 @@ public class OperatorController {
     private final Trigger aimAndShootButton = operatorController1.button(5);
     private final Trigger clearAllButton = operatorController1.button(6);
     private final Trigger clearLastButton = operatorController1.button(7);
-
+    private final Trigger setWeWonAutoPointsTrueButton = operatorController1.button(9);
+    private final Trigger setWeWonAutoPointsFalseButton = operatorController1.button(10);
     
     public OperatorController(AutoRoutineBuilder autoBuilder){
         // Add neutral sweep + score  
@@ -77,5 +79,17 @@ public class OperatorController {
                 System.out.println("Cleared auto routine");
                 autoBuilder.removeLast();
             }).ignoringDisable(true));
+
+        setWeWonAutoPointsTrueButton.onTrue(Commands.runOnce(
+            () -> {
+                System.out.println("We won auto points");
+                HubState.configureShifts(true);
+            }));
+
+        setWeWonAutoPointsFalseButton.onTrue(Commands.runOnce(
+            () -> {
+                System.out.println("We lost auto points");
+                HubState.configureShifts(false);
+            }));
     }
 }
