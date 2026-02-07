@@ -10,6 +10,12 @@ public enum HubState {
     @DefaultState INACTIVE,
     ACTIVE;
 
+    private enum AutoWin {
+        TRUE,
+        FALSE,
+        NONE;
+    }
+
     public static void setup(RebuiltStateMachine stateMachine) {
         // Auto
         stateMachine.state(MatchState.NONE).to(MatchState.AUTO).transitionTo(HubState.ACTIVE);
@@ -27,49 +33,83 @@ public enum HubState {
             stateMachine.state(matchState).to(MatchState.NONE).transitionTo(HubState.INACTIVE);
         }
 
-        // Game state during shifts
-        for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_3)) {
-            // Deactivate shift 1 & 3 if we won the auto points
-            stateMachine
-                    .state(shift, HubState.ACTIVE)
-                    .to(HubState.INACTIVE)
-                    .transitionWhen(HubState::weWonTheAutoPoints);
+        if (!weWonTheAutoPoints().equals(AutoWin.NONE)) { // If we either won the auto or did not win the auto
 
-            // Activate shift 1 & 3 if we lost the auto points
-            stateMachine
-                    .state(shift, HubState.INACTIVE)
-                    .to(HubState.ACTIVE)
-                    .transitionWhen(() -> ! weWonTheAutoPoints());
+            // Game state during shifts
+            for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_3)) {
+                // Deactivate shift 1 & 3 if we won the auto points
+                stateMachine
+                        .state(shift, HubState.ACTIVE)
+                        .to(HubState.INACTIVE)
+                        .transitionWhen(HubState::weWonAuto);
+
+                // Activate shift 1 & 3 if we lost the auto points
+                stateMachine
+                        .state(shift, HubState.INACTIVE)
+                        .to(HubState.ACTIVE)
+                        .transitionWhen(() -> ! weWonAuto());
+            }
+
+            for(var shift : Set.of(MatchState.SHIFT_2, MatchState.SHIFT_4)) {
+                // Activate shift 2 & 4 if we won the auto points
+                stateMachine
+                        .state(shift, HubState.INACTIVE)
+                        .to(HubState.ACTIVE)
+                        .transitionWhen(HubState::weWonAuto);
+
+                // Deactivate shift 2 & 4 if we lost the auto points
+                stateMachine
+                        .state(shift, HubState.ACTIVE)
+                        .to(HubState.INACTIVE)
+                        .transitionWhen(() -> ! weWonAuto());
+            }
+        } else { // If we do not have an alliance or there was no message
+            // Activate all shifts
+            for(var shift : Set.of(MatchState.SHIFT_1, MatchState.SHIFT_2, MatchState.SHIFT_3, MatchState.SHIFT_4)) {
+                // Activate shift 1, 2, 3 & 4 if we won the auto points
+                stateMachine
+                        .state(shift, HubState.INACTIVE)
+                        .to(HubState.ACTIVE)
+                        .transitionWhen(() -> true);
+            }
         }
+        
+    }
 
-        for(var shift : Set.of(MatchState.SHIFT_2, MatchState.SHIFT_4)) {
-            // Activate shift 2 & 4 if we won the auto points
-            stateMachine
-                    .state(shift, HubState.INACTIVE)
-                    .to(HubState.ACTIVE)
-                    .transitionWhen(HubState::weWonTheAutoPoints);
-
-            // Deactivate shift 2 & 4 if we lost the auto points
-            stateMachine
-                    .state(shift, HubState.ACTIVE)
-                    .to(HubState.INACTIVE)
-                    .transitionWhen(() -> ! weWonTheAutoPoints());
+    private static boolean autoWinConverter(AutoWin autoWin) {
+        switch(autoWin) {
+            case TRUE:
+                return true;
+            case FALSE:
+                return false;
+            case NONE: // Unreachable
+                return false;
+            default: // Unreachable
+                return false;
         }
     }
 
-    private static boolean weWonTheAutoPoints() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return false;
-        }
+    private static boolean weWonAuto() {
+        return autoWinConverter(weWonTheAutoPoints());
+    }
 
+    private static AutoWin weWonTheAutoPoints() {
         String gameSpecificMessage = DriverStation.getGameSpecificMessage();
         var alliance = DriverStation.getAlliance().get();
+
+        if (DriverStation.getAlliance().isEmpty() || (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B"))) { // If we don't have an alliance or there was not a game specific message
+            return AutoWin.NONE;
+        }
+
         if (alliance == Alliance.Red && gameSpecificMessage.equals("R")) {
-            return true;
+            return AutoWin.TRUE;
         } else if (alliance == Alliance.Red && gameSpecificMessage.equals("B")) {
-            return false;
+            return AutoWin.FALSE;
         } else if (alliance == Alliance.Blue && gameSpecificMessage.equals("R")) {
-            return false;
-        } else return alliance == Alliance.Blue && gameSpecificMessage.equals("B");
+            return AutoWin.FALSE;
+        } else if (alliance == Alliance.Blue && gameSpecificMessage.equals("B")) {
+            return AutoWin.TRUE;
+        }
+        return AutoWin.NONE;
     }
 }
