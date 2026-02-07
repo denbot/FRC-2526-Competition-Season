@@ -37,13 +37,13 @@ public enum HubState {
             stateMachine
                     .state(shift, HubState.ACTIVE)
                     .to(HubState.INACTIVE)
-                    .transitionWhen(HubState::autoWinAndStatesConfigurable);
+                    .transitionWhen(() -> (hubStateShiftsConfigurable()? weWonTheAutoPoints(): (hubStateShiftsFixed? false: weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically)));
 
             // Activate shift 1 & 3 if we lost the auto points
             stateMachine
                     .state(shift, HubState.INACTIVE)
                     .to(HubState.ACTIVE)
-                    .transitionWhen(() -> ! autoWinAndStatesConfigurable());
+                    .transitionWhen(() -> (hubStateShiftsConfigurable()? !weWonTheAutoPoints(): (hubStateShiftsFixed? false: !weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically)));
         }
 
         for(var shift : Set.of(MatchState.SHIFT_2, MatchState.SHIFT_4)) {
@@ -51,30 +51,19 @@ public enum HubState {
             stateMachine
                     .state(shift, HubState.INACTIVE)
                     .to(HubState.ACTIVE)
-                    .transitionWhen(HubState::autoWinAndStatesConfigurable);
+                    .transitionWhen(() -> (hubStateShiftsConfigurable()? weWonTheAutoPoints(): (hubStateShiftsFixed? false: weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically)));
 
             // Deactivate shift 2 & 4 if we lost the auto points
             stateMachine
                     .state(shift, HubState.ACTIVE)
                     .to(HubState.INACTIVE)
-                    .transitionWhen(() -> (!autoWinAndStatesConfigurable() && hubStateShiftsConfigurable()));
+                    .transitionWhen(() -> (hubStateShiftsConfigurable()? !weWonTheAutoPoints(): (hubStateShiftsFixed? false: !weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically)));
         }
     }
 
     public static void configureShifts(boolean weWonAutoPoints) {
         hubStateShiftsFixed = true;
         weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically = weWonAutoPoints;
-    }
-
-    private static boolean autoWinAndStatesConfigurable() { // Returns the fixed "weWonAutoPoints" if it is fixed, else return the weWonTheAutoPoints() method if there were no errors solving the driverstation. 
-        if (hubStateShiftsFixed) {
-            return (weWonAutoPointsAndHubStateShiftsNotConfiguredAutomatically);
-        } else {
-            if (hubStateShiftsConfigurable()) {
-                return weWonTheAutoPoints();
-            }
-            return false;
-        }
     }
 
     private static boolean weWonTheAutoPoints() {
