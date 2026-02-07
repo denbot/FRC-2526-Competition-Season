@@ -3,6 +3,7 @@ package frc.robot.state;
 import bot.den.foxflow.DefaultState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Set;
 
@@ -98,6 +99,7 @@ public enum HubState {
         var alliance = DriverStation.getAlliance().get();
 
         if (DriverStation.getAlliance().isEmpty() || (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B"))) { // If we don't have an alliance or there was not a game specific message
+            SmartDashboard.putString("CAN'T CONFIGURE HUBSTATE SHIFTS", DriverStation.getAlliance().isEmpty() ? "Issue: no alliance found": "Issue: Game-specific message not given");
             return AutoWin.NONE;
         }
 
