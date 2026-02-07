@@ -1,4 +1,4 @@
-package frc.robot.StateMachines;
+package frc.robot.state;
 
 import bot.den.foxflow.DefaultState;
 import edu.wpi.first.wpilibj.DriverStation;

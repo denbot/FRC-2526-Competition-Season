@@ -1,3 +1,5 @@
+package frc.robot.state;
+
 import bot.den.foxflow.RobotState;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
@@ -16,7 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static bot.den.frc2026.quaternion.helpers.TestHelpers.setDriverStationState;
+import static frc.robot.helpers.TestHelpers.setDriverStationState;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HubStateTest {

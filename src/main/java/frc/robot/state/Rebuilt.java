@@ -1,4 +1,4 @@
-package frc.robot.StateMachines;
+package frc.robot.state;
 
 import bot.den.foxflow.RobotState;
 import bot.den.foxflow.StateMachine;
