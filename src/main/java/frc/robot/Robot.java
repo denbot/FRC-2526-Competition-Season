@@ -100,9 +100,8 @@ public class Robot extends LoggedRobot {
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
     getPoseEstimate(Limelights.LEFT.name);
-    // Comented out for testing, only left is set up
-    //getPoseEstimate(Limelights.RIGHT.name);
-    //getPoseEstimate(Limelights.REAR.name);
+    getPoseEstimate(Limelights.RIGHT.name);
+    getPoseEstimate(Limelights.REAR.name);
     robotPosition.setRobotPose(robotContainer.getRobotPosition());
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
@@ -112,8 +111,9 @@ public class Robot extends LoggedRobot {
   public void getPoseEstimate(String limelightName){
     LimelightHelpers.PoseEstimate poseEstimate = 
     LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+
     if(poseEstimate == null || poseEstimate.tagCount == 0) return;
-    
+
     if (poseEstimate.tagCount == 1 && 
       poseEstimate.rawFiducials.length == 1 &&
       (poseEstimate.rawFiducials[0].ambiguity > .7 || 
