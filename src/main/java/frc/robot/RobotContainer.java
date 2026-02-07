@@ -75,6 +75,7 @@ public class RobotContainer {
   private AutoRoutineBuilder autoBuilder;
 
   // Controller
+  private OperatorController operatorController;
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // Dashboard inputs
@@ -150,8 +151,7 @@ public class RobotContainer {
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
-    OperatorController.defineAutoBindings(autoBuilder);
-    autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
+    operatorController = new OperatorController(autoBuilder);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Mute controller disconnected warnings
@@ -249,8 +249,6 @@ public class RobotContainer {
         .alongWith(indexer.runIndexer()))
         .alongWith(shooter.reverseKicker()));
         
-    autoBuilder.testAll();
-
     controller.povUp()
         .onTrue(Commands.runOnce(() -> 
                 shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
@@ -258,6 +256,7 @@ public class RobotContainer {
     controller.povDown()
         .onTrue(Commands.runOnce(() -> 
                 shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
+
 }
 
 public Pose2d getRobotPosition(){

@@ -2,66 +2,80 @@ package frc.robot.subsystems.Control;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
 
 public class OperatorController {
-    private static final CommandGenericHID operatorController1 = new CommandGenericHID(1);
-    
-    public static void defineAutoBindings(AutoRoutineBuilder autoBuilder){
-        // TODO all button numbers are assigned and not true to reality
-        
-        // add exit aliance based on state of side exit switch
-        operatorController1.button(2).onTrue(Commands.runOnce(
-            () ->{ 
-                autoBuilder.addExitAlliance(
-                    operatorController1.button(1).getAsBoolean() ? autoOptions.BORDER_LEFT : autoOptions.BORDER_RIGHT);
-            }));
-    
-        // add center sweep based on state of exit switch and sweep switch
-        operatorController1.button(4).onTrue(Commands.runOnce(
-            () -> autoBuilder.addSweep(
-                operatorController1.button(1).getAsBoolean() ? autoOptions.BORDER_LEFT : autoOptions.BORDER_RIGHT, 
-                operatorController1.button(3).getAsBoolean() ? autoOptions.SWEEP_EDGE : autoOptions.SWEEP_CENTER)));
-        
-        // add center sweep based on state of exit switch and return switch
-        operatorController1.button(6).onTrue(Commands.runOnce(
-            () -> autoBuilder.addReturnAlliance(
-                operatorController1.button(1).getAsBoolean() ? autoOptions.BORDER_LEFT : autoOptions.BORDER_RIGHT, 
-                operatorController1.button(5).getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP)));
+    private final CommandGenericHID operatorController1 = new CommandGenericHID(1);
+    private final Trigger leftRightSwitch = operatorController1.button(12);
+    private final Trigger edgeCenterSwitch = operatorController1.button(11);
+    private final Trigger trenchBumpSwitch = operatorController1.button(8);
+    private final Trigger neutralZoneFeedButton = operatorController1.button(1);
+    private final Trigger neutralZoneScoreButton = operatorController1.button(2);
+    private final Trigger humanPlayerButton = operatorController1.button(3);
+    private final Trigger climbButton = operatorController1.button(4);
+    private final Trigger aimAndShootButton = operatorController1.button(5);
+    private final Trigger clearAllButton = operatorController1.button(6);
+    private final Trigger clearLastButton = operatorController1.button(7);
 
-        // add exit, sweep, return, shoot based on all switch values
-        operatorController1.button(7).onTrue(Commands.runOnce(
+    
+    public OperatorController(AutoRoutineBuilder autoBuilder){
+        // Add neutral sweep + score  
+        neutralZoneScoreButton.onTrue(Commands.runOnce(
             () -> {
-                autoOptions startSide = operatorController1.button(1).getAsBoolean() ? autoOptions.BORDER_LEFT : autoOptions.BORDER_RIGHT;
+                System.out.println("Added neutral score to auto routine");
+                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
                 autoBuilder.addExitAlliance(startSide);
-                autoBuilder.addSweep(startSide, operatorController1.button(3).getAsBoolean() ? autoOptions.SWEEP_EDGE : autoOptions.SWEEP_CENTER); 
-                autoBuilder.addReturnAlliance(startSide, operatorController1.button(5).getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP);
-                autoBuilder.addScoreCommand();
-        })); 
+                autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
+                autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.RAMP : autoOptions.TRENCH);
+                autoBuilder.addScoreCommand(); 
+            }).ignoringDisable(true));
 
-        // add feed command
-        operatorController1.button(8).onTrue(Commands.runOnce(
-            () -> autoBuilder.addFeedCommand()));        
+        // Add neutral sweep + feed 
+        neutralZoneFeedButton.onTrue(Commands.runOnce(
+            () -> {
+                System.out.println("Added neutral feed to auto routine");
+                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
+                autoBuilder.addExitAlliance(startSide);
+                autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
+                autoBuilder.addFeedCommand(); 
+            }).ignoringDisable(true));
 
         // add human player command
-        operatorController1.button(9).onTrue(Commands.runOnce(
-            () -> autoBuilder.addHumanPlayerCommand(autoOptions.SHOOT_RIGHT)));
+        humanPlayerButton.onTrue(Commands.runOnce(
+            () -> {
+                System.out.println("Added human player to auto routine");
+                autoBuilder.addHumanPlayerCommand(autoOptions.SHOOT_RIGHT);
+            }).ignoringDisable(true));
         
         // add climb command
-        operatorController1.button(11).onTrue(Commands.runOnce(
-            () -> autoBuilder.addHumanPlayerCommand(
-                operatorController1.button(10).getAsBoolean() ? autoOptions.CLIMB_LEFT : autoOptions.CLIMB_RIGHT)));  
-                
+        climbButton.onTrue(Commands.runOnce(
+            () -> {
+                System.out.println("Added climb to auto routine");
+                autoBuilder.addClimbCommand(
+                    leftRightSwitch.getAsBoolean() ? autoOptions.CLIMB_RIGHT : autoOptions.CLIMB_LEFT);
+            }).ignoringDisable(true));  
+        
+        // add aim and shoot command
+        aimAndShootButton.onTrue(Commands.runOnce(
+            () -> {
+                System.out.println("Added aim & shoot to auto routine");
+                autoBuilder.addScoreCommand();
+            }).ignoringDisable(true));
+    
         // clear routine 
-        operatorController1.button(12).onTrue(Commands.runOnce(
-            () -> autoBuilder.clearRoutine()));
+        clearAllButton.onTrue(Commands.runOnce(
+            () -> {
+                System.out.println("Cleared auto routine");
+                autoBuilder.clearRoutine();
+            }).ignoringDisable(true));
 
         // remove last command from routine 
-        /* Commented out because im annoyed we cant fit all commands on one operator controller
-        operatorController1.button(12).onTrue(Commands.runOnce(
-            () -> autoBuilder.removeLast()));
-             */
-        
+        clearLastButton.onTrue(Commands.runOnce(
+            () -> {
+                System.out.println("Cleared auto routine");
+                autoBuilder.removeLast();
+            }).ignoringDisable(true));
     }
 }
