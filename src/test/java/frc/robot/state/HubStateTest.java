@@ -89,7 +89,45 @@ public class HubStateTest {
     @MethodSource("matchSetups")
     void goThroughShifts(Alliance us, Alliance autoPoints) {
         setOurAlliance(us);
-        setGameSpecificMessage(autoPoints);
+        setGameSpecificMessage(autoPoints, false);
+        boolean shiftOneIsOurs = us != autoPoints;
+
+        // Transition shift will start active
+        var machine = new RebuiltStateMachine(MatchState.TRANSITION_SHIFT, HubState.ACTIVE);
+        HubState.setup(machine);
+
+        // Shift 1
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_1));
+        machine.poll();
+
+        assertEquals(shiftOneIsOurs, machine.currentState().hubState() == HubState.ACTIVE, "Shift 1 is incorrect");
+
+        // Shift 2
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_2));
+        machine.poll();
+
+        assertEquals(shiftOneIsOurs, machine.currentState().hubState() == HubState.INACTIVE, "Shift 2 is incorrect");
+
+        // Shift 3
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_3));
+        machine.poll();
+
+        assertEquals(shiftOneIsOurs, machine.currentState().hubState() == HubState.ACTIVE, "Shift 3 is incorrect");
+
+        // Shift 4
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_4));
+        machine.poll();
+
+        assertEquals(shiftOneIsOurs, machine.currentState().hubState() == HubState.INACTIVE, "Shift 4 is incorrect");
+    }
+
+    @ParameterizedTest
+    @MethodSource("matchSetups")
+    void goThroughShiftsWhenNonconfigurableAndFixed(Alliance us, Alliance autoPoints) {
+        setOurAlliance(us);
+        setGameSpecificMessage(null, true);
+        setFixed(us, autoPoints);
+
         boolean shiftOneIsOurs = us != autoPoints;
 
         // Transition shift will start active
@@ -125,7 +163,7 @@ public class HubStateTest {
     void whenHubStateNotConfigurableHubAlwaysActive() {
         var machine = new RebuiltStateMachine();
         HubState.setup(machine);
-        setGameSpecificMessage(null);
+        setGameSpecificMessage(null, true);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
         machine.poll();
@@ -186,12 +224,24 @@ public class HubStateTest {
         DriverStationSim.notifyNewData();
     }
 
-    private static void setGameSpecificMessage(Alliance autoPoints) {
-        if(autoPoints == Alliance.Red) {
-            DriverStationSim.setGameSpecificMessage("R");
+    private static void setGameSpecificMessage(Alliance autoPoints, boolean error) {
+        if (!error) {
+            if(autoPoints == Alliance.Red) {
+                DriverStationSim.setGameSpecificMessage("R");
+            } else {
+                DriverStationSim.setGameSpecificMessage("B");
+            }
         } else {
-            DriverStationSim.setGameSpecificMessage("B");
+            DriverStationSim.setGameSpecificMessage("GREEN?????");
         }
         DriverStationSim.notifyNewData();
+    }
+
+    private static void setFixed(Alliance us, Alliance autoPoints) {
+        if(autoPoints.equals(us)) {
+            HubState.configureShifts(true);
+        } else {
+            HubState.configureShifts(false);
+        }
     }
 }
