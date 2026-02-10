@@ -33,4 +33,9 @@ public class TestHelpers {
 
         DriverStationSim.notifyNewData();
     }
+
+    public static void setGameSpecificMessage(String message) {
+        DriverStationSim.setGameSpecificMessage(message);
+        DriverStationSim.notifyNewData();
+    }
 }

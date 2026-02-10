@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BooleanSupplier;
 
 public enum HubState {
     @DefaultState INACTIVE,
