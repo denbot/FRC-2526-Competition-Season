@@ -237,7 +237,9 @@ public class RobotContainer {
 
     // Shoot when right trigger is held
     controller.rightTrigger()
-        .whileTrue(shooter.runKicker());
+        .whileTrue(
+            shooter.runKicker()
+            .alongWith(indexer.runIndexer()));
 
     // Toggle intake when left bumper is pressed
     controller.leftBumper()
