@@ -38,7 +38,7 @@ public class IndexerIOTalonFX implements IndexerIO{
     public IndexerIOTalonFX() {
         var indexMotorConfig =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
