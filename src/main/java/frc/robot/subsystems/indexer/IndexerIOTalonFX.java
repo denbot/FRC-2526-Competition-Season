@@ -21,11 +21,11 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
-import frc.robot.Constants;
+import frc.robot.Constants.OperatorConstants;
 
 public class IndexerIOTalonFX implements IndexerIO{
     private final TalonFX indexMotor = 
-        new TalonFX(IndexerConstants.INDEX_MOTOR_ID, Constants.OperatorConstants.canivoreSerial);
+        new TalonFX(IndexerConstants.INDEX_MOTOR_ID, OperatorConstants.canivoreCANBus);
     
     private final Debouncer indexMotorDebouncer = new Debouncer(0.5);
 

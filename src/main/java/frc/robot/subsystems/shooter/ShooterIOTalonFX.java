@@ -29,13 +29,13 @@ import frc.robot.Constants.OperatorConstants;
 
 public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX leftSpinnerMotor =
-        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
     private final TalonFX rightSpinnerMotor =
-        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID, OperatorConstants.canivoreCANBus);
     
     private final TalonFX kickerMotor =
-        new TalonFX(ShooterConstants.KICKER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.KICKER_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
     private final Debouncer leftSpinnerMotorDebounce = new Debouncer(0.5);
     private final Debouncer rightSpinnerMotorDebounce = new Debouncer(0.5);
