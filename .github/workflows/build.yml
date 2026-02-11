@@ -11,5 +11,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Build robot code
         run: ./gradlew build
+
+      - name: Upload Coveralls report
+        uses:  coverallsapp/github-action@v2
+        with:
+          format: jacoco
