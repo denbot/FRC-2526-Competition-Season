@@ -7,12 +7,18 @@ import frc.robot.helpers.TestHelpers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HubStatusAlertTest {
     private HubStatusAlert command;
+    private final Random random = new Random();
 
     @BeforeEach
     void setup() {
@@ -57,6 +63,51 @@ public class HubStatusAlertTest {
         command.execute();
 
         assertTrue(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+    }
+
+    @Test
+    void badDataAlertShowsAfterTwoSeconds() {
+        int[] randomInts = {random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257)};
+        ArrayList<Character> randomChars = new ArrayList<Character>();
+        for (int randomInt : randomInts) {
+            randomChars.add((char) randomInt);
+        }
+        String badData = randomChars.toString();
+        TestHelpers.setGameSpecificMessage(badData);
+
+        command.initialize();
+
+        SimHooks.stepTiming(1.8);
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+
+        SimHooks.stepTiming(0.3);
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertTrue(command.badDataAlert.get());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"R", "B"})
+    void noAlertsShowOnGoodData(String data) {
+        TestHelpers.setGameSpecificMessage(data);
+
+        command.initialize();
+
+        SimHooks.stepTiming(1.8);
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+
+        SimHooks.stepTiming(0.3);
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
         assertFalse(command.badDataAlert.get());
     }
 }

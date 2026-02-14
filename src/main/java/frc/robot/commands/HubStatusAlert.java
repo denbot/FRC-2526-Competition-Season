@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -27,18 +28,13 @@ public class HubStatusAlert extends Command {
     @Override
     public void execute() {
         if(timer.hasElapsed(Seconds.of(2))) {
-            emptyStatusAlert.set(true);
+            String gameSpecificMessage = DriverStation.getGameSpecificMessage();
+            if (gameSpecificMessage.isEmpty()) {
+                emptyStatusAlert.set(true);
+            } else if (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B")) {
+                badDataAlert.set(true);
+            }
         }
-
-//        String gameSpecificMessage = DriverStation.getGameSpecificMessage();
-//        if (gameSpecificMessage.isEmpty()) {
-//            emptyStatusAlert.set(true);
-//        } else if (gameSpecificMessage.equals("R") && gameSpecificMessage !"B") {
-//            badDataAlert.set(true);
-//        }
     }
-
-    //timer.time.toime.eitmtime≥
-
 
 }
