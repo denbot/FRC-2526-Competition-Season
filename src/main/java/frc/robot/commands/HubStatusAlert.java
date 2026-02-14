@@ -11,6 +11,7 @@ public class HubStatusAlert extends Command {
     public final Alert emptyStatusAlert;
     public final Alert badDataAlert;
     private final Timer timer;
+    private boolean goodData;
 
     public HubStatusAlert() {
         emptyStatusAlert = new Alert("Empty Status", Alert.AlertType.kError);
@@ -23,6 +24,7 @@ public class HubStatusAlert extends Command {
         emptyStatusAlert.set(false);
         badDataAlert.set(false);
         timer.restart();
+        goodData = false;
     }
 
     @Override
@@ -36,8 +38,13 @@ public class HubStatusAlert extends Command {
             } else {
                 emptyStatusAlert.set(false);
                 badDataAlert.set(false);
+                goodData = true;
             }
         }
     }
 
+    @Override
+    public boolean isFinished() {
+        return goodData;
+    }
 }

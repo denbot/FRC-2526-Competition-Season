@@ -64,6 +64,7 @@ public class HubStatusAlertTest {
 
         assertTrue(command.emptyStatusAlert.get());
         assertFalse(command.badDataAlert.get());
+        assertFalse(command.isFinished());
     }
 
     @Test
@@ -89,6 +90,7 @@ public class HubStatusAlertTest {
 
         assertFalse(command.emptyStatusAlert.get());
         assertTrue(command.badDataAlert.get());
+        assertFalse(command.isFinished());
     }
 
     @ParameterizedTest
@@ -104,6 +106,7 @@ public class HubStatusAlertTest {
 
         assertFalse(command.emptyStatusAlert.get());
         assertFalse(command.badDataAlert.get());
+        assertTrue(command.isFinished());
     }
 
     @ParameterizedTest
@@ -119,6 +122,7 @@ public class HubStatusAlertTest {
 
         assertTrue(command.emptyStatusAlert.get());
         assertFalse(command.badDataAlert.get());
+        assertFalse(command.isFinished());
 
         TestHelpers.setGameSpecificMessage(data);
 
@@ -126,6 +130,7 @@ public class HubStatusAlertTest {
 
         assertFalse(command.emptyStatusAlert.get());
         assertFalse(command.badDataAlert.get());
+        assertTrue(command.isFinished());
     }
 
     @ParameterizedTest
@@ -147,6 +152,7 @@ public class HubStatusAlertTest {
 
         assertFalse(command.emptyStatusAlert.get());
         assertTrue(command.badDataAlert.get());
+        assertFalse(command.isFinished());
 
         TestHelpers.setGameSpecificMessage(data);
 
@@ -154,6 +160,6 @@ public class HubStatusAlertTest {
 
         assertFalse(command.emptyStatusAlert.get());
         assertFalse(command.badDataAlert.get());
+        assertTrue(command.isFinished());
     }
-
 }
