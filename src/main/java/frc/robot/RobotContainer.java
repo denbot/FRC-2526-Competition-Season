@@ -12,7 +12,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.state.RebuiltStateMachine;
+import frc.robot.subsystems.Leds;
 import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
@@ -64,7 +67,7 @@ public class RobotContainer {
   private Indexer indexer;
   private Shooter shooter;
   private AutoRoutineBuilder autoBuilder;
-
+  private Leds leds;
   // Controller
   private OperatorController operatorController;
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -140,8 +143,8 @@ public class RobotContainer {
         intake = new Intake(new IntakeIO() {});
         break;
     }
-
-
+leds = new Leds();
+leds.setPattern(LEDPattern.rainbow(255,255));
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
