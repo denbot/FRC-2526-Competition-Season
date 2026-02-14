@@ -2,13 +2,11 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
@@ -24,7 +22,6 @@ public interface IntakeIO {
     public AngularVelocity rackVelocityRotPerSec = RevolutionsPerSecond.zero();
     public Angle intakePositionRots = Degree.zero();
     public Angle rackPositionRots = Degree.zero();
-    public Distance intakeExtensionLength = Inches.of(0);
   }
 
   // sets shooter velocity in RevolutionsPerSec
@@ -32,9 +29,11 @@ public interface IntakeIO {
 
   public default void setIntakeVelocity(AngularVelocity velocity) {}
 
-  public default void setIntakeExtensionLength(Distance length) {}
+  public default void setIntakeExtension(Angle position) {}
 
   public default void setIntakeMaxLength() {}
+
+  public default void setIntakeIdleLength() {}
 
   public default void setIntakeMinLength() {}
 
