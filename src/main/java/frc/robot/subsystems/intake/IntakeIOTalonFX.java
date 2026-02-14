@@ -122,6 +122,10 @@ public class IntakeIOTalonFX implements IntakeIO {
     public void setIntakeMaxLength() {
         rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength));
     }
+    
+    public void setIntakeIdleLength() {
+        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeIdleExtensionLength));
+    }
 
     public void setIntakeMinLength() {
         rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength));

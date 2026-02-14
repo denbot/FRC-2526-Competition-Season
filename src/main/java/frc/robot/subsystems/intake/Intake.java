@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeVelocitySetpoint = speed;
           this.io.setIntakeVelocity(speed);}, 
-          () -> this.io.stopIntake());
+          () -> this.io.stopIntake()).onlyIf(() -> this.inputs.intakeExtensionLength == Meters.of(IntakeConstants.intakeMaxExtensionLength));
   }
 
   public Command stopIntake() {
@@ -56,6 +56,13 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength);
           this.io.setIntakeMaxLength();});
+  }
+
+  public Command setIntakeIdleLength() {
+    return Commands.runOnce(
+        () -> {
+          intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeIdleExtensionLength);
+          this.io.setIntakeIdleLength();});
   }
 
   public Command setIntakeMinLength() {

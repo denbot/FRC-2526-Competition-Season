@@ -83,6 +83,10 @@ public class IntakeIOSim implements IntakeIO {
         rackController.setSetpoint(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength); // TODO: This doesnt work
     }
 
+    public void setIntakeIdleLength() {
+        rackController.setSetpoint(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeIdleExtensionLength); // TODO: This doesnt work
+    }
+
     public void setIntakeMinLength() {
         rackController.setSetpoint(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength); // TODO: This doesnt work
     }

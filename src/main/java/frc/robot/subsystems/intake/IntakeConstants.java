@@ -8,7 +8,8 @@ public class IntakeConstants {
   public static final double intakeRotationsToRackRatio =
       1.0; //TODO Unkown ratio for the rotations of the motors (pinion) to the surface speed of the
   // intake (rack). Units to be determined.
-  public static final double intakeMaxExtensionLength = 12; // TODO: find extension max
+  public static final double intakeMaxExtensionLength = 0.2; // TODO: find extension max
+  public static final double intakeIdleExtensionLength = 0.15; // TODO: find extension max
   public static final double intakeMinExtensionLength = 0; // TODO: find extension min
   public static int INTAKE_MOTOR_ID = 40;
   public static int RACK_MOTOR_ID = 34;

@@ -36,6 +36,8 @@ public interface IntakeIO {
 
   public default void setIntakeMaxLength() {}
 
+  public default void setIntakeIdleLength() {}
+
   public default void setIntakeMinLength() {}
 
   public default void stopIntake() {}
