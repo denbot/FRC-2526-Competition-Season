@@ -29,28 +29,17 @@ public class HubStatusAlert extends Command {
 
     @Override
     public void execute() {
-        if(timer.hasElapsed(Seconds.of(2))) {
-            String gameSpecificMessage = DriverStation.getGameSpecificMessage();
-            if (gameSpecificMessage.isEmpty()) {
-                emptyStatusAlert.set(true);
-            } else if (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B")) {
-                badDataAlert.set(true);
-            } else {
+        String gameSpecificMessage = DriverStation.getGameSpecificMessage();
+        if (!gameSpecificMessage.isEmpty()) {
+            if (gameSpecificMessage.equals("R") || gameSpecificMessage.equals("B")) {
                 emptyStatusAlert.set(false);
                 badDataAlert.set(false);
                 goodData = true;
+            } else {
+                badDataAlert.set(true);
             }
-        } else {
-            String gameSpecificMessage = DriverStation.getGameSpecificMessage();
-            if (!gameSpecificMessage.isEmpty()) {
-                if (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B")) {
-                    badDataAlert.set(true);
-                } else {
-                    emptyStatusAlert.set(false);
-                    badDataAlert.set(false);
-                    goodData = true;
-                }
-            }
+        } else if (timer.hasElapsed(Seconds.of(2))) {
+            emptyStatusAlert.set(true);
         }
     }
 

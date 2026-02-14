@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HubStatusAlertTest {
     private HubStatusAlert command;
-    private final Random random = new Random();
+    private static final Random random = new Random();
 
     @BeforeEach
     void setup() {
@@ -69,13 +69,7 @@ public class HubStatusAlertTest {
 
     @Test
     void badDataAlertShowsInstantly() {
-        int[] randomInts = {random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257)};
-        ArrayList<Character> randomChars = new ArrayList<>();
-        for (int randomInt : randomInts) {
-            randomChars.add((char) randomInt);
-        }
-        String badData = randomChars.toString();
-        TestHelpers.setGameSpecificMessage(badData);
+        TestHelpers.setGameSpecificMessage(getBadData());
 
         command.initialize();
 
@@ -92,8 +86,6 @@ public class HubStatusAlertTest {
         TestHelpers.setGameSpecificMessage(data);
 
         command.initialize();
-
-        SimHooks.stepTiming(2.1);
 
         command.execute();
 
@@ -129,13 +121,7 @@ public class HubStatusAlertTest {
     @ParameterizedTest
     @ValueSource(strings = {"R", "B"})
     void badDataAlertIsRemovedAfterGoodDataSent(String data) {
-        int[] randomInts = {random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257)};
-        ArrayList<Character> randomChars = new ArrayList<>();
-        for (int randomInt : randomInts) {
-            randomChars.add((char) randomInt);
-        }
-        String badData = randomChars.toString();
-        TestHelpers.setGameSpecificMessage(badData);
+        TestHelpers.setGameSpecificMessage(getBadData());
 
         command.initialize();
 
@@ -154,5 +140,11 @@ public class HubStatusAlertTest {
         assertFalse(command.emptyStatusAlert.get());
         assertFalse(command.badDataAlert.get());
         assertTrue(command.isFinished());
+    }
+
+    private static String getBadData() {
+        byte[] array = new byte[5];
+        random.nextBytes(array);
+        return new String(array, StandardCharsets.US_ASCII);
     }
 }
