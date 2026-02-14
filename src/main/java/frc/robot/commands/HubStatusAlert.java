@@ -40,6 +40,17 @@ public class HubStatusAlert extends Command {
                 badDataAlert.set(false);
                 goodData = true;
             }
+        } else {
+            String gameSpecificMessage = DriverStation.getGameSpecificMessage();
+            if (!gameSpecificMessage.isEmpty()) {
+                if (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B")) {
+                    badDataAlert.set(true);
+                } else {
+                    emptyStatusAlert.set(false);
+                    badDataAlert.set(false);
+                    goodData = true;
+                }
+            }
         }
     }
 

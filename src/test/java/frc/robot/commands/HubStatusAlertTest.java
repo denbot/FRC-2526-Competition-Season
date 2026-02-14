@@ -68,7 +68,7 @@ public class HubStatusAlertTest {
     }
 
     @Test
-    void badDataAlertShowsAfterTwoSeconds() {
+    void badDataAlertShowsInstantly() {
         int[] randomInts = {random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257)};
         ArrayList<Character> randomChars = new ArrayList<>();
         for (int randomInt : randomInts) {
@@ -79,13 +79,6 @@ public class HubStatusAlertTest {
 
         command.initialize();
 
-        SimHooks.stepTiming(1.8);
-        command.execute();
-
-        assertFalse(command.emptyStatusAlert.get());
-        assertFalse(command.badDataAlert.get());
-
-        SimHooks.stepTiming(0.3);
         command.execute();
 
         assertFalse(command.emptyStatusAlert.get());
