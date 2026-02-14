@@ -21,10 +21,10 @@ public class OperatorController {
     private final Trigger aimAndShootButton = operatorController1.button(5);
     private final Trigger clearAllButton = operatorController1.button(6);
     private final Trigger clearLastButton = operatorController1.button(7);
-    private final Trigger teleopAutoClimbSwitch = operatorController2.button(0);
+    private final Trigger teleopAutoClimbSwitch = operatorController2.button(12);
     // 3-way rotary switch, toggles A when left, neither when center, B when right
-    public final Trigger blueWonAutoToggle = operatorController2.button(1);
-    public final Trigger redWonAutoToggle = operatorController2.button(2);
+    public final Trigger blueWonAutoToggle = operatorController2.button(2);
+    public final Trigger redWonAutoToggle = operatorController2.button(3);
     
     public OperatorController(AutoRoutineBuilder autoBuilder){
         // Add neutral sweep + score  
