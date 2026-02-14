@@ -18,7 +18,7 @@ public class HubStatusAlertTest {
     void setup() {
         assertTrue(HAL.initialize(500, 0));
 
-        assertFalse(SimHooks.isTimingPaused());
+        SimHooks.pauseTiming();
 
         this.command = new HubStatusAlert();
     }

@@ -26,7 +26,7 @@ public class MatchStateTest {
 
         setDriverStationState(RobotState.DISABLED);
 
-        assertFalse(SimHooks.isTimingPaused());
+        SimHooks.pauseTiming();
     }
 
     @AfterEach

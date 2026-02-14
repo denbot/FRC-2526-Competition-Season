@@ -5,7 +5,6 @@ import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.helpers.TestHelpers;
 import org.junit.jupiter.api.AfterEach;
@@ -28,8 +27,6 @@ public class HubStateTest {
         assertTrue(HAL.initialize(500, 0));
 
         setDriverStationState(RobotState.DISABLED);
-
-        assertFalse(SimHooks.isTimingPaused());
     }
 
     @AfterEach
