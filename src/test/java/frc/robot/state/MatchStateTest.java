@@ -82,7 +82,7 @@ public class MatchStateTest {
         machine.poll();
         assertEquals(MatchState.AUTO, machine.currentState().matchState());
 
-        SimHooks.stepTiming(1);
+        SimHooks.stepTiming(1.2);
         machine.poll();
         assertEquals(MatchState.NONE, machine.currentState().matchState());
     }
@@ -116,7 +116,7 @@ public class MatchStateTest {
         machine.poll();
         assertEquals(MatchState.TRANSITION_SHIFT, machine.currentState().matchState());
 
-        SimHooks.stepTiming(1);
+        SimHooks.stepTiming(1.2);
         machine.poll();
         assertEquals(MatchState.SHIFT_1, machine.currentState().matchState());
     }
@@ -131,7 +131,7 @@ public class MatchStateTest {
         machine.poll();
         assertEquals(MatchState.SHIFT_1, machine.currentState().matchState());
 
-        SimHooks.stepTiming(1);
+        SimHooks.stepTiming(1.2);
         machine.poll();
         assertEquals(MatchState.SHIFT_2, machine.currentState().matchState());
     }
@@ -146,7 +146,7 @@ public class MatchStateTest {
         machine.poll();
         assertEquals(MatchState.SHIFT_2, machine.currentState().matchState());
 
-        SimHooks.stepTiming(1);
+        SimHooks.stepTiming(1.2);
         machine.poll();
         assertEquals(MatchState.SHIFT_3, machine.currentState().matchState());
     }
@@ -161,7 +161,7 @@ public class MatchStateTest {
         machine.poll();
         assertEquals(MatchState.SHIFT_3, machine.currentState().matchState());
 
-        SimHooks.stepTiming(1);
+        SimHooks.stepTiming(1.2);
         machine.poll();
         assertEquals(MatchState.SHIFT_4, machine.currentState().matchState());
     }
@@ -176,7 +176,7 @@ public class MatchStateTest {
         machine.poll();
         assertEquals(MatchState.SHIFT_4, machine.currentState().matchState());
 
-        SimHooks.stepTiming(1);
+        SimHooks.stepTiming(1.2);
         machine.poll();
         assertEquals(MatchState.END_GAME, machine.currentState().matchState());
     }
@@ -191,7 +191,7 @@ public class MatchStateTest {
         machine.poll();
         assertEquals(MatchState.END_GAME, machine.currentState().matchState());
 
-        SimHooks.stepTiming(1);
+        SimHooks.stepTiming(1.2);
         machine.poll();
         assertEquals(MatchState.NONE, machine.currentState().matchState());
     }
