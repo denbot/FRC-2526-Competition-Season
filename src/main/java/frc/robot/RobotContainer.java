@@ -44,6 +44,10 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
+import frc.robot.subsystems.vision.LimelightIO;
+import frc.robot.subsystems.vision.LimelightIOReal;
+import frc.robot.subsystems.vision.LimelightIOSim;
+import frc.robot.subsystems.vision.Limelights;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -59,10 +63,11 @@ public class RobotContainer {
   // Subsystems
   private final ShuffleBoardInputs shuffleBoardInputs = new ShuffleBoardInputs();
 
-  private final Drive drive;
+  public final Drive drive;
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
+  private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
 
   // Controller
@@ -93,6 +98,7 @@ public class RobotContainer {
         indexer = new Indexer(new IndexerIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX());
         shooter = new Shooter(new ShooterIOTalonFX());
+        limelights = new Limelights(new LimelightIOReal(), drive);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -125,6 +131,7 @@ public class RobotContainer {
         shooter = new Shooter(new ShooterIOSim());
         indexer = new Indexer(new IndexerIOSim());
         intake = new Intake(new IntakeIOSim());
+        limelights = new Limelights(new LimelightIOSim(), drive);
         break;
 
       default:
@@ -138,6 +145,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         shooter = new Shooter(new ShooterIO() {});
         intake = new Intake(new IntakeIO() {});
+        limelights = new Limelights(new LimelightIOSim(), drive);
         break;
     }
 
@@ -255,6 +263,10 @@ public class RobotContainer {
 
 public Pose2d getRobotPosition(){
     return drive.getPose();
+}
+
+public void updateRobotPose(){
+    limelights.getAllPoseEstimate();
 }
 
   /**
