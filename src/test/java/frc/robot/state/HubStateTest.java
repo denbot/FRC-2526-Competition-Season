@@ -24,9 +24,6 @@ import static frc.robot.helpers.TestHelpers.setDriverStationState;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HubStateTest {
-
-    Optional<Boolean> operatorOverride;
-
     @BeforeEach
     void setup() {
         assertTrue(HAL.initialize(500, 0));
@@ -44,8 +41,7 @@ public class HubStateTest {
     @Test
     void whenTheMatchStateIsAutoTheHubIsActive() {
         var machine = new RebuiltStateMachine();
-        operatorOverride = Optional.empty();
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, Optional::empty);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
 
@@ -59,8 +55,7 @@ public class HubStateTest {
         if(startingState == MatchState.NONE) return;
 
         var machine = new RebuiltStateMachine(startingState, HubState.ACTIVE);
-        operatorOverride = Optional.empty();
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, Optional::empty);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.NONE));
 
@@ -71,8 +66,7 @@ public class HubStateTest {
     @Test
     void whenTheMatchStateIsTransitionShiftTheHubIsActive() {
         var machine = new RebuiltStateMachine();
-        operatorOverride = Optional.empty();
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, Optional::empty);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.TRANSITION_SHIFT));
 
@@ -83,8 +77,7 @@ public class HubStateTest {
     @Test
     void whenTheMatchStateIsEndGameTheHubIsActive() {
         var machine = new RebuiltStateMachine(MatchState.SHIFT_4);
-        operatorOverride = Optional.empty();
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, Optional::empty);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.END_GAME));
 
@@ -99,8 +92,7 @@ public class HubStateTest {
         setGameSpecificMessage(autoPoints);
         boolean shiftOneIsOurs = us != autoPoints;
         var machine = new RebuiltStateMachine();
-        operatorOverride = Optional.empty();
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, Optional::empty);
 
         goThroughAllStates(shiftOneIsOurs, machine);
     }
@@ -110,8 +102,7 @@ public class HubStateTest {
     void emptyGameSpecificMessageMakesHubAlwaysActive(Alliance us) {
         setOurAlliance(us);
         var machine = new RebuiltStateMachine();
-        operatorOverride = Optional.empty();
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, Optional::empty);
         TestHelpers.setGameSpecificMessage("");
 
         alwaysActive(machine);
@@ -122,8 +113,7 @@ public class HubStateTest {
     void whenAllianceIsUnspecifiedHubIsAlwaysActive(Alliance autoPoints) {
         setOurAlliance(null);
         var machine = new RebuiltStateMachine();
-        operatorOverride = Optional.empty();
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, Optional::empty);
         setGameSpecificMessage(autoPoints);
 
         alwaysActive(machine);
@@ -131,14 +121,13 @@ public class HubStateTest {
 
     @ParameterizedTest
     @MethodSource("matchSetups")
-    void noOperatorOverrideIfStateConfigurable(Alliance us, Alliance autoPoints) {
+    void operatorOverrideIsIgnoredIfStateIsDeterminedFromGameSpecificMessage(Alliance us, Alliance autoPoints) {
         setOurAlliance(us);
         setGameSpecificMessage(autoPoints);
         boolean shiftOneIsOurs = us != autoPoints;
         var machine = new RebuiltStateMachine();
 
-        operatorOverride = Optional.of(true);
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, () -> Optional.of(true));
 
         goThroughAllStates(shiftOneIsOurs, machine);
     }
@@ -148,10 +137,9 @@ public class HubStateTest {
     void operatorOverrideWorksOnNoAlliance(boolean override) {
         setOurAlliance(null);
         var machine = new RebuiltStateMachine();
-        operatorOverride = Optional.of(override);
-        HubState.setup(machine, () -> operatorOverride);
+        HubState.setup(machine, () -> Optional.of(override));
         TestHelpers.setGameSpecificMessage("");
-        boolean shiftOneIsOurs = !operatorOverride.get();
+        boolean shiftOneIsOurs = !override;
 
         goThroughAllStates(shiftOneIsOurs, machine);
     }
