@@ -106,5 +106,54 @@ public class HubStatusAlertTest {
         assertFalse(command.badDataAlert.get());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"R", "B"})
+    void emptyStatusAlertIsRemovedAfterGoodDataSent(String data) {
+        TestHelpers.setGameSpecificMessage("");
+
+        command.initialize();
+
+        SimHooks.stepTiming(2.1);
+
+        command.execute();
+
+        assertTrue(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+
+        TestHelpers.setGameSpecificMessage(data);
+
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"R", "B"})
+    void badDataAlertIsRemovedAfterGoodDataSent(String data) {
+        int[] randomInts = {random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257),random.nextInt(257)};
+        ArrayList<Character> randomChars = new ArrayList<>();
+        for (int randomInt : randomInts) {
+            randomChars.add((char) randomInt);
+        }
+        String badData = randomChars.toString();
+        TestHelpers.setGameSpecificMessage(badData);
+
+        command.initialize();
+
+        SimHooks.stepTiming(2.1);
+
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertTrue(command.badDataAlert.get());
+
+        TestHelpers.setGameSpecificMessage(data);
+
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+    }
 
 }

@@ -33,6 +33,9 @@ public class HubStatusAlert extends Command {
                 emptyStatusAlert.set(true);
             } else if (!gameSpecificMessage.equals("R") && !gameSpecificMessage.equals("B")) {
                 badDataAlert.set(true);
+            } else {
+                emptyStatusAlert.set(false);
+                badDataAlert.set(false);
             }
         }
     }
