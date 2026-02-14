@@ -151,8 +151,9 @@ public class RobotContainer {
         limelights = new Limelights(new LimelightIOSim(), drive);
         break;
     }
-leds = new Leds();
-leds.setPattern(LEDPattern.rainbow(255,255));
+
+leds = new Leds(limelights);
+
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
