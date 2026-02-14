@@ -199,13 +199,20 @@ public class RobotContainer {
     // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
     controller.rightBumper().whileTrue(
         shooter.runSpinnerAddaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed)
-        .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)));
+        .alongWith(
+            DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> controller.getLeftX(),
+            () -> controller.getLeftY(),
+            () -> drive.findAngleForShooting(drive.getPose()))
+            .until(() -> Math.abs(drive.getPose().getRotation().relativeTo(drive.findAngleForShooting(drive.getPose())).getDegrees()) < 3) // If current rotation is within 3 degrees of target
+            .andThen(Commands.runOnce(() -> drive.stopWithX()))));
     
     // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
     controller.rightTrigger().whileTrue(
         shooter.runKicker()
         .alongWith(indexer.runIndexer())
-        .onlyIf(() -> (shooter.getRightSpinnerClosedLoopError()<1)&&(shooter.getLeftSpinnerClosedLoopError()<1)));
+        .onlyIf(() -> Math.abs(shooter.getRightSpinnerClosedLoopError())<1));
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
@@ -224,10 +231,11 @@ public class RobotContainer {
     controller.x().whileTrue(
         intake.runIntake(RotationsPerSecond.of(-60))
         .alongWith(shooter.reverseKicker())
+        .alongWith(indexer.reverseIndexer())
         .alongWith(intake.setIntakeMaxLength()));
     
     // Run static spinner, constant speed and no auto aiming
-    controller.y().onTrue(shooter.runSpinner());
+    controller.y().whileTrue(shooter.runSpinner());
 }
 
 public Pose2d getRobotPosition(){
