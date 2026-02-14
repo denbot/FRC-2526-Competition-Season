@@ -1,74 +1,63 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.Drive;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+public class Limelights extends SubsystemBase{
 
-public enum Limelights {
-    LEFT("limelight-left", "10.95.86.11"),
-    RIGHT("limelight-right", "10.95.86.13"),
-    REAR("limelight-rear", "10.95.86.12");
+    public final LimelightIO io;
+    private final LimelightIOInputsAutoLogged inputs = new LimelightIOInputsAutoLogged();
+    private final Drive drive;
 
-    private static final Map<String, Boolean> limelightCache = new HashMap<>();
-    private static final Map<String, Long> limelightLastCheckTimer = new HashMap<>();
+    public enum Limelight {
+        BACK_LEFT("limelight-back-left", LimelightConstants.backLeftLimelightIP),
+        BACK_RIGHT("limelight-back-right", LimelightConstants.backRightLimelightIP),
+        FRONT("limelight-front", LimelightConstants.frontLimelightIP);
 
-    public final String name;
-    private final String ip;
+        public final String name;
+        public final String ip;
+        public final Matrix<N3, N1> visionMatrix = new Matrix<>(Nat.N3(), Nat.N1());
 
-    Limelights(String name, String ip) {
-        this.name = name;
-        this.ip = ip;
+        Limelight(String name, String ip) {
+            this.name = name;
+            this.ip = ip;
+            this.visionMatrix.fill(0.5);
+            this.visionMatrix.set(2, 0, 1);
+        }
     }
 
-    public boolean isConnected() {
-        // We only want to check every so often, instead of every 20ms. Every second is sufficient.
-        long fpgaTime = RobotController.getFPGATime();
-        if (limelightLastCheckTimer.containsKey(name)) {
-            long elapsedTime = fpgaTime - limelightLastCheckTimer.get(name);
-
-            if (elapsedTime < 1_000_000) { // 1 second in microseconds
-                return limelightCache.getOrDefault(name, false);
-            }
-            limelightLastCheckTimer.put(name, fpgaTime);
-        } else {
-            // Okay, so we haven't been checked ever. Let's see if anyone else got checked this loop
-            // Note that "this loop" is approximate, we just verify it wasn't in the last 20 ms.
-            for (Map.Entry<String, Long> lastChecked : limelightLastCheckTimer.entrySet()) {
-                long elapsedTime = fpgaTime - lastChecked.getValue();
-                if (elapsedTime < 20) {
-                    return false; // We haven't been checked and another camera got checked this loop
-                }
-            }
-        }
-
-        boolean limelightFound = isLimelightFound();
-
-        limelightCache.put(name, limelightFound);
-        limelightLastCheckTimer.put(name, fpgaTime);
-
-        return limelightFound;
+    @Override
+    public void periodic(){
+        // Log key variables
+        io.updateInputs(inputs);
     }
 
-    private boolean isLimelightFound() {
-        String url = String.format("http://%s/", ip);
+    public Limelights(LimelightIO io, Drive drive){
+        this.io = io;
+        this.drive = drive;
+    }    
 
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setConnectTimeout(5);
-            connection.setReadTimeout(5);
-            connection.setRequestMethod("HEAD");
-            int responseCode = connection.getResponseCode();
+    public void getAllPoseEstimate(){
+        this.io.getAllPoseEstimate(this.drive);
+    }
 
-            return responseCode == 200;
-        } catch (SocketTimeoutException e) {
-            return false;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public boolean getAllConnected(){
+        return inputs.allConnected;
+    }
+    
+    public boolean getBackLeftConnected(){
+        return this.inputs.backLeftConnected;
+    }
+    
+    public boolean getBackRightConnected(){
+        return this.inputs.backRightConnected;
+    }
+    
+    public boolean getFrontConnected(){
+        return this.inputs.frontConnected;
     }
 }

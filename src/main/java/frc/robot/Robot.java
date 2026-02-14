@@ -7,16 +7,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.vision.LimelightHelpers;
-import frc.robot.subsystems.vision.Limelights;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -35,7 +29,6 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
   private Field2d robotPosition = new Field2d();
-  private final Matrix<N3, N1> visionMatrix = new Matrix<>(Nat.N3(), Nat.N1());
  
   public Robot() {
     // Record metadata
@@ -81,9 +74,6 @@ public class Robot extends LoggedRobot {
     // and put our autonomous chooser on the dashboard.
     SmartDashboard.putData(robotPosition);
     robotContainer = new RobotContainer();
-
-    visionMatrix.fill(0.5); // X/Y location to 0.5
-    visionMatrix.set(2, 0, 1); // Vision rotation is not to be trusted, apparently
   }
 
   /** This function is called periodically during all modes. */
@@ -99,29 +89,11 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    getPoseEstimate(Limelights.LEFT.name);
-    getPoseEstimate(Limelights.RIGHT.name);
-    getPoseEstimate(Limelights.REAR.name);
+    robotContainer.updateRobotPose();
     robotPosition.setRobotPose(robotContainer.getRobotPosition());
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
   }
-
-  
-  public void getPoseEstimate(String limelightName){
-    LimelightHelpers.PoseEstimate poseEstimate = 
-    LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
-
-    if(poseEstimate == null || poseEstimate.tagCount == 0) return;
-
-    if (poseEstimate.tagCount == 1 && 
-      poseEstimate.rawFiducials.length == 1 &&
-      (poseEstimate.rawFiducials[0].ambiguity > .7 || 
-      poseEstimate.rawFiducials[0].distToCamera > 3)) return;
-    
-    robotContainer.drive.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds, visionMatrix);
-  }
-
 
   /** This function is called once when the robot is disabled. */
   @Override
