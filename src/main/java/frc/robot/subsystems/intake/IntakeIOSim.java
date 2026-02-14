@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -10,7 +9,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class IntakeIOSim implements IntakeIO {
@@ -62,11 +60,11 @@ public class IntakeIOSim implements IntakeIO {
         inputs.stallCurrentIntake = null;
         inputs.stallCurrentRack = null;
 
-        if (rackController.getSetpoint() == (IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength)) {
+        if (rackController.getSetpoint() == (IntakeConstants.intakeMaxExtensionPosition.magnitude())) {
             inputs.intakeDeployedSwitch = true;
         }
 
-        if (rackController.getSetpoint() == (IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength)) {
+        if (rackController.getSetpoint() == (IntakeConstants.intakeMinExtensionPosition.magnitude())) {
             inputs.intakeRetractedSwitch = true;
         }
     }
@@ -75,20 +73,20 @@ public class IntakeIOSim implements IntakeIO {
         intakeController.setSetpoint(velocity.in(RotationsPerSecond));
     }
 
-    public void setIntakeExtensionLength(Distance length) {
-        rackController.setSetpoint(IntakeConstants.intakeRotationsToRackRatio * length.abs(Inches)); // TODO: This doesnt work
+    public void setIntakeExtension(Angle position) {
+        rackController.setSetpoint(position.magnitude()); // TODO: This doesnt work
     }
 
     public void setIntakeMaxLength() {
-        rackController.setSetpoint(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength); // TODO: This doesnt work
+        rackController.setSetpoint(IntakeConstants.intakeMaxExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 
     public void setIntakeIdleLength() {
-        rackController.setSetpoint(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeIdleExtensionLength); // TODO: This doesnt work
+        rackController.setSetpoint(IntakeConstants.intakeIdleExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 
     public void setIntakeMinLength() {
-        rackController.setSetpoint(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength); // TODO: This doesnt work
+        rackController.setSetpoint(IntakeConstants.intakeMinExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 
     public void stopIntake() {
