@@ -153,7 +153,7 @@ public class RobotContainer {
         break;
     }
 
-    leds = new Leds(limelights);
+    leds = new Leds(limelights, controller, shooter);
 
 
     // Set up auto routines
