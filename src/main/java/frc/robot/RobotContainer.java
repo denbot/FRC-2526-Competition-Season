@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.state.HubState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
@@ -177,6 +178,8 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // HubState.setup(stateMachine, () -> );
   }
 
   /**
