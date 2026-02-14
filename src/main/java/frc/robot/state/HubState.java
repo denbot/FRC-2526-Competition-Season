@@ -6,12 +6,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public enum HubState {
     @DefaultState INACTIVE,
     ACTIVE;
 
-    public static void setup(RebuiltStateMachine stateMachine) {
+    public static void setup(RebuiltStateMachine stateMachine, Supplier<Optional<Boolean>> operatorOverride) {
         // Auto
         stateMachine.state(MatchState.NONE).to(MatchState.AUTO).transitionTo(HubState.ACTIVE);
 
@@ -36,7 +37,13 @@ public enum HubState {
                     .to(HubState.INACTIVE)
                     .transitionWhen(() -> {
                         var weWonTheAutoPoints = weWonTheAutoPoints();
-                        return weWonTheAutoPoints.isPresent() && weWonTheAutoPoints.get();
+                        if (weWonTheAutoPoints.isEmpty()) {
+                            if (operatorOverride.get().isEmpty()) {
+                                return false;
+                            } else {
+                                return operatorOverride.get().get();
+                            }
+                        } else return weWonTheAutoPoints.get();
                     });
 
             // Activate shift 1 & 3 if we lost the auto points
@@ -45,7 +52,13 @@ public enum HubState {
                     .to(HubState.ACTIVE)
                     .transitionWhen(() -> {
                         var weWonTheAutoPoints = weWonTheAutoPoints();
-                        return weWonTheAutoPoints.isPresent() && !weWonTheAutoPoints.get();
+                        if (weWonTheAutoPoints.isEmpty()) {
+                            if (operatorOverride.get().isEmpty()) {
+                                return false;
+                            } else {
+                                return !operatorOverride.get().get();
+                            }
+                        } else return !weWonTheAutoPoints.get();
                     });
         }
 
@@ -56,7 +69,13 @@ public enum HubState {
                     .to(HubState.ACTIVE)
                     .transitionWhen(() -> {
                         var weWonTheAutoPoints = weWonTheAutoPoints();
-                        return weWonTheAutoPoints.isPresent() && weWonTheAutoPoints.get();
+                        if (weWonTheAutoPoints.isEmpty()) {
+                            if (operatorOverride.get().isEmpty()) {
+                                return false;
+                            } else {
+                                return operatorOverride.get().get();
+                            }
+                        } else return weWonTheAutoPoints.get();
                     });
 
             // Deactivate shift 2 & 4 if we lost the auto points
@@ -65,7 +84,13 @@ public enum HubState {
                     .to(HubState.INACTIVE)
                     .transitionWhen(() -> {
                         var weWonTheAutoPoints = weWonTheAutoPoints();
-                        return weWonTheAutoPoints.isPresent() && !weWonTheAutoPoints.get();
+                        if (weWonTheAutoPoints.isEmpty()) {
+                            if (operatorOverride.get().isEmpty()) {
+                                return false;
+                            } else {
+                                return !operatorOverride.get().get();
+                            }
+                        } else return !weWonTheAutoPoints.get();
                     });
         }
     }

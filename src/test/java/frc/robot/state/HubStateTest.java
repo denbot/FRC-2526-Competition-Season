@@ -14,14 +14,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static frc.robot.helpers.TestHelpers.setDriverStationState;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HubStateTest {
+
+    Optional<Boolean> operatorOverride;
+
     @BeforeEach
     void setup() {
         assertTrue(HAL.initialize(500, 0));
@@ -39,7 +44,8 @@ public class HubStateTest {
     @Test
     void whenTheMatchStateIsAutoTheHubIsActive() {
         var machine = new RebuiltStateMachine();
-        HubState.setup(machine);
+        operatorOverride = Optional.empty();
+        HubState.setup(machine, () -> operatorOverride);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
 
@@ -53,7 +59,8 @@ public class HubStateTest {
         if(startingState == MatchState.NONE) return;
 
         var machine = new RebuiltStateMachine(startingState, HubState.ACTIVE);
-        HubState.setup(machine);
+        operatorOverride = Optional.empty();
+        HubState.setup(machine, () -> operatorOverride);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.NONE));
 
@@ -64,7 +71,8 @@ public class HubStateTest {
     @Test
     void whenTheMatchStateIsTransitionShiftTheHubIsActive() {
         var machine = new RebuiltStateMachine();
-        HubState.setup(machine);
+        operatorOverride = Optional.empty();
+        HubState.setup(machine, () -> operatorOverride);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.TRANSITION_SHIFT));
 
@@ -75,7 +83,8 @@ public class HubStateTest {
     @Test
     void whenTheMatchStateIsEndGameTheHubIsActive() {
         var machine = new RebuiltStateMachine(MatchState.SHIFT_4);
-        HubState.setup(machine);
+        operatorOverride = Optional.empty();
+        HubState.setup(machine, () -> operatorOverride);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.END_GAME));
 
@@ -89,10 +98,70 @@ public class HubStateTest {
         setOurAlliance(us);
         setGameSpecificMessage(autoPoints);
         boolean shiftOneIsOurs = us != autoPoints;
+        var machine = new RebuiltStateMachine();
+        operatorOverride = Optional.empty();
+        HubState.setup(machine, () -> operatorOverride);
 
-        // Transition shift will start active
-        var machine = new RebuiltStateMachine(MatchState.TRANSITION_SHIFT, HubState.ACTIVE);
-        HubState.setup(machine);
+        goThroughAllStates(shiftOneIsOurs, machine);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Alliance.class)
+    void emptyGameSpecificMessageMakesHubAlwaysActive(Alliance us) {
+        setOurAlliance(us);
+        var machine = new RebuiltStateMachine();
+        operatorOverride = Optional.empty();
+        HubState.setup(machine, () -> operatorOverride);
+        TestHelpers.setGameSpecificMessage("");
+
+        alwaysActive(machine);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Alliance.class)
+    void whenAllianceIsUnspecifiedHubIsAlwaysActive(Alliance autoPoints) {
+        setOurAlliance(null);
+        var machine = new RebuiltStateMachine();
+        operatorOverride = Optional.empty();
+        HubState.setup(machine, () -> operatorOverride);
+        setGameSpecificMessage(autoPoints);
+
+        alwaysActive(machine);
+    }
+
+    @ParameterizedTest
+    @MethodSource("matchSetups")
+    void noOperatorOverrideIfStateConfigurable(Alliance us, Alliance autoPoints) {
+        setOurAlliance(us);
+        setGameSpecificMessage(autoPoints);
+        boolean shiftOneIsOurs = us != autoPoints;
+        var machine = new RebuiltStateMachine();
+
+        operatorOverride = Optional.of(true);
+        HubState.setup(machine, () -> operatorOverride);
+
+        goThroughAllStates(shiftOneIsOurs, machine);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void operatorOverrideWorksOnNoAlliance(boolean override) {
+        setOurAlliance(null);
+        var machine = new RebuiltStateMachine();
+        operatorOverride = Optional.of(override);
+        HubState.setup(machine, () -> operatorOverride);
+        TestHelpers.setGameSpecificMessage("");
+        boolean shiftOneIsOurs = !operatorOverride.get();
+
+        goThroughAllStates(shiftOneIsOurs, machine);
+    }
+
+    private static void goThroughAllStates(boolean shiftOneIsOurs, RebuiltStateMachine machine) {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
+        machine.poll();
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.TRANSITION_SHIFT));
+        machine.poll();
 
         // Shift 1
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_1));
@@ -119,65 +188,7 @@ public class HubStateTest {
         assertEquals(shiftOneIsOurs, machine.currentState().hubState() == HubState.INACTIVE, "Shift 4 is incorrect");
     }
 
-    @ParameterizedTest
-    @EnumSource(Alliance.class)
-    void emptyGameSpecificMessageMakesHubAlwaysActive(Alliance us) {
-        setOurAlliance(us);
-        var machine = new RebuiltStateMachine();
-        HubState.setup(machine);
-        TestHelpers.setGameSpecificMessage("");
-
-        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
-        machine.poll();
-
-        assertEquals(MatchState.AUTO, machine.currentState().matchState());
-        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
-
-        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.TRANSITION_SHIFT));
-        machine.poll();
-
-        assertEquals(MatchState.TRANSITION_SHIFT, machine.currentState().matchState());
-        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
-
-        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_1));
-        machine.poll();
-
-        assertEquals(MatchState.SHIFT_1, machine.currentState().matchState());
-        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
-
-        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_2));
-        machine.poll();
-
-        assertEquals(MatchState.SHIFT_2, machine.currentState().matchState());
-        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
-
-        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_3));
-        machine.poll();
-
-        assertEquals(MatchState.SHIFT_3, machine.currentState().matchState());
-        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
-
-        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_4));
-        machine.poll();
-
-        assertEquals(MatchState.SHIFT_4, machine.currentState().matchState());
-        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
-
-        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.END_GAME));
-        machine.poll();
-
-        assertEquals(MatchState.END_GAME, machine.currentState().matchState());
-        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
-    }
-
-    @ParameterizedTest
-    @EnumSource(Alliance.class)
-    void whenAllianceIsUnspecifiedHubIsAlwaysActive(Alliance autoPoints) {
-        setOurAlliance(null);
-        var machine = new RebuiltStateMachine();
-        HubState.setup(machine);
-        setGameSpecificMessage(autoPoints);
-
+    public static void alwaysActive(RebuiltStateMachine machine) {
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
         machine.poll();
 
