@@ -29,13 +29,13 @@ import frc.robot.Constants.OperatorConstants;
 
 public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX leftSpinnerMotor =
-        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
     private final TalonFX rightSpinnerMotor =
-        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID, OperatorConstants.canivoreCANBus);
     
     private final TalonFX kickerMotor =
-        new TalonFX(ShooterConstants.KICKER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.KICKER_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
     private final Debouncer leftSpinnerMotorDebounce = new Debouncer(0.5);
     private final Debouncer rightSpinnerMotorDebounce = new Debouncer(0.5);
@@ -71,7 +71,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     public ShooterIOTalonFX() {
         var leftSpinnerMotorConfig =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -87,7 +87,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
         var rightSpinnerMotorConfig =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -103,7 +103,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
         var kickerMotorConfig =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)

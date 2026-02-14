@@ -121,6 +121,108 @@ public class HubStateTest {
         assertEquals(shiftOneIsOurs, machine.currentState().hubState() == HubState.INACTIVE, "Shift 4 is incorrect");
     }
 
+    @ParameterizedTest
+    @EnumSource(Alliance.class)
+    void emptyGameSpecificMessageMakesHubAlwaysActive(Alliance us) {
+        setOurAlliance(us);
+        var machine = new RebuiltStateMachine();
+        HubState.setup(machine);
+        setGameSpecificMessage("");
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
+        machine.poll();
+
+        assertEquals(MatchState.AUTO, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.TRANSITION_SHIFT));
+        machine.poll();
+
+        assertEquals(MatchState.TRANSITION_SHIFT, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_1));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_1, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_2));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_2, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_3));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_3, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_4));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_4, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.END_GAME));
+        machine.poll();
+
+        assertEquals(MatchState.END_GAME, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+    }
+
+    @ParameterizedTest
+    @EnumSource(Alliance.class)
+    void whenAllianceIsUnspecifiedHubIsAlwaysActive(Alliance autoPoints) {
+        setOurAlliance(null);
+        var machine = new RebuiltStateMachine();
+        HubState.setup(machine);
+        setGameSpecificMessage(autoPoints);
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
+        machine.poll();
+
+        assertEquals(MatchState.AUTO, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.TRANSITION_SHIFT));
+        machine.poll();
+
+        assertEquals(MatchState.TRANSITION_SHIFT, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_1));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_1, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_2));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_2, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_3));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_3, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.SHIFT_4));
+        machine.poll();
+
+        assertEquals(MatchState.SHIFT_4, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.END_GAME));
+        machine.poll();
+
+        assertEquals(MatchState.END_GAME, machine.currentState().matchState());
+        assertEquals(HubState.ACTIVE, machine.currentState().hubState());
+    }
+
     private static Stream<Arguments> matchSetups() {
         return Arrays.stream(Alliance.values())
                 .flatMap(a -> Arrays.stream(Alliance.values())
@@ -130,18 +232,24 @@ public class HubStateTest {
     private static void setOurAlliance(Alliance us) {
         if(us == Alliance.Red) {
             DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
-        } else {
+        } else if(us == Alliance.Blue) {
             DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+        } else {
+            DriverStationSim.setAllianceStationId(AllianceStationID.Unknown);
         }
         DriverStationSim.notifyNewData();
     }
 
     private static void setGameSpecificMessage(Alliance autoPoints) {
         if(autoPoints == Alliance.Red) {
-            DriverStationSim.setGameSpecificMessage("R");
+            setGameSpecificMessage("R");
         } else {
-            DriverStationSim.setGameSpecificMessage("B");
+            setGameSpecificMessage("B");
         }
+    }
+
+    private static void setGameSpecificMessage(String message) {
+        DriverStationSim.setGameSpecificMessage(message);
         DriverStationSim.notifyNewData();
     }
 }
