@@ -5,8 +5,8 @@ import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.helpers.TestHelpers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,8 +27,6 @@ public class HubStateTest {
         assertTrue(HAL.initialize(500, 0));
 
         setDriverStationState(RobotState.DISABLED);
-
-        assertFalse(SimHooks.isTimingPaused());
     }
 
     @AfterEach
@@ -127,7 +125,7 @@ public class HubStateTest {
         setOurAlliance(us);
         var machine = new RebuiltStateMachine();
         HubState.setup(machine);
-        setGameSpecificMessage("");
+        TestHelpers.setGameSpecificMessage("");
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(MatchState.AUTO));
         machine.poll();
@@ -242,14 +240,9 @@ public class HubStateTest {
 
     private static void setGameSpecificMessage(Alliance autoPoints) {
         if(autoPoints == Alliance.Red) {
-            setGameSpecificMessage("R");
+            TestHelpers.setGameSpecificMessage("R");
         } else {
-            setGameSpecificMessage("B");
+            TestHelpers.setGameSpecificMessage("B");
         }
-    }
-
-    private static void setGameSpecificMessage(String message) {
-        DriverStationSim.setGameSpecificMessage(message);
-        DriverStationSim.notifyNewData();
     }
 }
