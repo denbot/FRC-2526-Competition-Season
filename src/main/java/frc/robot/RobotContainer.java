@@ -73,6 +73,7 @@ public class RobotContainer {
   private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
   private Leds leds;
+  
   // Controller
   private OperatorController operatorController;
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -152,7 +153,7 @@ public class RobotContainer {
         break;
     }
 
-leds = new Leds(limelights);
+    leds = new Leds(limelights);
 
 
     // Set up auto routines
