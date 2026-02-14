@@ -60,4 +60,20 @@ public class Limelights extends SubsystemBase{
     public boolean getFrontConnected(){
         return this.inputs.frontConnected;
     }
+
+    public int getBackRightTags(){
+        return inputs.backLeftTagCount;
+    }
+    
+    public int getBackLeftTags(){
+        return inputs.backRightTagCount;
+    }
+    
+    public int getFrontTags(){
+        return inputs.frontTagCount;
+    }
+    
+    public int geTotalTagCount(){
+        return inputs.totalTagCount;
+    }
 }
