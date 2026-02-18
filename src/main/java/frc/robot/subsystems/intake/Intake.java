@@ -22,6 +22,7 @@ public class Intake extends SubsystemBase {
     this.io = io;
   }
 
+  @Override
   public void periodic() {
     // Log key variables
     io.updateInputs(inputs);
