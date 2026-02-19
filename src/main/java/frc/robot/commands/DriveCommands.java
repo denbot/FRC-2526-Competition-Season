@@ -92,9 +92,9 @@ public class DriveCommands {
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
                       : drive.getRotation()));
-          if (Math.abs(linearVelocity.getX()) <= 0.1 && Math.abs(linearVelocity.getY()) <= 0.1 && Math.abs(omega) <= 0.1) {
-            drive.stopWithX();
-          }
+          // if (Math.abs(linearVelocity.getX()) <= 0.1 && Math.abs(linearVelocity.getY()) <= 0.1 && Math.abs(omega) <= 0.1) {
+          //   drive.stopWithX();
+          // }
         },
         drive);
   }
