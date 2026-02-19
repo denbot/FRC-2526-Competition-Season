@@ -1,0 +1,150 @@
+package frc.robot.commands;
+
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.helpers.TestHelpers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class HubStatusAlertTest {
+    private HubStatusAlert command;
+    private static final Random random = new Random();
+
+    @BeforeEach
+    void setup() {
+        assertTrue(HAL.initialize(500, 0));
+
+        SimHooks.pauseTiming();
+
+        this.command = new HubStatusAlert();
+    }
+
+    @AfterEach
+    public void cleanup() {
+        // This method runs after each test to reset the scheduler state
+        CommandScheduler.getInstance().cancelAll();
+        CommandScheduler.getInstance().run(); // Call run() to execute end() methods
+    }
+
+    @Test
+    void initializeHidesAlerts() {
+        command.emptyStatusAlert.set(true);
+        command.badDataAlert.set(true);
+
+        command.initialize();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+    }
+
+    @Test
+    void emptyStatusAlertShowsAfterTwoSeconds() {
+        TestHelpers.setGameSpecificMessage("");
+
+        command.initialize();
+
+        SimHooks.stepTiming(1.8);
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+
+        SimHooks.stepTiming(0.3);
+        command.execute();
+
+        assertTrue(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+        assertFalse(command.isFinished());
+    }
+
+    @Test
+    void badDataAlertShowsInstantly() {
+        TestHelpers.setGameSpecificMessage(getBadData());
+
+        command.initialize();
+
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertTrue(command.badDataAlert.get());
+        assertFalse(command.isFinished());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"R", "B"})
+    void noAlertsShowOnGoodData(String data) {
+        TestHelpers.setGameSpecificMessage(data);
+
+        command.initialize();
+
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+        assertTrue(command.isFinished());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"R", "B"})
+    void emptyStatusAlertIsRemovedAfterGoodDataSent(String data) {
+        TestHelpers.setGameSpecificMessage("");
+
+        command.initialize();
+
+        SimHooks.stepTiming(2.1);
+
+        command.execute();
+
+        assertTrue(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+        assertFalse(command.isFinished());
+
+        TestHelpers.setGameSpecificMessage(data);
+
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+        assertTrue(command.isFinished());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"R", "B"})
+    void badDataAlertIsRemovedAfterGoodDataSent(String data) {
+        TestHelpers.setGameSpecificMessage(getBadData());
+
+        command.initialize();
+
+        SimHooks.stepTiming(2.1);
+
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertTrue(command.badDataAlert.get());
+        assertFalse(command.isFinished());
+
+        TestHelpers.setGameSpecificMessage(data);
+
+        command.execute();
+
+        assertFalse(command.emptyStatusAlert.get());
+        assertFalse(command.badDataAlert.get());
+        assertTrue(command.isFinished());
+    }
+
+    private static String getBadData() {
+        byte[] array = new byte[5];
+        random.nextBytes(array);
+        return new String(array, StandardCharsets.US_ASCII);
+    }
+}

@@ -27,10 +27,10 @@ public class IntakeIOTalonFX implements IntakeIO {
     private final DigitalInput intakeRetractedSensor = new DigitalInput(IntakeConstants.RETRACTED_DIO_PORT);
     
     private final TalonFX intakeMotor =
-        new TalonFX(IntakeConstants.INTAKE_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(IntakeConstants.INTAKE_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
     private final TalonFX rackMotor =
-        new TalonFX(IntakeConstants.RACK_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(IntakeConstants.RACK_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
     private final Debouncer intakeMotorDebounce = new Debouncer(0.5);
     private final Debouncer rackMotorDebounce = new Debouncer(0.5);
