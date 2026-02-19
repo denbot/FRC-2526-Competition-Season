@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.util.PhoenixUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -18,7 +17,6 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.OperatorConstants;
 
@@ -115,16 +113,20 @@ public class IntakeIOTalonFX implements IntakeIO {
         intakeMotor.setControl(new VelocityVoltage(velocity));
     }
 
-    public void setIntakeExtensionLength(Distance length) {
-        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeRotationsToRackRatio * length.abs(Inches)));
+    public void setIntakeExtensionLength(Angle position) {
+        rackMotor.setControl(new PositionVoltage(position));
     }
 
     public void setIntakeMaxLength() {
-        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength));
+        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeMaxExtensionPosition));
+    }
+    
+    public void setIntakeIdleLength() {
+        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeIdleExtensionPosition));
     }
 
     public void setIntakeMinLength() {
-        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength));
+        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition));
     }
 
     public void stopIntake() {

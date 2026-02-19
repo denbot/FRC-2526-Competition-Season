@@ -1,13 +1,11 @@
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,7 +16,7 @@ public class Intake extends SubsystemBase {
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(60);
-  private Distance intakeExtensionSetpoint = Inches.of(0);
+  private Angle intakeExtensionSetpoint = Rotations.zero();
 
   public Intake(IntakeIO io) {
     this.io = io;
@@ -45,24 +43,31 @@ public class Intake extends SubsystemBase {
     return Commands.runOnce(() -> this.io.stopIntake());
   }
 
-  public Command runIntakeExtension(Distance length) {
+  public Command runIntakeExtension(Angle position) {
     return Commands.runOnce(
         () -> {
-          intakeExtensionSetpoint = length;
-          this.io.setIntakeExtensionLength(length);});
+          intakeExtensionSetpoint = position;
+          this.io.setIntakeExtension(position);});
   }
 
   public Command setIntakeMaxLength() {
     return Commands.runOnce(
         () -> {
-          intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength);
+          intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
           this.io.setIntakeMaxLength();});
+  }
+
+  public Command setIntakeIdleLength() {
+    return Commands.runOnce(
+        () -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
+          this.io.setIntakeIdleLength();});
   }
 
   public Command setIntakeMinLength() {
     return Commands.runOnce(
         () -> {
-          intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength);
+          intakeExtensionSetpoint = IntakeConstants.intakeMinExtensionPosition;
           this.io.setIntakeMinLength();});
   }
 
@@ -105,9 +110,5 @@ public class Intake extends SubsystemBase {
 
   public Angle getRackPositionRots() {
     return inputs.rackPositionRots;
-  }
-
-  public Distance getIntakeExtensionLength() {
-    return inputs.intakeExtensionLength;
   }
 }
