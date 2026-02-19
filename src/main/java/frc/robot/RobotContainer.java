@@ -216,8 +216,8 @@ public class RobotContainer {
         .alongWith(
             DriveCommands.joystickDriveAtAngle(
             drive,
-            () -> controller.getLeftY(),
-            () -> controller.getLeftX(),
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
             () -> drive.findAngleForShooting(drive.getPose()))
             .andThen(Commands.runOnce(() -> drive.stopWithX()))));
     
