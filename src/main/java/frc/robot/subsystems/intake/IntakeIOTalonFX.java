@@ -51,9 +51,9 @@ public class IntakeIOTalonFX implements IntakeIO {
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(0) // TODO
-                        .withKD(0) // TODO
-                        .withKG(0)); // TODO
+                    .withKP(.5)
+                    .withKI(1)
+                    .withKV(0.1));
 
         var rackMotorConfig =
             new TalonFXConfiguration()

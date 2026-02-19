@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeVelocitySetpoint = speed;
           this.io.setIntakeVelocity(speed);}, 
-          () -> this.io.stopIntake()).onlyIf(() -> this.inputs.intakePositionRots == IntakeConstants.intakeMaxExtensionPosition);
+          () -> this.io.stopIntake());
   }
 
   public Command stopIntake() {

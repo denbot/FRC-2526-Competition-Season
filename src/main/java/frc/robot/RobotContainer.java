@@ -219,7 +219,6 @@ public class RobotContainer {
             () -> controller.getLeftX(),
             () -> controller.getLeftY(),
             () -> drive.findAngleForShooting(drive.getPose()))
-            .until(() -> Math.abs(drive.getPose().getRotation().relativeTo(drive.findAngleForShooting(drive.getPose())).getDegrees()) < 3) // If current rotation is within 3 degrees of target
             .andThen(Commands.runOnce(() -> drive.stopWithX()))));
     
     // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
@@ -239,7 +238,7 @@ public class RobotContainer {
     controller.leftBumper().onTrue(intake.setIntakeMinLength());
 
     // Individually run indexer
-    controller.a().onTrue(indexer.runIndexer());
+    controller.a().whileTrue(indexer.reverseIndexer());
 
     // "Outtake" command extends intake and runs all subsystems in reverse
     controller.x().whileTrue(
