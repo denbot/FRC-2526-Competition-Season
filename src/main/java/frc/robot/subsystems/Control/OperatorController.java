@@ -29,7 +29,7 @@ public class OperatorController {
                 autoBuilder.addExitAlliance(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
                 autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.RAMP : autoOptions.TRENCH);
-                autoBuilder.addScoreCommand(); 
+                autoBuilder.addShootCommand(); 
             }).ignoringDisable(true));
 
         // Add neutral sweep + feed 
@@ -39,7 +39,7 @@ public class OperatorController {
                 autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
                 autoBuilder.addExitAlliance(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
-                autoBuilder.addFeedCommand(); 
+                autoBuilder.addShootCommand(); 
             }).ignoringDisable(true));
 
         // add human player command
@@ -61,7 +61,7 @@ public class OperatorController {
         aimAndShootButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added aim & shoot to auto routine");
-                autoBuilder.addScoreCommand();
+                autoBuilder.addShootCommand();
             }).ignoringDisable(true));
     
         // clear routine 
