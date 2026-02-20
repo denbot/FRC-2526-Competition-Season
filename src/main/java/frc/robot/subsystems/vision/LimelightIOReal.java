@@ -9,6 +9,7 @@ import java.util.Map;
 
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.vision.Limelights.Limelight;
 
 public class LimelightIOReal implements LimelightIO{
@@ -73,9 +74,15 @@ public class LimelightIOReal implements LimelightIO{
         inputs.allConnected = inputs.backLeftConnected&&inputs.backRightConnected&&inputs.frontConnected;
 
         // Tag count
-        inputs.backLeftTagCount = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.BACK_LEFT.name).tagCount;
-        inputs.backRightTagCount = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.BACK_RIGHT.name).tagCount;
-        inputs.frontTagCount = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.FRONT.name).tagCount;
+        // pre-define to check for null cases
+        PoseEstimate poseEstimate1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.BACK_LEFT.name);
+        PoseEstimate poseEstimate2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.BACK_RIGHT.name);
+        PoseEstimate poseEstimate3 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.FRONT.name);
+
+        inputs.backLeftTagCount = poseEstimate1 == null ? 0 : poseEstimate1.tagCount;
+        inputs.backRightTagCount = poseEstimate2 == null ? 0 : poseEstimate2.tagCount;
+        inputs.frontTagCount = poseEstimate3 == null ? 0 : poseEstimate3.tagCount;
+
         inputs.totalTagCount = inputs.backLeftTagCount + inputs.backRightTagCount + inputs.frontTagCount;
 
     }
