@@ -7,9 +7,15 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2024-22.04
+    container: wpilib/roborio-cross-ubuntu:2025-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Build robot code
         run: ./gradlew build
+
+      - name: Upload Coveralls report
+        uses:  coverallsapp/github-action@v2
+        with:
+          format: jacoco

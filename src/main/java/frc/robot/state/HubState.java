@@ -4,13 +4,16 @@ import bot.den.foxflow.DefaultState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public enum HubState {
     @DefaultState INACTIVE,
     ACTIVE;
 
-    public static void setup(RebuiltStateMachine stateMachine) {
+    public static void setup(RebuiltStateMachine stateMachine, Supplier<Optional<Boolean>> operatorOverride) {
         // Auto
         stateMachine.state(MatchState.NONE).to(MatchState.AUTO).transitionTo(HubState.ACTIVE);
 
@@ -33,13 +36,13 @@ public enum HubState {
             stateMachine
                     .state(shift, HubState.ACTIVE)
                     .to(HubState.INACTIVE)
-                    .transitionWhen(HubState::weWonTheAutoPoints);
+                    .transitionWhen(shouldTransitionHubActiveState(operatorOverride, false));
 
             // Activate shift 1 & 3 if we lost the auto points
             stateMachine
                     .state(shift, HubState.INACTIVE)
                     .to(HubState.ACTIVE)
-                    .transitionWhen(() -> ! weWonTheAutoPoints());
+                    .transitionWhen(shouldTransitionHubActiveState(operatorOverride, true));
         }
 
         for(var shift : Set.of(MatchState.SHIFT_2, MatchState.SHIFT_4)) {
@@ -47,29 +50,52 @@ public enum HubState {
             stateMachine
                     .state(shift, HubState.INACTIVE)
                     .to(HubState.ACTIVE)
-                    .transitionWhen(HubState::weWonTheAutoPoints);
+                    .transitionWhen(shouldTransitionHubActiveState(operatorOverride, false));
 
             // Deactivate shift 2 & 4 if we lost the auto points
             stateMachine
                     .state(shift, HubState.ACTIVE)
                     .to(HubState.INACTIVE)
-                    .transitionWhen(() -> ! weWonTheAutoPoints());
+                    .transitionWhen(shouldTransitionHubActiveState(operatorOverride, true));
         }
     }
 
-    private static boolean weWonTheAutoPoints() {
-        if (DriverStation.getAlliance().isEmpty()) {
+    private static BooleanSupplier shouldTransitionHubActiveState(
+            Supplier<Optional<Boolean>> operatorOverride,
+            boolean inverted
+    ) {
+        return () -> {
+            var weWonTheAutoPoints = weWonTheAutoPoints();
+            if (weWonTheAutoPoints.isPresent()) {
+                return inverted ^ weWonTheAutoPoints.get();
+            }
+
+            Optional<Boolean> operatorOverrideValue = operatorOverride.get();
+            if (operatorOverrideValue.isPresent()) {
+                return inverted ^ operatorOverrideValue.get();
+            }
+
             return false;
+        };
+    }
+
+    private static Optional<Boolean> weWonTheAutoPoints() {
+        if (DriverStation.getAlliance().isEmpty()) {
+            return Optional.empty();
         }
 
         String gameSpecificMessage = DriverStation.getGameSpecificMessage();
         var alliance = DriverStation.getAlliance().get();
         if (alliance == Alliance.Red && gameSpecificMessage.equals("R")) {
-            return true;
+            return Optional.of(true);
         } else if (alliance == Alliance.Red && gameSpecificMessage.equals("B")) {
-            return false;
+            return Optional.of(false);
         } else if (alliance == Alliance.Blue && gameSpecificMessage.equals("R")) {
-            return false;
-        } else return alliance == Alliance.Blue && gameSpecificMessage.equals("B");
+            return Optional.of(false);
+        } else if (alliance == Alliance.Blue && gameSpecificMessage.equals("B")) {
+            return Optional.of(true);
+        } else {
+            return Optional.empty();
+        }
     }
 }

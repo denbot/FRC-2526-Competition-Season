@@ -29,13 +29,13 @@ import frc.robot.Constants.OperatorConstants;
 
 public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX leftSpinnerMotor =
-        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.LEFT_SPINNER_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
     private final TalonFX rightSpinnerMotor =
-        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.RIGHT_SPINNER_MOTOR_ID, OperatorConstants.canivoreCANBus);
     
     private final TalonFX kickerMotor =
-        new TalonFX(ShooterConstants.KICKER_MOTOR_ID, OperatorConstants.canivoreSerial);
+        new TalonFX(ShooterConstants.KICKER_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
     private final Debouncer leftSpinnerMotorDebounce = new Debouncer(0.5);
     private final Debouncer rightSpinnerMotorDebounce = new Debouncer(0.5);
@@ -71,6 +71,22 @@ public class ShooterIOTalonFX implements ShooterIO {
     public ShooterIOTalonFX() {
         var leftSpinnerMotorConfig =
         new TalonFXConfiguration()
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimitEnable(true)
+                    .withStatorCurrentLimit(70))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(.1)
+                    .withKS(0.0703125)
+                    .withKV(0.1200000059604645));
+
+        var rightSpinnerMotorConfig =
+        new TalonFXConfiguration()
             .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
@@ -81,29 +97,13 @@ public class ShooterIOTalonFX implements ShooterIO {
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(.001)
+                    .withKP(.1)
                     .withKS(0.0703125)
-                    .withKV(0.11500000059604645));
-
-        var rightSpinnerMotorConfig =
-        new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(70))
-            .withFeedback(
-                new FeedbackConfigs()
-                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
-            .withSlot0(
-                new Slot0Configs()
-                    .withKP(.001)
-                    .withKS(0.0703125)
-                    .withKV(0.11500000059604645));
+                    .withKV(0.1200000059604645));
 
         var kickerMotorConfig =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)

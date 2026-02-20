@@ -1,0 +1,1 @@
+[![Coverage Status](https://coveralls.io/repos/github/denbot/FRC-2526-Competition-Season/badge.svg?branch=jacoco)](https://coveralls.io/github/denbot/FRC-2526-Competition-Season?branch=main)

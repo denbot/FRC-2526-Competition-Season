@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.path.PathConstraints;
 
 /**
@@ -40,7 +41,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     // Mr Ray canivore ID public static final String canivoreSerial = "D75CCE723353385320202034111303FF";
-    public static final String canivoreSerial = "33ED01F9463847532020204B451D0DFF";
+    public static final CANBus canivoreCANBus = new CANBus("33ED01F9463847532020204B451D0DFF");
     public static final PathConstraints pathfindingConstraints =
       new PathConstraints(6.0, 6.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
   }

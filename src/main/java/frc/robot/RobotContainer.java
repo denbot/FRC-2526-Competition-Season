@@ -11,27 +11,19 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.state.HubState;
+import frc.robot.state.RebuiltStateMachine;
 import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
-import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
-import frc.robot.subsystems.auto.AutoRoutineBuilder;
-import frc.robot.subsystems.auto.ShuffleBoardInputs;
-import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -49,10 +41,13 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 
 import frc.robot.subsystems.shooter.Shooter;
-//import frc.robot.subsystems.shooter.ShooterConstants.OperatorConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
+import frc.robot.subsystems.vision.LimelightIO;
+import frc.robot.subsystems.vision.LimelightIOReal;
+import frc.robot.subsystems.vision.LimelightIOSim;
+import frc.robot.subsystems.vision.Limelights;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -68,10 +63,11 @@ public class RobotContainer {
   // Subsystems
   private final ShuffleBoardInputs shuffleBoardInputs = new ShuffleBoardInputs();
 
-  private final Drive drive;
+  public final Drive drive;
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
+  private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
 
   // Controller
@@ -80,6 +76,9 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  // State machine
+  public final RebuiltStateMachine stateMachine = new RebuiltStateMachine();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -99,6 +98,7 @@ public class RobotContainer {
         indexer = new Indexer(new IndexerIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX());
         shooter = new Shooter(new ShooterIOTalonFX());
+        limelights = new Limelights(new LimelightIOReal(), drive);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -131,6 +131,7 @@ public class RobotContainer {
         shooter = new Shooter(new ShooterIOSim());
         indexer = new Indexer(new IndexerIOSim());
         intake = new Intake(new IntakeIOSim());
+        limelights = new Limelights(new LimelightIOSim(), drive);
         break;
 
       default:
@@ -144,6 +145,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         shooter = new Shooter(new ShooterIO() {});
         intake = new Intake(new IntakeIO() {});
+        limelights = new Limelights(new LimelightIOSim(), drive);
         break;
     }
 
@@ -173,6 +175,8 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // HubState.setup(stateMachine, () -> );
   }
 
   /**
@@ -204,61 +208,53 @@ public class RobotContainer {
                 drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),drive)
         .ignoringDisable(true));
 
-    // Spin up when A is held (use this if you don't want to lock position)
-    controller.a()
-        .whileTrue(shooter.runSpinner());
-
-    // Climb/cancel climb when B button is pressed
-    // TODO: implement climbing
-    // controller.b()
-    //    .onTrue(new ConditionalCommand(climber.retract(), climber.extend(), () -> climber.getClimberExtended()));
-
-    // Switch to X pattern when X button is pressed
-    controller.x()
-        .whileTrue(indexer.reverseIndexer());
-
-    // Outtake when Y button is held
-    controller.y()
-        .whileTrue((intake.runIntake(IntakeConstants.intakeSpeed.times(-1))
-        .alongWith(indexer.reverseIndexer()))
-        .andThen(intake.stopIntake()
-        .alongWith(indexer.stopIndexer())));
-
-    // Spinup and aim when right bumper is held
-    controller.rightBumper()
-        .whileTrue(shooter.runSpinner()
-        .alongWith(DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> drive.findAngleForShooting(drive.getPose()))));
-
-    // Shoot when right trigger is held
-    controller.rightTrigger()
-        .whileTrue(shooter.runKicker());
-
-    // Toggle intake when left bumper is pressed
-    controller.leftBumper()
-        .onTrue(new ConditionalCommand(intake.setIntakeMinLength(), intake.setIntakeMaxLength(), () -> intake.getIntakeDeployedSwitch()));
-
-    // Run intake when left trigger is held
-    controller.leftTrigger()
-        .whileTrue((intake.runIntake(IntakeConstants.intakeSpeed)
-        .alongWith(indexer.runIndexer()))
-        .alongWith(shooter.reverseKicker()));
-        
-    controller.povUp()
-        .onTrue(Commands.runOnce(() -> 
-                shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
+    // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
+    controller.rightBumper().whileTrue(
+        shooter.runSpinnerAddaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed)
+        .alongWith(
+            DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> drive.findAngleForShooting(drive.getPose()))
+            .andThen(Commands.runOnce(() -> drive.stopWithX()))));
     
-    controller.povDown()
-        .onTrue(Commands.runOnce(() -> 
-                shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
+    // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
+    controller.rightTrigger().whileTrue(
+        shooter.runKicker()
+        .alongWith(indexer.runIndexer())
+        .onlyIf(() -> Math.abs(shooter.getRightSpinnerClosedLoopError())<1));
+    
+    // "Run Intake" runs intake and indexer forward, reverses kicker 
+    controller.leftTrigger().whileTrue(
+        intake.setIntakeMaxLength()
+        .alongWith(intake.runIntake(RotationsPerSecond.of(60))) 
+        .alongWith(indexer.runIndexer())
+        .alongWith(shooter.reverseKicker()));
 
+    // Retract intake in case of jam, etc
+    controller.leftBumper().onTrue(intake.setIntakeMinLength());
+
+    // Individually run indexer
+    controller.a().whileTrue(indexer.reverseIndexer());
+
+    // "Outtake" command extends intake and runs all subsystems in reverse
+    controller.x().whileTrue(
+        intake.runIntake(RotationsPerSecond.of(-60))
+        .alongWith(shooter.reverseKicker())
+        .alongWith(indexer.reverseIndexer())
+        .alongWith(intake.setIntakeMaxLength()));
+    
+    // Run static spinner, constant speed and no auto aiming
+    controller.y().whileTrue(shooter.runSpinner());
 }
 
 public Pose2d getRobotPosition(){
     return drive.getPose();
+}
+
+public void updateRobotPose(){
+    limelights.getAllPoseEstimate();
 }
 
   /**

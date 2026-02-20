@@ -21,10 +21,11 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
+import frc.robot.Constants.OperatorConstants;
 
 public class IndexerIOTalonFX implements IndexerIO{
     private final TalonFX indexMotor = 
-        new TalonFX(IndexerConstants.INDEX_MOTOR_ID);
+        new TalonFX(IndexerConstants.INDEX_MOTOR_ID, OperatorConstants.canivoreCANBus);
     
     private final Debouncer indexMotorDebouncer = new Debouncer(0.5);
 
@@ -37,7 +38,7 @@ public class IndexerIOTalonFX implements IndexerIO{
     public IndexerIOTalonFX() {
         var indexMotorConfig =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+            .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
