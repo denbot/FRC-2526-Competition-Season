@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.state.HopperState;
 import frc.robot.state.HubState;
 import frc.robot.state.IntakeState;
 import frc.robot.state.RebuiltStateMachine;
@@ -185,6 +186,13 @@ public class RobotContainer {
             stateMachine,
             controller.rightBumper(),
             controller.y()
+    );
+
+    HopperState.setup(
+            stateMachine,
+            controller.leftBumper(),
+            intake::getIntakeRetractedSwitch,
+            intake::getIntakeDeployedSwitch
     );
   }
 
