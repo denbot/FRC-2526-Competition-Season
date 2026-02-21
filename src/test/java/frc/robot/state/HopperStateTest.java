@@ -17,12 +17,19 @@ public class HopperStateTest{
     final AtomicBoolean button = new AtomicBoolean();
     final AtomicBoolean retractingLimitSwitch = new AtomicBoolean();
     final AtomicBoolean deployingLimitSwitch = new AtomicBoolean();
+    private RebuiltStateMachine machine;
 
     @BeforeEach
     void setup() {
         assertTrue(HAL.initialize(500, 0));
 
         setDriverStationState(RobotState.DISABLED);
+
+        machine = new RebuiltStateMachine();
+        button.set(false);
+        retractingLimitSwitch.set(false);
+        deployingLimitSwitch.set(false);
+        HopperState.setup(machine, button::get, retractingLimitSwitch::get, deployingLimitSwitch::get);
     }
 
     @AfterEach
@@ -33,67 +40,32 @@ public class HopperStateTest{
     }
 
     @Test
-    public void rightBumperDeploysHopper() {
-        var machine = new RebuiltStateMachine();
+    public void hopperWorksAsExpected() {
         button.set(true);
-        retractingLimitSwitch.set(false);
-        deployingLimitSwitch.set(false);
-        HopperState.setup(machine, button::get, retractingLimitSwitch::get, deployingLimitSwitch::get);
         machine.poll();
+
+        // Verify hopper begins to deploy
         assertEquals(HopperState.DEPLOYING, machine.currentState().hopperState());
-    }
 
-    @Test
-    public void hopperDeploysAfterLimitSwitch() {
-        var machine = new RebuiltStateMachine();
-        button.set(true);
-        retractingLimitSwitch.set(false);
-        deployingLimitSwitch.set(false);
-        HopperState.setup(machine, button::get, retractingLimitSwitch::get, deployingLimitSwitch::get);
-        machine.poll();
         button.set(false);
         deployingLimitSwitch.set(true);
         machine.poll();
+
+        // Verify hopper gets deployed
         assertEquals(HopperState.DEPLOYED, machine.currentState().hopperState());
-    }
 
-    @Test
-    public void rightBumperRetractsHopper() {
-        var machine = new RebuiltStateMachine();
         button.set(true);
-        retractingLimitSwitch.set(false);
-        deployingLimitSwitch.set(false);
-        HopperState.setup(machine, button::get, retractingLimitSwitch::get, deployingLimitSwitch::get);
         machine.poll();
-        button.set(false);
-        deployingLimitSwitch.set(true);
-        machine.poll();
-        button.set(true);
-        HopperState.setup(machine, () -> true, () -> false, () -> true);
-        machine.poll();
+
+        // Verify hopper begins to retract
         assertEquals(HopperState.RETRACTING, machine.currentState().hopperState());
-    }
 
-    @Test
-    public void hopperRetractsAfterLimitSwitch() {
-        var machine = new RebuiltStateMachine();
-        button.set(true);
-        retractingLimitSwitch.set(false);
-        deployingLimitSwitch.set(false);
-        HopperState.setup(machine, button::get, retractingLimitSwitch::get, deployingLimitSwitch::get);
-        machine.poll();
-        button.set(false);
-        deployingLimitSwitch.set(true);
-        machine.poll();
-        button.set(true);
-        machine.poll();
         button.set(false);
         retractingLimitSwitch.set(true);
         deployingLimitSwitch.set(false);
-        HopperState.setup(machine, () -> false, () -> true, () -> false);
         machine.poll();
+
+        // Verify hopper gets retracted
         assertEquals(HopperState.RETRACTED, machine.currentState().hopperState());
     }
-
-
 }

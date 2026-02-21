@@ -16,12 +16,18 @@ public class IntakeStateTest {
 
     final AtomicBoolean rightBumper = new AtomicBoolean();
     final AtomicBoolean yButton = new AtomicBoolean();
+    private RebuiltStateMachine machine;
 
     @BeforeEach
     void setup() {
         assertTrue(HAL.initialize(500, 0));
 
         setDriverStationState(RobotState.DISABLED);
+
+        machine = new RebuiltStateMachine();
+        rightBumper.set(false);
+        yButton.set(false);
+        IntakeState.setup(machine, rightBumper::get, yButton::get);
     }
 
     @AfterEach
@@ -33,64 +39,70 @@ public class IntakeStateTest {
 
     @Test
     void intakeBecomesActiveIfButtonPressedAndHopperDeployed() {
-        var machine = new RebuiltStateMachine();
-        rightBumper.set(true);
-        yButton.set(false);
-        IntakeState.setup(machine, rightBumper::get, yButton::get);
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
+
         machine.poll();
+
+        // Verify Intake isn't active yet
+        assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());
+
+        rightBumper.set(true);
+        machine.poll();
+
+        // Verify both are required
         assertEquals(IntakeState.ACTIVE, machine.currentState().intakeState());
     }
 
     @Test
     void intakeBecomesInactiveIfButtonReleased() {
-        var machine = new RebuiltStateMachine();
-        rightBumper.set(true);
-        yButton.set(false);
-        IntakeState.setup(machine, rightBumper::get, yButton::get);
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
+        rightBumper.set(true);
+
+        // Double check that it's active
         machine.poll();
+        assertEquals(IntakeState.ACTIVE, machine.currentState().intakeState());
+
+        // Release the button
         rightBumper.set(false);
-        yButton.set(false);
         machine.poll();
+
         assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());
     }
 
     @Test
     void intakeBecomesInactiveIfHopperRetracts() {
-        var machine = new RebuiltStateMachine();
-        rightBumper.set(true);
-        yButton.set(false);
-        IntakeState.setup(machine, rightBumper::get, yButton::get);
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
+        rightBumper.set(true);
         machine.poll();
+
+        //  Double check that it's active
+        assertEquals(IntakeState.ACTIVE, machine.currentState().intakeState());
+
+        // Retract the hopper
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.RETRACTING));
         machine.poll();
+
         assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());
     }
 
     @Test
     void intakeReversesWhenYButtonIsPressed() {
-        var machine = new RebuiltStateMachine();
-        rightBumper.set(false);
         yButton.set(true);
-        IntakeState.setup(machine, rightBumper::get, yButton::get);
         machine.poll();
         assertEquals(IntakeState.REVERSE, machine.currentState().intakeState());
     }
 
     @Test
     void intakeStopsReversingWhenYButtonIsReleased() {
-        var machine = new RebuiltStateMachine();
-        rightBumper.set(false);
         yButton.set(true);
-        IntakeState.setup(machine, rightBumper::get, yButton::get);
         machine.poll();
-        rightBumper.set(false);
+
+        assertEquals(IntakeState.REVERSE, machine.currentState().intakeState());
+
         yButton.set(false);
         machine.poll();
+
         assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());
     }
-
 
 }
