@@ -8,10 +8,12 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
@@ -27,21 +29,29 @@ public class IntakeIOTalonFX implements IntakeIO {
     private final TalonFX intakeMotor =
         new TalonFX(IntakeConstants.INTAKE_MOTOR_ID, OperatorConstants.canivoreCANBus);
 
-    private final TalonFX rackMotor =
-        new TalonFX(IntakeConstants.RACK_MOTOR_ID, OperatorConstants.canivoreCANBus);
+    private final TalonFX extensionMotorLeft =
+        new TalonFX(IntakeConstants.EXTENSION_MOTOR_LEFT_ID, OperatorConstants.canivoreCANBus);
+   
+        private final TalonFX extensionMotorRight =
+        new TalonFX(IntakeConstants.EXTENSION_MOTOR_RIGHT_ID, OperatorConstants.canivoreCANBus);
 
     private final Debouncer intakeMotorDebounce = new Debouncer(0.5);
-    private final Debouncer rackMotorDebounce = new Debouncer(0.5);
+    private final Debouncer extensionMotorLeftDebounce = new Debouncer(0.5);
+    private final Debouncer extensionMotorRightDebounce = new Debouncer(0.5);
 
     private final StatusSignal<AngularVelocity> intakeVelocity = intakeMotor.getVelocity();
     private final StatusSignal<Current> intakeCurrentAmps = intakeMotor.getSupplyCurrent();
     private final StatusSignal<Current> intakeStallCurrentAmps = intakeMotor.getMotorStallCurrent();
     private final StatusSignal<Angle> intakePositionRot = intakeMotor.getPosition();
 
-    private final StatusSignal<AngularVelocity> rackVelocity = rackMotor.getVelocity();
-    private final StatusSignal<Current> rackCurrentAmps = rackMotor.getSupplyCurrent();
-    private final StatusSignal<Current> rackStallCurrentAmps = rackMotor.getMotorStallCurrent();
-    private final StatusSignal<Angle> rackPositionRot = rackMotor.getPosition();
+    private final StatusSignal<AngularVelocity> extensionLeftVelocity = extensionMotorLeft.getVelocity();
+    private final StatusSignal<AngularVelocity> extensionRightVelocity = extensionMotorRight.getVelocity();
+    private final StatusSignal<Current> extensionLeftCurrentAmps = extensionMotorLeft.getSupplyCurrent();
+    private final StatusSignal<Current> extensionRightCurrentAmps = extensionMotorRight.getSupplyCurrent();
+    private final StatusSignal<Current> extensionLeftStallCurrentAmps = extensionMotorLeft.getMotorStallCurrent();
+    private final StatusSignal<Current> extensionRightStallCurrentAmps = extensionMotorRight.getMotorStallCurrent();
+    private final StatusSignal<Angle> extensionLeftPositionRot = extensionMotorLeft.getPosition();
+    private final StatusSignal<Angle> extensionRightPositionRot = extensionMotorRight.getPosition();
 
     public IntakeIOTalonFX() {
         var intakeMotorConfig =
@@ -55,7 +65,18 @@ public class IntakeIOTalonFX implements IntakeIO {
                         .withKI(1)
                         .withKV(0.1));
 
-        var rackMotorConfig =
+        var extensionMotorLeftConfig =
+            new TalonFXConfiguration()
+                .withFeedback(
+                    new FeedbackConfigs()
+                        .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
+                .withSlot0(
+                    new Slot0Configs()
+                        .withKP(0) // TODO
+                        .withKD(0) // TODO
+                        .withKG(0)); // TODO
+
+        var extensionMotorRightConfig =
             new TalonFXConfiguration()
                 .withFeedback(
                     new FeedbackConfigs()
@@ -67,7 +88,10 @@ public class IntakeIOTalonFX implements IntakeIO {
                         .withKG(0)); // TODO
 
         intakeMotor.setNeutralMode(NeutralModeValue.Coast);
-        rackMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        extensionMotorLeft.setNeutralMode(NeutralModeValue.Brake);
+        extensionMotorRight.setNeutralMode(NeutralModeValue.Brake);
+
         tryUntilOk(
             5,
             () ->
@@ -77,33 +101,50 @@ public class IntakeIOTalonFX implements IntakeIO {
         tryUntilOk(
             5,
             () ->
-                rackMotor
+                extensionMotorLeft
                     .getConfigurator()
-                    .apply(rackMotorConfig, 0.25)); // TODO: Unaware of what this does.
+                    .apply(extensionMotorLeftConfig, 0.25)); // TODO: Unaware of what this does.
+        tryUntilOk(
+            5,
+            () ->
+                extensionMotorRight
+                    .getConfigurator()
+                    .apply(extensionMotorRightConfig, 0.25)); // TODO: Unaware of what this does.
+
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             intakeMotor.getIsProLicensed().getValue() ? 200 : 50, intakeVelocity, intakeCurrentAmps, intakeStallCurrentAmps, intakePositionRot);
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-            rackMotor.getIsProLicensed().getValue() ? 200 : 50, rackVelocity, rackCurrentAmps, rackStallCurrentAmps, rackPositionRot);
+            extensionMotorLeft.getIsProLicensed().getValue() ? 200 : 50, extensionLeftVelocity, extensionLeftCurrentAmps, extensionLeftStallCurrentAmps, extensionLeftPositionRot);
+        
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            extensionMotorRight.getIsProLicensed().getValue() ? 200 : 50, extensionRightVelocity, extensionRightCurrentAmps, extensionRightStallCurrentAmps, extensionRightPositionRot);
+
+        extensionMotorRight.setControl(new Follower(extensionMotorLeft.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
         var intakeMotorStatus = BaseStatusSignal.refreshAll(intakeVelocity, intakeCurrentAmps, intakeStallCurrentAmps, intakePositionRot);
-        var rackMotorStatus = BaseStatusSignal.refreshAll(rackVelocity, rackCurrentAmps, rackStallCurrentAmps, rackPositionRot);
+        var intakeLeftMotorStatus = BaseStatusSignal.refreshAll(extensionLeftVelocity, extensionLeftCurrentAmps, extensionLeftStallCurrentAmps, extensionLeftPositionRot);
+        var intakeRightMotorStatus = BaseStatusSignal.refreshAll(extensionRightVelocity, extensionRightCurrentAmps, extensionRightStallCurrentAmps, extensionRightPositionRot);
 
         inputs.intakeMotorConnected = intakeMotorDebounce.calculate(intakeMotorStatus.isOK());
-        inputs.rackMotorConnected = rackMotorDebounce.calculate(rackMotorStatus.isOK());
+        inputs.extensionMotorLeftConnected = extensionMotorLeftDebounce.calculate(intakeLeftMotorStatus.isOK());
+        inputs.extensionMotorRightConnected = extensionMotorRightDebounce.calculate(intakeRightMotorStatus.isOK());
 
         inputs.intakeVelocityRotPerSec = intakeVelocity.getValue();
-        inputs.rackVelocityRotPerSec = rackVelocity.getValue();
+        inputs.extensionVelocityLeft = extensionLeftVelocity.getValue();
+        inputs.extensionVelocityRight = extensionRightVelocity.getValue();
 
         inputs.intakePositionRots = intakePositionRot.getValue();
-        inputs.rackPositionRots = rackPositionRot.getValue();
+        inputs.extensionLeftPositionRots = extensionLeftPositionRot.getValue();
+        inputs.extensionRightPositionRots = extensionRightPositionRot.getValue();
 
         inputs.stallCurrentIntake = intakeStallCurrentAmps.getValue();
-        inputs.stallCurrentRack = rackStallCurrentAmps.getValue();
+        inputs.stallCurrentExtensionLeft = extensionLeftStallCurrentAmps.getValue();
+        inputs.stallCurrentExtensionRight = extensionRightStallCurrentAmps.getValue();
 
         inputs.intakeDeployedSwitch = !intakeDeployedSensor.get();
         inputs.intakeRetractedSwitch = !intakeRetractedSensor.get();
@@ -114,19 +155,19 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     public void setIntakeExtensionLength(Angle position) {
-        rackMotor.setControl(new PositionVoltage(position));
+        extensionMotorLeft.setControl(new PositionVoltage(position));
     }
 
     public void setIntakeMaxLength() {
-        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeMaxExtensionPosition));
+        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMaxExtensionPosition));
     }
     
     public void setIntakeIdleLength() {
-        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeIdleExtensionPosition));
+        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeIdleExtensionPosition));
     }
 
     public void setIntakeMinLength() {
-        rackMotor.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition));
+        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition));
     }
 
     public void stopIntake() {

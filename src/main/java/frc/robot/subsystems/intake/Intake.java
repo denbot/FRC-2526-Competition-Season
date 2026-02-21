@@ -76,8 +76,8 @@ public class Intake extends SubsystemBase {
     return inputs.intakeMotorConnected;
   }
 
-  public boolean getRackMotorConnected() {
-    return inputs.rackMotorConnected;
+  public boolean getExtensionMotorsConnected() {
+    return inputs.extensionMotorLeftConnected && inputs.extensionMotorRightConnected;
   }
 
   public boolean getIntakeDeployedSwitch() {
@@ -92,23 +92,35 @@ public class Intake extends SubsystemBase {
     return inputs.stallCurrentIntake;
   }
 
-  public Current getStallCurrentRack() {
-    return inputs.stallCurrentRack;
+  public Current getStallCurrentExtensionLeft() {
+    return inputs.stallCurrentExtensionLeft;
+  }
+  
+  public Current getStallCurrentExtensionRight() {
+    return inputs.stallCurrentExtensionRight;
   }
 
   public AngularVelocity getIntakeVelocityRotPerSec() {
     return inputs.intakeVelocityRotPerSec;
   }
 
-  public AngularVelocity getRackVelocityRotPerSec() {
-    return inputs.rackVelocityRotPerSec;
+  public AngularVelocity getExtensionLeftVelocityRotPerSec() {
+    return inputs.extensionVelocityLeft;
+  }
+  
+  public AngularVelocity getExtensionRightVelocityRotPerSec() {
+    return inputs.extensionVelocityRight;
   }
 
   public Angle getIntakePositionRots() {
     return inputs.intakePositionRots;
   }
 
-  public Angle getRackPositionRots() {
-    return inputs.rackPositionRots;
+  public Angle getExtensionLeftPositionRots() {
+    return inputs.extensionLeftPositionRots;
+  }
+  
+  public Angle getExtensionRightPositionRots() {
+    return inputs.extensionRightPositionRots;
   }
 }

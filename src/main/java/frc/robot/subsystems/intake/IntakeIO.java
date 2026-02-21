@@ -15,13 +15,17 @@ public interface IntakeIO {
     public boolean intakeDeployedSwitch = false;
     public boolean intakeRetractedSwitch = false;
     public boolean intakeMotorConnected = false;
-    public boolean rackMotorConnected = false;
-    public Current stallCurrentRack = Amp.zero();
+    public boolean extensionMotorLeftConnected = false;
+    public boolean extensionMotorRightConnected = false;
+    public Current stallCurrentExtensionLeft = Amp.zero();
+    public Current stallCurrentExtensionRight = Amp.zero();
     public Current stallCurrentIntake = Amp.zero();
     public AngularVelocity intakeVelocityRotPerSec = RevolutionsPerSecond.zero();
-    public AngularVelocity rackVelocityRotPerSec = RevolutionsPerSecond.zero();
+    public AngularVelocity extensionVelocityLeft = RevolutionsPerSecond.zero();
+    public AngularVelocity extensionVelocityRight = RevolutionsPerSecond.zero();
     public Angle intakePositionRots = Degree.zero();
-    public Angle rackPositionRots = Degree.zero();
+    public Angle extensionLeftPositionRots = Degree.zero();
+    public Angle extensionRightPositionRots = Degree.zero();
   }
 
   // sets shooter velocity in RevolutionsPerSec
