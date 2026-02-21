@@ -114,9 +114,8 @@ public class ShooterIOTalonFX implements ShooterIO {
             .withSlot0(
                 new Slot0Configs()
                     .withKP(0.1)
-                    .withKD(0)
-                    .withKS(0.25)
-                    .withKV(0.09));
+                    .withKS(0.09)
+                    .withKV(0.25));
 
 
         leftSpinnerMotor.setNeutralMode(NeutralModeValue.Coast);
