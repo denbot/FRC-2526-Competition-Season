@@ -36,11 +36,14 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeVelocitySetpoint = speed;
           this.io.setIntakeVelocity(speed);}, 
-          () -> this.io.stopIntake());
+          () -> { intakeVelocitySetpoint = RotationsPerSecond.of(0);
+          this.io.stopIntake();});
   }
 
   public Command stopIntake() {
-    return Commands.runOnce(() -> this.io.stopIntake());
+    return Commands.runOnce(() -> {
+      intakeVelocitySetpoint = RotationsPerSecond.of(0);
+      this.io.stopIntake();});
   }
 
   public Command runIntakeExtension(Angle position) {
@@ -51,12 +54,16 @@ public class Intake extends SubsystemBase {
   }
 
   public Command setIntakeMaxLength() {
-    return Commands.runOnce(
+    return Commands.runEnd(
         () -> {
           intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
-          this.io.setIntakeMaxLength();});
+          this.io.setIntakeMaxLength();},
+        () -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
+          this.io.setIntakeIdleLength();});
   }
 
+  // technically unescesary
   public Command setIntakeIdleLength() {
     return Commands.runOnce(
         () -> {
@@ -65,10 +72,13 @@ public class Intake extends SubsystemBase {
   }
 
   public Command setIntakeMinLength() {
-    return Commands.runOnce(
+    return Commands.runEnd(
         () -> {
           intakeExtensionSetpoint = IntakeConstants.intakeMinExtensionPosition;
-          this.io.setIntakeMinLength();});
+          this.io.setIntakeMinLength();},
+        () -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
+          this.io.setIntakeIdleLength();});
   }
 
   // Getters for private IO variables

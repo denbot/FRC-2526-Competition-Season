@@ -233,7 +233,7 @@ public class RobotContainer {
         .alongWith(shooter.reverseKicker()));
 
     // Retract intake in case of jam, etc
-    controller.leftBumper().onTrue(intake.setIntakeMinLength());
+    controller.leftBumper().whileTrue(intake.setIntakeMinLength());
 
     // Individually run indexer
     controller.a().whileTrue(indexer.reverseIndexer());

@@ -5,6 +5,7 @@ import static frc.robot.util.PhoenixUtil.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
@@ -13,6 +14,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
@@ -43,6 +45,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     private final StatusSignal<Current> intakeCurrentAmps = intakeMotor.getSupplyCurrent();
     private final StatusSignal<Current> intakeStallCurrentAmps = intakeMotor.getMotorStallCurrent();
     private final StatusSignal<Angle> intakePositionRot = intakeMotor.getPosition();
+    private final StatusSignal<Double> intakeVelocityClosedLoopError = intakeMotor.getClosedLoopError();
 
     private final StatusSignal<AngularVelocity> extensionLeftVelocity = extensionMotorLeft.getVelocity();
     private final StatusSignal<AngularVelocity> extensionRightVelocity = extensionMotorRight.getVelocity();
@@ -67,25 +70,29 @@ public class IntakeIOTalonFX implements IntakeIO {
 
         var extensionMotorLeftConfig =
             new TalonFXConfiguration()
+                .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
+                .withFeedback(
+                    new FeedbackConfigs()
+                    .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(0) // TODO
-                        .withKD(0) // TODO
-                        .withKG(0)); // TODO
+                        .withKP(5)); // TODO
 
         var extensionMotorRightConfig =
             new TalonFXConfiguration()
+                .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
+                .withFeedback(
+                    new FeedbackConfigs()
+                    .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(0) // TODO
-                        .withKD(0) // TODO
-                        .withKG(0)); // TODO
+                        .withKP(5)); // TODO
 
         intakeMotor.setNeutralMode(NeutralModeValue.Coast);
 
@@ -133,6 +140,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         inputs.intakeMotorConnected = intakeMotorDebounce.calculate(intakeMotorStatus.isOK());
         inputs.extensionMotorLeftConnected = extensionMotorLeftDebounce.calculate(intakeLeftMotorStatus.isOK());
         inputs.extensionMotorRightConnected = extensionMotorRightDebounce.calculate(intakeRightMotorStatus.isOK());
+
+        inputs.intakeVelocityClosedLoopError = intakeVelocityClosedLoopError.getValue();
 
         inputs.intakeVelocityRotPerSec = intakeVelocity.getValue();
         inputs.extensionVelocityLeft = extensionLeftVelocity.getValue();

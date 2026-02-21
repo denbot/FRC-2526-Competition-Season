@@ -20,6 +20,7 @@ public interface IntakeIO {
     public Current stallCurrentExtensionLeft = Amp.zero();
     public Current stallCurrentExtensionRight = Amp.zero();
     public Current stallCurrentIntake = Amp.zero();
+    public double intakeVelocityClosedLoopError = 0.0;
     public AngularVelocity intakeVelocityRotPerSec = RevolutionsPerSecond.zero();
     public AngularVelocity extensionVelocityLeft = RevolutionsPerSecond.zero();
     public AngularVelocity extensionVelocityRight = RevolutionsPerSecond.zero();

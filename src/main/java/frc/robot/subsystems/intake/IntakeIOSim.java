@@ -20,39 +20,41 @@ public class IntakeIOSim implements IntakeIO {
     private DCMotorSim extensionLeftMotorSim;
     private DCMotorSim extensionRightMotorSim;
 
-    private SimpleMotorFeedforward spinnFeedforwards = new SimpleMotorFeedforward(0, 0); // TODO
-    private PIDController intakeController = new PIDController(1, 0, 0); // TODO
-    private PIDController extensionLeftController = new PIDController(1, 0, 0); // TODO
-    private PIDController extensionRightController = new PIDController(1, 0, 0); // TODO
+    private SimpleMotorFeedforward spinFeedforwards = new SimpleMotorFeedforward(0.0, 0.1); // TODO
+    private PIDController intakeController = new PIDController(0.5, 1, 0); // TODO
+    private PIDController extensionLeftController = new PIDController(7, 0, 0); // TODO
+    private PIDController extensionRightController = new PIDController(7, 0, 0); // TODO
 
-    private double intakeAppliedVolts = 0.0;
+    private double intakeAppliedVoltsPID = 0.0;
+    private double intakeAppliedVoltsFF = 0.0;
     private double extensionLeftAppliedVolts = 0.0;
     private double extensionRightAppliedVolts = 0.0;
 
     public IntakeIOSim(){
         intakeMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(intakeMotor, 0.2, 1), // TODO
+            LinearSystemId.createDCMotorSystem(intakeMotor, 0.02, 2), // TODO
             intakeMotor);   
         
         extensionLeftMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(extensionLeftMotor, 0.2, 1), // TODO
+            LinearSystemId.createDCMotorSystem(extensionLeftMotor, 0.02, 23), // TODO
             extensionLeftMotor);
             
         extensionRightMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(extensionRightMotor, 0.2, 1), // TODO
+            LinearSystemId.createDCMotorSystem(extensionRightMotor, 0.02, 23), // TODO
             extensionRightMotor);   
     }
 
     @Override
     public void updateInputs(IntakeIOInputs inputs){
-        intakeAppliedVolts = intakeController.calculate(intakeMotorSim.getAngularVelocityRPM()) + spinnFeedforwards.calculate(intakeMotorSim.getAngularVelocityRPM());
-        extensionLeftAppliedVolts = extensionLeftController.calculate(extensionLeftMotorSim.getAngularVelocityRPM());
-        extensionRightAppliedVolts = extensionRightController.calculate(extensionRightMotorSim.getAngularVelocityRPM());
+        intakeAppliedVoltsPID = intakeController.calculate(intakeMotorSim.getAngularVelocity().in(RotationsPerSecond)) + intakeAppliedVoltsFF;
 
-        intakeMotorSim.setInputVoltage(intakeAppliedVolts);
+        extensionLeftAppliedVolts = extensionLeftController.calculate(extensionLeftMotorSim.getAngularPositionRotations());
+        extensionRightAppliedVolts = extensionRightController.calculate(extensionRightMotorSim.getAngularPositionRotations());
+
+        intakeMotorSim.setInputVoltage(intakeAppliedVoltsPID);
         extensionLeftMotorSim.setInputVoltage(extensionLeftAppliedVolts);
         extensionRightMotorSim.setInputVoltage(extensionRightAppliedVolts);
 
@@ -63,6 +65,8 @@ public class IntakeIOSim implements IntakeIO {
         inputs.intakeMotorConnected = true;
         inputs.extensionMotorLeftConnected = true;
         inputs.extensionMotorRightConnected = true;
+
+        inputs.intakeVelocityClosedLoopError = intakeController.getError();
 
         inputs.intakeVelocityRotPerSec = intakeMotorSim.getAngularVelocity();
         inputs.extensionVelocityLeft = extensionLeftMotorSim.getAngularVelocity();
@@ -88,6 +92,7 @@ public class IntakeIOSim implements IntakeIO {
     }
 
     public void setIntakeVelocity(AngularVelocity velocity) {
+        intakeAppliedVoltsFF = spinFeedforwards.calculate(velocity.in(RotationsPerSecond));
         intakeController.setSetpoint(velocity.in(RotationsPerSecond));
     }
 
