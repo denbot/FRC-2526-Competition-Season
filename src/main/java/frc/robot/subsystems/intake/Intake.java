@@ -1,15 +1,18 @@
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.state.HopperState;
+import frc.robot.state.RebuiltStateMachine;
 import org.littletonrobotics.junction.Logger;
+
+import java.util.function.BooleanSupplier;
+
+import static edu.wpi.first.units.Units.*;
 
 public class Intake extends SubsystemBase {
   public final IntakeIO io;
@@ -18,8 +21,14 @@ public class Intake extends SubsystemBase {
   private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(60);
   private Angle intakeExtensionSetpoint = Rotations.zero();
 
-  public Intake(IntakeIO io) {
+  public Intake(IntakeIO io, RebuiltStateMachine stateMachine) {
     this.io = io;
+
+    stateMachine
+            .state(HopperState.DEPLOYING)
+            .to(HopperState.DEPLOYED)
+            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+    // TODO Also check extensionRightPositionRots
   }
 
   @Override
@@ -88,6 +97,10 @@ public class Intake extends SubsystemBase {
 
   public boolean getExtensionMotorsConnected() {
     return inputs.extensionMotorLeftConnected && inputs.extensionMotorRightConnected;
+  }
+
+  public double getClosedLoopError() {
+    return inputs.intakeVelocityClosedLoopError;
   }
 
   public boolean getIntakeDeployedSwitch() {
