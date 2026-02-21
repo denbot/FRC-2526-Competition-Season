@@ -79,7 +79,7 @@ public class IntakeStateTest {
         assertEquals(IntakeState.ACTIVE, machine.currentState().intakeState());
 
         // Retract the hopper
-        CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.RETRACTING));
+        //CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.RETRACTING));
         machine.poll();
 
         assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());

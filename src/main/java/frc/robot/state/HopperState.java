@@ -13,7 +13,8 @@ public enum HopperState {
     RETRACTING_TO_RETRACTED;
 
     public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier leftTrigger, BooleanSupplier leftBumper, BooleanSupplier xButton) {
-        // Intake functions
+        // Hopper functions
+        //stateMachine.state(HopperState)
 //        stateMachine
 //                .state(HopperState.DEPLOYED)
 //                .to(HopperState.RETRACTING)
