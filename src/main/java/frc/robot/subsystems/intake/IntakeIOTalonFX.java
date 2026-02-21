@@ -79,7 +79,7 @@ public class IntakeIOTalonFX implements IntakeIO {
                     .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(5)); // TODO
+                        .withKP(34)); // TODO
 
         var extensionMotorRightConfig =
             new TalonFXConfiguration()
@@ -92,7 +92,7 @@ public class IntakeIOTalonFX implements IntakeIO {
                     .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(5)); // TODO
+                        .withKP(34)); // TODO
 
         intakeMotor.setNeutralMode(NeutralModeValue.Coast);
 
