@@ -14,24 +14,23 @@ public enum HopperState {
 
     public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier leftTrigger, BooleanSupplier leftBumper, BooleanSupplier xButton) {
         // Hopper functions
-        //stateMachine.state(HopperState)
-//        stateMachine
-//                .state(HopperState.DEPLOYED)
-//                .to(HopperState.RETRACTING)
-//                .transitionWhen(button); // Transition to retracting when bumper is pressed
-//        stateMachine
-//                .state(HopperState.RETRACTING)
-//                .to(HopperState.RETRACTED)
-//                .transitionWhen(retractingLimitSwitch); // Transition to retracted when limit switch is activated
-//        stateMachine
-//                .state(HopperState.RETRACTED)
-//                .to(HopperState.DEPLOYING)
-//                .transitionWhen(button); // Transition to deploying when bumper is pressed
-//        stateMachine
-//                .state(HopperState.DEPLOYING)
-//                .to(HopperState.DEPLOYED)
-//                .transitionWhen(deployingLimitSwitch); // Transition to deployed when limit switch is activated
+        stateMachine
+                .state(HopperState.RETRACTED)
+                .to(HopperState.DEPLOYING)
+                .transitionWhen(leftTrigger);
+        stateMachine
+                .state(HopperState.IDLE)
+                .to(HopperState.DEPLOYING)
+                .transitionWhen(leftTrigger);
 
+        stateMachine
+                .state(HopperState.DEPLOYED)
+                .to(HopperState.RETRACTING_TO_IDLE)
+                .transitionWhen(() -> !leftTrigger.getAsBoolean());
+        stateMachine
+                .state(HopperState.IDLE)
+                .to(HopperState.RETRACTING_TO_RETRACTED)
+                .transitionWhen(leftBumper);
     }
 }
 
