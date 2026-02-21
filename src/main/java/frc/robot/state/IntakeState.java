@@ -5,32 +5,29 @@ import bot.den.foxflow.DefaultState;
 import java.util.function.BooleanSupplier;
 
 public enum IntakeState {
-    ACTIVE,
-    REVERSE,
-    @DefaultState INACTIVE;
+    @DefaultState STOPPED,
+    RUNNING,
+    REVERSING;
 
-    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightBumper, BooleanSupplier yButton) {
+
+    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier leftTrigger, BooleanSupplier xButton) {
         // Intake functions
-//        stateMachine
-//                .state(IntakeState.INACTIVE, HopperState.DEPLOYED)
-//                .to(IntakeState.ACTIVE)
-//                .transitionWhen(rightBumper); // Transition to active when trigger is pressed
-//        stateMachine
-//                .state(IntakeState.ACTIVE, HopperState.DEPLOYED)
-//                .to(IntakeState.INACTIVE)
-//                .transitionWhen(() -> !rightBumper.getAsBoolean()); // Transition to inactive when trigger is let go
-//        stateMachine
-//                .state(IntakeState.ACTIVE, HopperState.RETRACTING)
-//                .to(IntakeState.INACTIVE)
-//                .transitionAlways(); // Transition to inactive if retracting
-//
-//        stateMachine
-//                .state(IntakeState.INACTIVE)
-//                .to(IntakeState.REVERSE)
-//                .transitionWhen(yButton); // Goes from inactive to reverse if y button is pressed
-//        stateMachine
-//                .state(IntakeState.REVERSE)
-//                .to(IntakeState.INACTIVE)
-//                .transitionWhen(() -> !yButton.getAsBoolean()); // Go from reverse to inactive if y button let go
+        stateMachine
+                .state(IntakeState.STOPPED)
+                .to(IntakeState.RUNNING)
+                .transitionWhen(leftTrigger); // Transition to running when trigger is pressed
+        stateMachine
+                .state(IntakeState.RUNNING)
+                .to(IntakeState.STOPPED)
+                .transitionWhen(() -> !leftTrigger.getAsBoolean()); // Transition to inactive when trigger is let go
+
+        stateMachine
+                .state(IntakeState.STOPPED)
+                .to(IntakeState.REVERSING)
+                .transitionWhen(xButton); // Goes from inactive to reverse if x button is pressed
+        stateMachine
+                .state(IntakeState.REVERSING)
+                .to(IntakeState.STOPPED)
+                .transitionWhen(() -> !xButton.getAsBoolean()); // Go from reverse to inactive if x button let go
     }
 }

@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class IntakeStateTest {
 
-    final AtomicBoolean rightBumper = new AtomicBoolean();
-    final AtomicBoolean yButton = new AtomicBoolean();
+    final AtomicBoolean leftTrigger = new AtomicBoolean();
+    final AtomicBoolean xButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
     @BeforeEach
@@ -25,9 +25,9 @@ public class IntakeStateTest {
         setDriverStationState(RobotState.DISABLED);
 
         machine = new RebuiltStateMachine();
-        rightBumper.set(false);
-        yButton.set(false);
-        IntakeState.setup(machine, rightBumper::get, yButton::get);
+        leftTrigger.set(false);
+        xButton.set(false);
+        IntakeState.setup(machine, leftTrigger::get, xButton::get);
     }
 
     @AfterEach
@@ -38,71 +38,48 @@ public class IntakeStateTest {
     }
 
     @Test
-    void intakeBecomesActiveIfButtonPressedAndHopperDeployed() {
-        CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
-
+    void intakeBecomesActiveIfTriggerPressed() {
+        leftTrigger.set(true);
         machine.poll();
 
-        // Verify Intake isn't active yet
-        assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());
-
-        rightBumper.set(true);
-        machine.poll();
-
-        // Verify both are required
-        assertEquals(IntakeState.ACTIVE, machine.currentState().intakeState());
+        assertEquals(IntakeState.RUNNING, machine.currentState().intakeState());
     }
 
     @Test
-    void intakeBecomesInactiveIfButtonReleased() {
-        CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
-        rightBumper.set(true);
-
-        // Double check that it's active
+    void intakeStopsIfTriggerReleased() {
+        leftTrigger.set(true);
         machine.poll();
-        assertEquals(IntakeState.ACTIVE, machine.currentState().intakeState());
+
+        // Double check that it's running
+        assertEquals(IntakeState.RUNNING, machine.currentState().intakeState());
+
+        // Release the trigger
+        leftTrigger.set(false);
+        machine.poll();
+
+        assertEquals(IntakeState.STOPPED, machine.currentState().intakeState());
+    }
+
+    @Test
+    void intakeReversesWhenXButtonIsPressed() {
+        xButton.set(true);
+        machine.poll();
+
+        assertEquals(IntakeState.REVERSING, machine.currentState().intakeState());
+    }
+
+    @Test
+    void intakeStopsWhenXButtonIsReleased() {
+        xButton.set(true);
+        machine.poll();
+
+        // Double check that it's reversing
+        assertEquals(IntakeState.REVERSING, machine.currentState().intakeState());
 
         // Release the button
-        rightBumper.set(false);
+        xButton.set(false);
         machine.poll();
 
-        assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());
+        assertEquals(IntakeState.STOPPED, machine.currentState().intakeState());
     }
-
-    @Test
-    void intakeBecomesInactiveIfHopperRetracts() {
-        CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
-        rightBumper.set(true);
-        machine.poll();
-
-        //  Double check that it's active
-        assertEquals(IntakeState.ACTIVE, machine.currentState().intakeState());
-
-        // Retract the hopper
-        //CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.RETRACTING));
-        machine.poll();
-
-        assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());
-    }
-
-    @Test
-    void intakeReversesWhenYButtonIsPressed() {
-        yButton.set(true);
-        machine.poll();
-        assertEquals(IntakeState.REVERSE, machine.currentState().intakeState());
-    }
-
-    @Test
-    void intakeStopsReversingWhenYButtonIsReleased() {
-        yButton.set(true);
-        machine.poll();
-
-        assertEquals(IntakeState.REVERSE, machine.currentState().intakeState());
-
-        yButton.set(false);
-        machine.poll();
-
-        assertEquals(IntakeState.INACTIVE, machine.currentState().intakeState());
-    }
-
 }
