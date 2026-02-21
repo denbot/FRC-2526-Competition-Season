@@ -20,7 +20,7 @@ public enum IntakeState {
                 .to(IntakeState.INACTIVE)
                 .transitionWhen(() -> !rightBumper.getAsBoolean()); // Transition to inactive when trigger is let go
         stateMachine
-                .state(HopperState.RETRACTING)
+                .state(IntakeState.ACTIVE, HopperState.RETRACTING)
                 .to(IntakeState.INACTIVE)
                 .transitionAlways(); // Transition to inactive if retracting
 

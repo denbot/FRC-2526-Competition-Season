@@ -46,7 +46,7 @@ public class IntakeStateTest {
     }
 
     @Test
-    void intakeBecomesInactiveIfHopperStateChangesReleased() {
+    void intakeBecomesInactiveIfHopperRetracts() {
         var machine = new RebuiltStateMachine();
         IntakeState.setup(machine, () -> true, () -> false);
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
