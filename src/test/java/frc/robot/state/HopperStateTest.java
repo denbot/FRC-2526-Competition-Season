@@ -3,20 +3,24 @@ package frc.robot.state;
 import bot.den.foxflow.RobotState;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOSim;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static frc.robot.helpers.TestHelpers.setDriverStationState;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HopperStateTest{
 
-    final AtomicBoolean button = new AtomicBoolean();
-    final AtomicBoolean retractingLimitSwitch = new AtomicBoolean();
-    final AtomicBoolean deployingLimitSwitch = new AtomicBoolean();
+    final AtomicBoolean leftTrigger = new AtomicBoolean();
+    final AtomicBoolean leftBumper = new AtomicBoolean();
+    final AtomicBoolean xButton = new AtomicBoolean();
+    final AtomicLong closedLoopError = new AtomicLong();
     private RebuiltStateMachine machine;
 
     @BeforeEach
@@ -26,10 +30,12 @@ public class HopperStateTest{
         setDriverStationState(RobotState.DISABLED);
 
         machine = new RebuiltStateMachine();
-        button.set(false);
-        retractingLimitSwitch.set(false);
-        deployingLimitSwitch.set(false);
-        HopperState.setup(machine, button::get, retractingLimitSwitch::get, deployingLimitSwitch::get);
+        leftTrigger.set(false);
+        leftBumper.set(false);
+        closedLoopError.set(0);
+        HopperState.setup(machine, leftTrigger::get, leftBumper::get, xButton::get);
+
+        Intake intake = new Intake(new IntakeIOSim());
     }
 
     @AfterEach
@@ -40,32 +46,102 @@ public class HopperStateTest{
     }
 
     @Test
-    public void hopperWorksAsExpected() {
-        button.set(true);
+    public void hopperDeploys() {
+        leftTrigger.set(true);
+        closedLoopError.set(999);
         machine.poll();
 
         // Verify hopper begins to deploy
         assertEquals(HopperState.DEPLOYING, machine.currentState().hopperState());
 
-        button.set(false);
-        deployingLimitSwitch.set(true);
+        closedLoopError.set(0);
+        machine.poll();
+
+        // Verify hopper gets deployed
+        assertEquals(HopperState.DEPLOYED, machine.currentState().hopperState());
+    }
+
+    @Test
+    public void hopperRetractsToIdle() {
+        leftTrigger.set(true);
+        closedLoopError.set(0);
         machine.poll();
 
         // Verify hopper gets deployed
         assertEquals(HopperState.DEPLOYED, machine.currentState().hopperState());
 
-        button.set(true);
+        leftTrigger.set(false);
+        closedLoopError.set(999);
         machine.poll();
 
-        // Verify hopper begins to retract
-        assertEquals(HopperState.RETRACTING, machine.currentState().hopperState());
+        // Verify hopper begins to retract to idle
+        assertEquals(HopperState.RETRACTING_TO_IDLE, machine.currentState().hopperState());
 
-        button.set(false);
-        retractingLimitSwitch.set(true);
-        deployingLimitSwitch.set(false);
+        closedLoopError.set(0);
         machine.poll();
 
-        // Verify hopper gets retracted
+        // Verify hopper retracts to idle
+        assertEquals(HopperState.IDLE, machine.currentState().hopperState());
+    }
+
+    @Test
+    public void hopperCanDeployFromIdle() {
+        leftTrigger.set(true);
+        closedLoopError.set(0);
+        machine.poll();
+
+        // Double check that hopper gets deployed
+        assertEquals(HopperState.DEPLOYED, machine.currentState().hopperState());
+
+        leftTrigger.set(false);
+        closedLoopError.set(0);
+        machine.poll();
+
+        // Double check hopper retracts to idle
+        assertEquals(HopperState.IDLE, machine.currentState().hopperState());
+
+        leftTrigger.set(true);
+        closedLoopError.set(999);
+        machine.poll();
+
+        // Verify hopper begins to deploy
+        assertEquals(HopperState.DEPLOYING, machine.currentState().hopperState());
+
+        closedLoopError.set(0);
+        machine.poll();
+
+        // Verify hopper gets deployed
+        assertEquals(HopperState.DEPLOYED, machine.currentState().hopperState());
+    }
+
+    @Test
+    public void hopperCanFullyRetractFromIdle() {
+        leftTrigger.set(true);
+        closedLoopError.set(0);
+        machine.poll();
+
+        // Double check that hopper gets deployed
+        assertEquals(HopperState.DEPLOYED, machine.currentState().hopperState());
+
+        leftTrigger.set(false);
+        closedLoopError.set(0);
+        machine.poll();
+
+        // Double check hopper retracts to idle
+        assertEquals(HopperState.IDLE, machine.currentState().hopperState());
+
+        leftBumper.set(true);
+        closedLoopError.set(999);
+        machine.poll();
+
+        // Verify that hopper begins retracting to fully retracted
+        assertEquals(HopperState.RETRACTING_TO_RETRACTED, machine.currentState().hopperState());
+
+        closedLoopError.set(0);
+        machine.poll();
+
+        // Verify that hopper begins retracting to fully retracted
         assertEquals(HopperState.RETRACTED, machine.currentState().hopperState());
     }
+
 }

@@ -181,15 +181,15 @@ public class RobotContainer {
     // HubState.setup(stateMachine, () -> );
     IntakeState.setup(
             stateMachine,
-            controller.rightBumper(),
-            controller.y()
+            controller.leftTrigger(),
+            controller.x()
     );
 
     HopperState.setup(
             stateMachine,
+            controller.leftTrigger(),
             controller.leftBumper(),
-            intake::getIntakeRetractedSwitch,
-            intake::getIntakeDeployedSwitch
+            controller.x()
     );
   }
 

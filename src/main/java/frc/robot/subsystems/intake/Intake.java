@@ -90,6 +90,10 @@ public class Intake extends SubsystemBase {
     return inputs.extensionMotorLeftConnected && inputs.extensionMotorRightConnected;
   }
 
+  public double getClosedLoopError() {
+    return inputs.intakeVelocityClosedLoopError;
+  }
+
   public boolean getIntakeDeployedSwitch() {
     return inputs.intakeDeployedSwitch;
   }
