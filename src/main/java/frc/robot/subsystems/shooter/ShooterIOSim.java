@@ -17,32 +17,35 @@ public class ShooterIOSim implements ShooterIO{
     private DCMotorSim spinnerMotorSim;
     private DCMotorSim kickerMotorSim;
 
-    private SimpleMotorFeedforward spinnFeedforwards = new SimpleMotorFeedforward(0.001, 0.11500000059604645);
-    private PIDController spinnerController = new PIDController(0, 0, 0);
-    private PIDController kickerController = new PIDController(0, 0, 0);
+    private SimpleMotorFeedforward spinFeedforwards = new SimpleMotorFeedforward(0.0703125, 0.1200000059604645);
+    private SimpleMotorFeedforward kickerFeedforwards = new SimpleMotorFeedforward(0.09, 0.25);
+    private PIDController spinnerController = new PIDController(0.1, 0, 0);
+    private PIDController kickerController = new PIDController(0.01, 0, 0.0);
 
-    private double spinnerAppliedVolts = 0.0;
-    private double kickerAppliedVolts = 0.0;
+    private double spinnerAppliedVoltsPID = 0.0;
+    private double spinnerAppliedVoltsFF = 0.0;
+    private double kickerAppliedVoltsPID = 0.0;
+    private double kickerAppliedVoltsFF = 0.0;
 
     public ShooterIOSim(){
         spinnerMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(spinnerMotor, 0.0002, 1), 
+            LinearSystemId.createDCMotorSystem(spinnerMotor, 0.02, 1), 
             spinnerMotor);   
         
         kickerMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(kickerMotor, 0.0002, 1), 
+            LinearSystemId.createDCMotorSystem(kickerMotor, 0.002, 1), 
             kickerMotor);   
     }
 
     @Override
     public void updateInputs(ShooterIOInputs inputs){
-        spinnerAppliedVolts = spinnerController.calculate(spinnerMotorSim.getAngularVelocityRPM()) + spinnFeedforwards.calculate(spinnerMotorSim.getAngularVelocityRPM());
-        kickerAppliedVolts = kickerController.calculate(kickerMotorSim.getAngularVelocityRPM());
+        spinnerAppliedVoltsPID = spinnerController.calculate(spinnerMotorSim.getAngularVelocity().in(RotationsPerSecond)) + spinnerAppliedVoltsFF;
+        kickerAppliedVoltsPID = kickerController.calculate(kickerMotorSim.getAngularVelocity().in(RotationsPerSecond)) + kickerAppliedVoltsFF;
 
-        spinnerMotorSim.setInputVoltage(spinnerAppliedVolts);
-        kickerMotorSim.setInputVoltage(kickerAppliedVolts);
+        spinnerMotorSim.setInputVoltage(spinnerAppliedVoltsPID);
+        kickerMotorSim.setInputVoltage(kickerAppliedVoltsPID);
 
         spinnerMotorSim.update(0.02);
         kickerMotorSim.update(0.02);
@@ -51,8 +54,8 @@ public class ShooterIOSim implements ShooterIO{
         inputs.rightSpinnerMotorConnected = true;
         inputs.kickerMotorConnected = true;
         
-        inputs.leftSpinnerRotationSpeed = RotationsPerSecond.of(spinnerMotorSim.getAngularVelocityRPM() / 60);
-        inputs.kickerRotationSpeed = RotationsPerSecond.of(kickerMotorSim.getAngularVelocityRPM() / 60);
+        inputs.leftSpinnerRotationSpeed = spinnerMotorSim.getAngularVelocity();
+        inputs.kickerRotationSpeed = kickerMotorSim.getAngularVelocity();
         
         inputs.leftSpinnerCurrentAmps = Amp.of(spinnerMotorSim.getCurrentDrawAmps());
         inputs.kickerCurrentAmps = Amp.of(kickerMotorSim.getCurrentDrawAmps());
@@ -65,16 +68,20 @@ public class ShooterIOSim implements ShooterIO{
     }
 
     public void setSpinnerVelocity(AngularVelocity velocity){
+        spinnerAppliedVoltsFF = spinFeedforwards.calculate(velocity.in(RotationsPerSecond));
         spinnerController.setSetpoint(velocity.in(RotationsPerSecond));
     }
     public void stopSpinner(){
+        spinnerAppliedVoltsFF = spinFeedforwards.calculate(0);
         spinnerController.setSetpoint(0);
     }
 
     public void setKickerVelocity(AngularVelocity velocity){
+        kickerAppliedVoltsFF = kickerFeedforwards.calculate(velocity.in(RotationsPerSecond));
         kickerController.setSetpoint(velocity.in(RotationsPerSecond));
     }
     public void stopKicker(){
+        kickerAppliedVoltsFF = kickerFeedforwards.calculate(0);
         kickerController.setSetpoint(0);
     }
 }
