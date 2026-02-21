@@ -13,80 +13,107 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class IntakeIOSim implements IntakeIO {
     private static final DCMotor intakeMotor = DCMotor.getKrakenX60Foc(1);
-    private static final DCMotor rackMotor = DCMotor.getKrakenX60Foc(1);
+    private static final DCMotor extensionLeftMotor = DCMotor.getKrakenX60Foc(1);
+    private static final DCMotor extensionRightMotor = DCMotor.getKrakenX60Foc(1);
 
     private DCMotorSim intakeMotorSim;
-    private DCMotorSim rackMotorSim;
+    private DCMotorSim extensionLeftMotorSim;
+    private DCMotorSim extensionRightMotorSim;
 
-    private SimpleMotorFeedforward spinnFeedforwards = new SimpleMotorFeedforward(0, 0); // TODO
-    private PIDController intakeController = new PIDController(1, 0, 0); // TODO
-    private PIDController rackController = new PIDController(1, 0, 0); // TODO
+    private SimpleMotorFeedforward spinFeedforwards = new SimpleMotorFeedforward(0.0, 0.1); // TODO
+    private PIDController intakeController = new PIDController(0.5, 1, 0); // TODO
+    private PIDController extensionLeftController = new PIDController(7, 0, 0); // TODO
+    private PIDController extensionRightController = new PIDController(7, 0, 0); // TODO
 
-    private double intakeAppliedVolts = 0.0;
-    private double rackAppliedVolts = 0.0;
+    private double intakeAppliedVoltsPID = 0.0;
+    private double intakeAppliedVoltsFF = 0.0;
+    private double extensionLeftAppliedVolts = 0.0;
+    private double extensionRightAppliedVolts = 0.0;
 
     public IntakeIOSim(){
         intakeMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(intakeMotor, 0.2, 1), // TODO
+            LinearSystemId.createDCMotorSystem(intakeMotor, 0.02, 2), // TODO
             intakeMotor);   
         
-        rackMotorSim = 
+        extensionLeftMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(rackMotor, 0.2, 1), // TODO
-            rackMotor);   
+            LinearSystemId.createDCMotorSystem(extensionLeftMotor, 0.02, 23), // TODO
+            extensionLeftMotor);
+            
+        extensionRightMotorSim = 
+        new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(extensionRightMotor, 0.02, 23), // TODO
+            extensionRightMotor);   
     }
 
     @Override
     public void updateInputs(IntakeIOInputs inputs){
-        intakeAppliedVolts = intakeController.calculate(intakeMotorSim.getAngularVelocityRPM()) + spinnFeedforwards.calculate(intakeMotorSim.getAngularVelocityRPM());
-        rackAppliedVolts = rackController.calculate(rackMotorSim.getAngularVelocityRPM());
+        intakeAppliedVoltsPID = intakeController.calculate(intakeMotorSim.getAngularVelocity().in(RotationsPerSecond)) + intakeAppliedVoltsFF;
 
-        intakeMotorSim.setInputVoltage(intakeAppliedVolts);
-        rackMotorSim.setInputVoltage(rackAppliedVolts);
+        extensionLeftAppliedVolts = extensionLeftController.calculate(extensionLeftMotorSim.getAngularPositionRotations());
+        extensionRightAppliedVolts = extensionRightController.calculate(extensionRightMotorSim.getAngularPositionRotations());
+
+        intakeMotorSim.setInputVoltage(intakeAppliedVoltsPID);
+        extensionLeftMotorSim.setInputVoltage(extensionLeftAppliedVolts);
+        extensionRightMotorSim.setInputVoltage(extensionRightAppliedVolts);
 
         intakeMotorSim.update(0.02);
-        rackMotorSim.update(0.02);
+        extensionLeftMotorSim.update(0.02);
+        extensionRightMotorSim.update(0.02);
 
         inputs.intakeMotorConnected = true;
-        inputs.rackMotorConnected = true;
+        inputs.extensionMotorLeftConnected = true;
+        inputs.extensionMotorRightConnected = true;
+
+        inputs.intakeVelocityClosedLoopError = intakeController.getError();
 
         inputs.intakeVelocityRotPerSec = intakeMotorSim.getAngularVelocity();
-        inputs.rackVelocityRotPerSec = rackMotorSim.getAngularVelocity();
+        inputs.extensionVelocityLeft = extensionLeftMotorSim.getAngularVelocity();
+        inputs.extensionVelocityRight = extensionRightMotorSim.getAngularVelocity();
 
         inputs.intakePositionRots = Angle.ofBaseUnits(intakeMotorSim.getAngularPositionRotations(), Rotations);
-        inputs.rackPositionRots =  Angle.ofBaseUnits(rackMotorSim.getAngularPositionRotations(), Rotations);
+        inputs.extensionLeftPositionRots =  Angle.ofBaseUnits(extensionLeftMotorSim.getAngularPositionRotations(), Rotations);
+        inputs.extensionRightPositionRots =  Angle.ofBaseUnits(extensionRightMotorSim.getAngularPositionRotations(), Rotations);
 
         inputs.stallCurrentIntake = null;
-        inputs.stallCurrentRack = null;
+        inputs.stallCurrentExtensionLeft = null;
+        inputs.stallCurrentExtensionRight = null;
 
-        if (rackController.getSetpoint() == (IntakeConstants.intakeMaxExtensionPosition.magnitude())) {
+        if (extensionLeftController.getSetpoint() == (IntakeConstants.intakeMaxExtensionPosition.magnitude())
+            || extensionLeftController.getSetpoint() == (IntakeConstants.intakeMaxExtensionPosition.magnitude())) {
             inputs.intakeDeployedSwitch = true;
         }
 
-        if (rackController.getSetpoint() == (IntakeConstants.intakeMinExtensionPosition.magnitude())) {
+        if (extensionLeftController.getSetpoint() == (IntakeConstants.intakeMinExtensionPosition.magnitude())
+            || extensionLeftController.getSetpoint() == (IntakeConstants.intakeMinExtensionPosition.magnitude())) {
             inputs.intakeRetractedSwitch = true;
         }
     }
 
     public void setIntakeVelocity(AngularVelocity velocity) {
+        intakeAppliedVoltsFF = spinFeedforwards.calculate(velocity.in(RotationsPerSecond));
         intakeController.setSetpoint(velocity.in(RotationsPerSecond));
     }
 
     public void setIntakeExtension(Angle position) {
-        rackController.setSetpoint(position.magnitude()); // TODO: This doesnt work
+        extensionLeftController.setSetpoint(position.magnitude()); // TODO: This doesnt work
+        extensionRightController.setSetpoint(position.magnitude()); // TODO: This doesnt work
     }
 
     public void setIntakeMaxLength() {
-        rackController.setSetpoint(IntakeConstants.intakeMaxExtensionPosition.magnitude()); // TODO: This doesnt work
+        extensionLeftController.setSetpoint(IntakeConstants.intakeMaxExtensionPosition.magnitude()); // TODO: This doesnt work
+        extensionRightController.setSetpoint(IntakeConstants.intakeMaxExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 
     public void setIntakeIdleLength() {
-        rackController.setSetpoint(IntakeConstants.intakeIdleExtensionPosition.magnitude()); // TODO: This doesnt work
+        extensionLeftController.setSetpoint(IntakeConstants.intakeIdleExtensionPosition.magnitude()); // TODO: This doesnt work
+        extensionRightController.setSetpoint(IntakeConstants.intakeIdleExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 
     public void setIntakeMinLength() {
-        rackController.setSetpoint(IntakeConstants.intakeMinExtensionPosition.magnitude()); // TODO: This doesnt work
+        extensionLeftController.setSetpoint(IntakeConstants.intakeMinExtensionPosition.magnitude()); // TODO: This doesnt work
+        extensionRightController.setSetpoint(IntakeConstants.intakeMinExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 
     public void stopIntake() {

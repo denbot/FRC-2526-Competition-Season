@@ -36,11 +36,14 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeVelocitySetpoint = speed;
           this.io.setIntakeVelocity(speed);}, 
-          () -> this.io.stopIntake());
+          () -> { intakeVelocitySetpoint = RotationsPerSecond.of(0);
+          this.io.stopIntake();});
   }
 
   public Command stopIntake() {
-    return Commands.runOnce(() -> this.io.stopIntake());
+    return Commands.runOnce(() -> {
+      intakeVelocitySetpoint = RotationsPerSecond.of(0);
+      this.io.stopIntake();});
   }
 
   public Command runIntakeExtension(Angle position) {
@@ -51,12 +54,16 @@ public class Intake extends SubsystemBase {
   }
 
   public Command setIntakeMaxLength() {
-    return Commands.runOnce(
+    return Commands.runEnd(
         () -> {
           intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
-          this.io.setIntakeMaxLength();});
+          this.io.setIntakeMaxLength();},
+        () -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
+          this.io.setIntakeIdleLength();});
   }
 
+  // technically unescesary
   public Command setIntakeIdleLength() {
     return Commands.runOnce(
         () -> {
@@ -65,10 +72,13 @@ public class Intake extends SubsystemBase {
   }
 
   public Command setIntakeMinLength() {
-    return Commands.runOnce(
+    return Commands.runEnd(
         () -> {
           intakeExtensionSetpoint = IntakeConstants.intakeMinExtensionPosition;
-          this.io.setIntakeMinLength();});
+          this.io.setIntakeMinLength();},
+        () -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
+          this.io.setIntakeIdleLength();});
   }
 
   // Getters for private IO variables
@@ -76,8 +86,8 @@ public class Intake extends SubsystemBase {
     return inputs.intakeMotorConnected;
   }
 
-  public boolean getRackMotorConnected() {
-    return inputs.rackMotorConnected;
+  public boolean getExtensionMotorsConnected() {
+    return inputs.extensionMotorLeftConnected && inputs.extensionMotorRightConnected;
   }
 
   public boolean getIntakeDeployedSwitch() {
@@ -92,23 +102,35 @@ public class Intake extends SubsystemBase {
     return inputs.stallCurrentIntake;
   }
 
-  public Current getStallCurrentRack() {
-    return inputs.stallCurrentRack;
+  public Current getStallCurrentExtensionLeft() {
+    return inputs.stallCurrentExtensionLeft;
+  }
+  
+  public Current getStallCurrentExtensionRight() {
+    return inputs.stallCurrentExtensionRight;
   }
 
   public AngularVelocity getIntakeVelocityRotPerSec() {
     return inputs.intakeVelocityRotPerSec;
   }
 
-  public AngularVelocity getRackVelocityRotPerSec() {
-    return inputs.rackVelocityRotPerSec;
+  public AngularVelocity getExtensionLeftVelocityRotPerSec() {
+    return inputs.extensionVelocityLeft;
+  }
+  
+  public AngularVelocity getExtensionRightVelocityRotPerSec() {
+    return inputs.extensionVelocityRight;
   }
 
   public Angle getIntakePositionRots() {
     return inputs.intakePositionRots;
   }
 
-  public Angle getRackPositionRots() {
-    return inputs.rackPositionRots;
+  public Angle getExtensionLeftPositionRots() {
+    return inputs.extensionLeftPositionRots;
+  }
+  
+  public Angle getExtensionRightPositionRots() {
+    return inputs.extensionRightPositionRots;
   }
 }
