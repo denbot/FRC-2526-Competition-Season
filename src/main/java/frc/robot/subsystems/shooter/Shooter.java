@@ -45,8 +45,10 @@ public class Shooter extends SubsystemBase{
             Math.pow(robotPose.getX() - targetPose.getX(), 2) +
             Math.pow(robotPose.getY() - targetPose.getY(), 2)));
 
+        System.out.println("Distance From Hub: " + distance.magnitude() + " meters");
+
         double x = distance.in(Meters);
-        return RotationsPerSecond.of((Math.pow(x, 2) / 6) + (2.5 * x) + 39.3); // TODO This function is guesswork and estimation
+        return RotationsPerSecond.of((Math.pow(x, 2) / 6) + (2.5 * x) + 39.3).plus(spinnerVelocityOffset); // TODO This function is guesswork and estimation
     }
 
     //TODO move this to be implemented in the runSpinner command, refference intake.java for example
@@ -63,7 +65,7 @@ public class Shooter extends SubsystemBase{
     }
 
     public Command runSpinner(){
-        return Commands.runEnd(() -> this.io.setSpinnerVelocity(defaultSpinnerSpeed), () -> this.io.stopSpinner());
+        return Commands.runEnd(() -> this.io.setSpinnerVelocity(defaultSpinnerSpeed.plus(spinnerVelocityOffset)), () -> this.io.stopSpinner());
     }
     public Command stopSpinner(){
         return Commands.runOnce(() -> this.io.stopSpinner());

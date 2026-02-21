@@ -247,6 +247,14 @@ public class RobotContainer {
     
     // Run static spinner, constant speed and no auto aiming
     controller.y().whileTrue(shooter.runSpinner());
+
+    controller.povUp().onTrue(
+        Commands.runOnce(
+            () -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
+    
+    controller.povDown().onTrue(
+        Commands.runOnce(
+            () ->shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
 }
 
 public Pose2d getRobotPosition(){
