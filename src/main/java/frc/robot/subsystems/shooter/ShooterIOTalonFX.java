@@ -81,9 +81,9 @@ public class ShooterIOTalonFX implements ShooterIO {
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(.001)
+                    .withKP(.1)
                     .withKS(0.0703125)
-                    .withKV(0.11500000059604645));
+                    .withKV(0.1200000059604645));
 
         var rightSpinnerMotorConfig =
         new TalonFXConfiguration()
@@ -97,9 +97,9 @@ public class ShooterIOTalonFX implements ShooterIO {
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(.001)
+                    .withKP(.1)
                     .withKS(0.0703125)
-                    .withKV(0.11500000059604645));
+                    .withKV(0.1200000059604645));
 
         var kickerMotorConfig =
         new TalonFXConfiguration()
@@ -114,9 +114,8 @@ public class ShooterIOTalonFX implements ShooterIO {
             .withSlot0(
                 new Slot0Configs()
                     .withKP(0.1)
-                    .withKD(0)
-                    .withKS(0.25)
-                    .withKV(0.09));
+                    .withKS(0.09)
+                    .withKV(0.25));
 
 
         leftSpinnerMotor.setNeutralMode(NeutralModeValue.Coast);

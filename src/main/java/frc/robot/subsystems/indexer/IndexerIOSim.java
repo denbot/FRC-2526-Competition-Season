@@ -14,24 +14,25 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 public class IndexerIOSim implements IndexerIO{
     private static final DCMotor indexMotor = DCMotor.getKrakenX44(1);
     private DCMotorSim indexMotorSim;
-    private SimpleMotorFeedforward indexFeedforward = new SimpleMotorFeedforward(0.001, 0.11500000059604645);
-    private PIDController indexMotorController = new PIDController(0.11, 0.0, 0.0);
-    private double indexMotorAppliedVolts = 0;
+    private SimpleMotorFeedforward indexFeedforward = new SimpleMotorFeedforward(0.0, 0.11500000059604645);
+    private PIDController indexMotorController = new PIDController(0.001, 0.0, 0.0);
+    private double indexMotorAppliedVoltsPID = 0;
+    private double indexMotorAppliedVoltsFF = 0;
 
     public IndexerIOSim(){
         indexMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(indexMotor, 0.0002, 1), 
+            LinearSystemId.createDCMotorSystem(indexMotor, 0.002, 2), 
             indexMotor);   
     }
 
     @Override
     public void updateInputs(IndexerIOInputs inputs){
-        indexMotorAppliedVolts = indexMotorController.calculate(indexMotorSim.getAngularVelocityRPM()) + indexFeedforward.calculate(indexMotorSim.getAngularVelocityRPM());
-        indexMotorSim.setInputVoltage(indexMotorAppliedVolts);
+        indexMotorAppliedVoltsPID = indexMotorController.calculate(indexMotorSim.getAngularVelocity().in(RotationsPerSecond)) + indexMotorAppliedVoltsFF;
+        indexMotorSim.setInputVoltage(indexMotorAppliedVoltsPID);
         indexMotorSim.update(0.02);
         inputs.indexMotorConnected = true;
-        inputs.indexMotorRotationSpeed = RotationsPerSecond.of(indexMotorSim.getAngularVelocityRPM() / 60);
+        inputs.indexMotorRotationSpeed = indexMotorSim.getAngularVelocity();
         inputs.indexMotorCurrentAmps = Amp.of(indexMotorSim.getCurrentDrawAmps());
         inputs.indexMotorPositionRots = indexMotorSim.getAngularPosition();
         inputs.indexMotorClosedLoopError = indexMotorController.getError();
@@ -39,10 +40,12 @@ public class IndexerIOSim implements IndexerIO{
     }
 
     public void runIndexerAtSpeed(AngularVelocity speed){
+        indexMotorAppliedVoltsFF = indexFeedforward.calculate(indexMotorSim.getAngularVelocity().in(RotationsPerSecond));
         indexMotorController.setSetpoint(speed.in(RotationsPerSecond));
     }
     
     public void stopIndexer(){
+        indexMotorAppliedVoltsFF = indexFeedforward.calculate(0);
         indexMotorController.setSetpoint(0);
     }
 }

@@ -2,13 +2,11 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
@@ -17,14 +15,18 @@ public interface IntakeIO {
     public boolean intakeDeployedSwitch = false;
     public boolean intakeRetractedSwitch = false;
     public boolean intakeMotorConnected = false;
-    public boolean rackMotorConnected = false;
-    public Current stallCurrentRack = Amp.zero();
+    public boolean extensionMotorLeftConnected = false;
+    public boolean extensionMotorRightConnected = false;
+    public Current stallCurrentExtensionLeft = Amp.zero();
+    public Current stallCurrentExtensionRight = Amp.zero();
     public Current stallCurrentIntake = Amp.zero();
+    public double intakeVelocityClosedLoopError = 0.0;
     public AngularVelocity intakeVelocityRotPerSec = RevolutionsPerSecond.zero();
-    public AngularVelocity rackVelocityRotPerSec = RevolutionsPerSecond.zero();
+    public AngularVelocity extensionVelocityLeft = RevolutionsPerSecond.zero();
+    public AngularVelocity extensionVelocityRight = RevolutionsPerSecond.zero();
     public Angle intakePositionRots = Degree.zero();
-    public Angle rackPositionRots = Degree.zero();
-    public Distance intakeExtensionLength = Inches.of(0);
+    public Angle extensionLeftPositionRots = Degree.zero();
+    public Angle extensionRightPositionRots = Degree.zero();
   }
 
   // sets shooter velocity in RevolutionsPerSec
@@ -32,9 +34,11 @@ public interface IntakeIO {
 
   public default void setIntakeVelocity(AngularVelocity velocity) {}
 
-  public default void setIntakeExtensionLength(Distance length) {}
+  public default void setIntakeExtension(Angle position) {}
 
   public default void setIntakeMaxLength() {}
+
+  public default void setIntakeIdleLength() {}
 
   public default void setIntakeMinLength() {}
 

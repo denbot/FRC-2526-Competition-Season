@@ -1,22 +1,28 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.Drive;
 
 public class Shooter extends SubsystemBase{
     private final ShooterIO io;
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     private AngularVelocity spinnerVelocitySetpoint = RotationsPerSecond.of(60);
+    private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(60);
     private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
+    private AngularVelocity spinnerVelocityOffset = RotationsPerSecond.of(0);
 
     public Shooter(ShooterIO io){
         this.io = io;
@@ -31,17 +37,33 @@ public class Shooter extends SubsystemBase{
         Logger.recordOutput("Kicker Velocity Setpoint", kickerVelocitySetpoint);
     }
 
+    public AngularVelocity getIdealSpeed(Pose2d robotPose, Pose2d targetPose){
+        // TODO replace target pose withs state machine based identification and logic for aiming
+        Distance distance;
+
+        distance = Meters.of(Math.sqrt(
+            Math.pow(robotPose.getX() - targetPose.getX(), 2) +
+            Math.pow(robotPose.getY() - targetPose.getY(), 2)));
+
+        double x = distance.in(Meters);
+        return RotationsPerSecond.of((Math.pow(x, 2) / 6) + (2.5 * x) + 39.3); // TODO This function is guesswork and estimation
+    }
+
     //TODO move this to be implemented in the runSpinner command, refference intake.java for example
     public void setSpinnerVelocitySetpoint(AngularVelocity speed){
-        spinnerVelocitySetpoint = speed;
+        spinnerVelocitySetpoint = speed.plus(spinnerVelocityOffset);
     }
     
     public void stepSpinnerVelocitySetpoint(AngularVelocity speed){
-        spinnerVelocitySetpoint = spinnerVelocitySetpoint.plus(speed);
+        spinnerVelocityOffset = spinnerVelocityOffset.plus(speed);
+    }
+
+    public Command runSpinnerAddaptive(Drive drive, Pose2d targetPose){
+        return Commands.runEnd(() -> this.io.setSpinnerVelocity(this.getIdealSpeed(drive.getPose(), targetPose)), () -> this.io.stopSpinner());
     }
 
     public Command runSpinner(){
-        return Commands.runEnd(() -> this.io.setSpinnerVelocity(spinnerVelocitySetpoint), () -> this.io.stopSpinner());
+        return Commands.runEnd(() -> this.io.setSpinnerVelocity(defaultSpinnerSpeed), () -> this.io.stopSpinner());
     }
     public Command stopSpinner(){
         return Commands.runOnce(() -> this.io.stopSpinner());

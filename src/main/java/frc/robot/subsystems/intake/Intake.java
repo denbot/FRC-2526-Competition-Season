@@ -1,13 +1,11 @@
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,7 +16,7 @@ public class Intake extends SubsystemBase {
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(60);
-  private Distance intakeExtensionSetpoint = Inches.of(0);
+  private Angle intakeExtensionSetpoint = Rotations.zero();
 
   public Intake(IntakeIO io) {
     this.io = io;
@@ -38,32 +36,49 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeVelocitySetpoint = speed;
           this.io.setIntakeVelocity(speed);}, 
-          () -> this.io.stopIntake());
+          () -> { intakeVelocitySetpoint = RotationsPerSecond.of(0);
+          this.io.stopIntake();});
   }
 
   public Command stopIntake() {
-    return Commands.runOnce(() -> this.io.stopIntake());
+    return Commands.runOnce(() -> {
+      intakeVelocitySetpoint = RotationsPerSecond.of(0);
+      this.io.stopIntake();});
   }
 
-  public Command runIntakeExtension(Distance length) {
+  public Command runIntakeExtension(Angle position) {
     return Commands.runOnce(
         () -> {
-          intakeExtensionSetpoint = length;
-          this.io.setIntakeExtensionLength(length);});
+          intakeExtensionSetpoint = position;
+          this.io.setIntakeExtension(position);});
   }
 
   public Command setIntakeMaxLength() {
+    return Commands.runEnd(
+        () -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+          this.io.setIntakeMaxLength();},
+        () -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
+          this.io.setIntakeIdleLength();});
+  }
+
+  // technically unescesary
+  public Command setIntakeIdleLength() {
     return Commands.runOnce(
         () -> {
-          intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMaxExtensionLength);
-          this.io.setIntakeMaxLength();});
+          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
+          this.io.setIntakeIdleLength();});
   }
 
   public Command setIntakeMinLength() {
-    return Commands.runOnce(
+    return Commands.runEnd(
         () -> {
-          intakeExtensionSetpoint = Meters.of(IntakeConstants.intakeRotationsToRackRatio * IntakeConstants.intakeMinExtensionLength);
-          this.io.setIntakeMinLength();});
+          intakeExtensionSetpoint = IntakeConstants.intakeMinExtensionPosition;
+          this.io.setIntakeMinLength();},
+        () -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
+          this.io.setIntakeIdleLength();});
   }
 
   // Getters for private IO variables
@@ -71,8 +86,8 @@ public class Intake extends SubsystemBase {
     return inputs.intakeMotorConnected;
   }
 
-  public boolean getRackMotorConnected() {
-    return inputs.rackMotorConnected;
+  public boolean getExtensionMotorsConnected() {
+    return inputs.extensionMotorLeftConnected && inputs.extensionMotorRightConnected;
   }
 
   public boolean getIntakeDeployedSwitch() {
@@ -87,27 +102,35 @@ public class Intake extends SubsystemBase {
     return inputs.stallCurrentIntake;
   }
 
-  public Current getStallCurrentRack() {
-    return inputs.stallCurrentRack;
+  public Current getStallCurrentExtensionLeft() {
+    return inputs.stallCurrentExtensionLeft;
+  }
+  
+  public Current getStallCurrentExtensionRight() {
+    return inputs.stallCurrentExtensionRight;
   }
 
   public AngularVelocity getIntakeVelocityRotPerSec() {
     return inputs.intakeVelocityRotPerSec;
   }
 
-  public AngularVelocity getRackVelocityRotPerSec() {
-    return inputs.rackVelocityRotPerSec;
+  public AngularVelocity getExtensionLeftVelocityRotPerSec() {
+    return inputs.extensionVelocityLeft;
+  }
+  
+  public AngularVelocity getExtensionRightVelocityRotPerSec() {
+    return inputs.extensionVelocityRight;
   }
 
   public Angle getIntakePositionRots() {
     return inputs.intakePositionRots;
   }
 
-  public Angle getRackPositionRots() {
-    return inputs.rackPositionRots;
+  public Angle getExtensionLeftPositionRots() {
+    return inputs.extensionLeftPositionRots;
   }
-
-  public Distance getIntakeExtensionLength() {
-    return inputs.intakeExtensionLength;
+  
+  public Angle getExtensionRightPositionRots() {
+    return inputs.extensionRightPositionRots;
   }
 }

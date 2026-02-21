@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -152,8 +151,6 @@ public class RobotContainer {
         break;
     }
 
-
-
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
     operatorController = new OperatorController(autoBuilder);
@@ -225,57 +222,45 @@ public class RobotContainer {
                 drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),drive)
         .ignoringDisable(true));
 
-    // Spin up when A is held (use this if you don't want to lock position)
-    controller.a()
-        .whileTrue(shooter.runSpinner());
-
-    // Climb/cancel climb when B button is pressed
-    // TODO: implement climbing
-    // controller.b()
-    //    .onTrue(new ConditionalCommand(climber.retract(), climber.extend(), () -> climber.getClimberExtended()));
-
-    // Switch to X pattern when X button is pressed
-    controller.x()
-        .whileTrue(indexer.reverseIndexer());
-
-    // Outtake when Y button is held
-    controller.y()
-        .whileTrue((intake.runIntake(IntakeConstants.intakeSpeed.times(-1))
-        .alongWith(indexer.reverseIndexer()))
-        .andThen(intake.stopIntake()
-        .alongWith(indexer.stopIndexer())));
-
-    // Spinup and aim when right bumper is held
-    controller.rightBumper()
-        .whileTrue(shooter.runSpinner()
-        .alongWith(DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> drive.findAngleForShooting(drive.getPose()))));
-
-    // Shoot when right trigger is held
-    controller.rightTrigger()
-        .whileTrue(shooter.runKicker());
-
-    // Toggle intake when left bumper is pressed
-    controller.leftBumper()
-        .onTrue(new ConditionalCommand(intake.setIntakeMinLength(), intake.setIntakeMaxLength(), () -> intake.getIntakeDeployedSwitch()));
-
-    // Run intake when left trigger is held
-    controller.leftTrigger()
-        .whileTrue((intake.runIntake(IntakeConstants.intakeSpeed)
-        .alongWith(indexer.runIndexer()))
-        .alongWith(shooter.reverseKicker()));
-        
-    controller.povUp()
-        .onTrue(Commands.runOnce(() -> 
-                shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
+    // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
+    controller.rightBumper().whileTrue(
+        shooter.runSpinnerAddaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed)
+        .alongWith(
+            DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> drive.findAngleForShooting(drive.getPose()))
+            .andThen(Commands.runOnce(() -> drive.stopWithX()))));
     
-    controller.povDown()
-        .onTrue(Commands.runOnce(() -> 
-                shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
+    // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
+    controller.rightTrigger().whileTrue(
+        shooter.runKicker()
+        .alongWith(indexer.runIndexer())
+        .onlyIf(() -> Math.abs(shooter.getRightSpinnerClosedLoopError())<1));
+    
+    // "Run Intake" runs intake and indexer forward, reverses kicker 
+    controller.leftTrigger().whileTrue(
+        intake.setIntakeMaxLength()
+        .alongWith(intake.runIntake(RotationsPerSecond.of(60))) 
+        .alongWith(indexer.runIndexer())
+        .alongWith(shooter.reverseKicker()));
 
+    // Retract intake in case of jam, etc
+    controller.leftBumper().whileTrue(intake.setIntakeMinLength());
+
+    // Individually run indexer
+    controller.a().whileTrue(indexer.reverseIndexer());
+
+    // "Outtake" command extends intake and runs all subsystems in reverse
+    controller.x().whileTrue(
+        intake.runIntake(RotationsPerSecond.of(-60))
+        .alongWith(shooter.reverseKicker())
+        .alongWith(indexer.reverseIndexer())
+        .alongWith(intake.setIntakeMaxLength()));
+    
+    // Run static spinner, constant speed and no auto aiming
+    controller.y().whileTrue(shooter.runSpinner());
 }
 
 public Pose2d getRobotPosition(){
