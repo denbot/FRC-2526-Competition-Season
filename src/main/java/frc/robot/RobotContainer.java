@@ -243,8 +243,7 @@ public class RobotContainer {
     controller.leftTrigger().whileTrue(
         intake.setIntakeMaxLength()
         .alongWith(intake.runIntake(RotationsPerSecond.of(60))) 
-        .alongWith(indexer.runIndexer())
-        .alongWith(shooter.reverseKicker()));
+        .alongWith(indexer.runIndexer()));
 
     // Retract intake in case of jam, etc
     controller.leftBumper().whileTrue(intake.setIntakeMinLength());
