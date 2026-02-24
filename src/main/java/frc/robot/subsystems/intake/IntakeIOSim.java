@@ -103,16 +103,19 @@ public class IntakeIOSim implements IntakeIO {
 
     public void setIntakeMaxLength() {
         extensionLeftController.setSetpoint(IntakeConstants.intakeMaxExtensionPosition.magnitude()); // TODO: This doesnt work
+        System.out.println("Intake set to max length");
         extensionRightController.setSetpoint(IntakeConstants.intakeMaxExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 
     public void setIntakeIdleLength() {
         extensionLeftController.setSetpoint(IntakeConstants.intakeIdleExtensionPosition.magnitude()); // TODO: This doesnt work
+        System.out.println("Intake set to idle length");
         extensionRightController.setSetpoint(IntakeConstants.intakeIdleExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 
     public void setIntakeMinLength() {
         extensionLeftController.setSetpoint(IntakeConstants.intakeMinExtensionPosition.magnitude()); // TODO: This doesnt work
+        System.out.println("Intake set to min length");
         extensionRightController.setSetpoint(IntakeConstants.intakeMinExtensionPosition.magnitude()); // TODO: This doesnt work
     }
 

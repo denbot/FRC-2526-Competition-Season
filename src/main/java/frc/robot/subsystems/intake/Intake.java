@@ -25,8 +25,38 @@ public class Intake extends SubsystemBase {
     this.io = io;
 
     stateMachine
+            .state(HopperState.IDLE)
+            .to(HopperState.DEPLOYING)
+            .run(setIntakeMaxLengthNew());
+
+    stateMachine
+            .state(HopperState.RETRACTED)
+            .to(HopperState.DEPLOYING)
+            .run(setIntakeMaxLengthNew());
+
+    stateMachine
+            .state(HopperState.DEPLOYED)
+            .to(HopperState.RETRACTING_TO_IDLE)
+            .run(setIntakeIdleLengthNew());
+
+    stateMachine
+            .state(HopperState.DEPLOYED)
+            .to(HopperState.RETRACTING_TO_RETRACTED)
+            .run(setIntakeMinLengthNew());
+
+    stateMachine
             .state(HopperState.DEPLOYING)
             .to(HopperState.DEPLOYED)
+            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+
+    stateMachine
+            .state(HopperState.RETRACTING_TO_IDLE)
+            .to(HopperState.IDLE)
+            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+
+    stateMachine
+            .state(HopperState.RETRACTING_TO_RETRACTED)
+            .to(HopperState.RETRACTED)
             .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
     // TODO Also check extensionRightPositionRots
   }
@@ -60,6 +90,27 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeExtensionSetpoint = position;
           this.io.setIntakeExtension(position);});
+  }
+
+  private Command setIntakeMaxLengthNew() {
+    return Commands.runOnce(() -> {
+      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+      this.io.setIntakeMaxLength();
+    });
+  }
+
+  private Command setIntakeMinLengthNew() {
+    return Commands.runOnce(() -> {
+      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+      this.io.setIntakeMinLength();
+    });
+  }
+
+  private Command setIntakeIdleLengthNew() {
+    return Commands.runOnce(() -> {
+      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+      this.io.setIntakeIdleLength();
+    });
   }
 
   public Command setIntakeMaxLength() {
