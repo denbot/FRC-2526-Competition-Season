@@ -1,15 +1,18 @@
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.state.HopperState;
+import frc.robot.state.RebuiltStateMachine;
 import org.littletonrobotics.junction.Logger;
+
+import java.util.function.BooleanSupplier;
+
+import static edu.wpi.first.units.Units.*;
 
 public class Intake extends SubsystemBase {
   public final IntakeIO io;
@@ -18,8 +21,44 @@ public class Intake extends SubsystemBase {
   private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(60);
   private Angle intakeExtensionSetpoint = Rotations.zero();
 
-  public Intake(IntakeIO io) {
+  public Intake(IntakeIO io, RebuiltStateMachine stateMachine) {
     this.io = io;
+
+    stateMachine
+            .state(HopperState.IDLE)
+            .to(HopperState.DEPLOYING)
+            .run(setIntakeMaxLengthNew());
+
+    stateMachine
+            .state(HopperState.RETRACTED)
+            .to(HopperState.DEPLOYING)
+            .run(setIntakeMaxLengthNew());
+
+    stateMachine
+            .state(HopperState.DEPLOYED)
+            .to(HopperState.RETRACTING_TO_IDLE)
+            .run(setIntakeIdleLengthNew());
+
+    stateMachine
+            .state(HopperState.DEPLOYED)
+            .to(HopperState.RETRACTING_TO_RETRACTED)
+            .run(setIntakeMinLengthNew());
+
+    stateMachine
+            .state(HopperState.DEPLOYING)
+            .to(HopperState.DEPLOYED)
+            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+
+    stateMachine
+            .state(HopperState.RETRACTING_TO_IDLE)
+            .to(HopperState.IDLE)
+            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+
+    stateMachine
+            .state(HopperState.RETRACTING_TO_RETRACTED)
+            .to(HopperState.RETRACTED)
+            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+    // TODO Also check extensionRightPositionRots
   }
 
   @Override
@@ -51,6 +90,27 @@ public class Intake extends SubsystemBase {
         () -> {
           intakeExtensionSetpoint = position;
           this.io.setIntakeExtension(position);});
+  }
+
+  private Command setIntakeMaxLengthNew() {
+    return Commands.runOnce(() -> {
+      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+      this.io.setIntakeMaxLength();
+    });
+  }
+
+  private Command setIntakeMinLengthNew() {
+    return Commands.runOnce(() -> {
+      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+      this.io.setIntakeMinLength();
+    });
+  }
+
+  private Command setIntakeIdleLengthNew() {
+    return Commands.runOnce(() -> {
+      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+      this.io.setIntakeIdleLength();
+    });
   }
 
   public Command setIntakeMaxLength() {
@@ -88,6 +148,10 @@ public class Intake extends SubsystemBase {
 
   public boolean getExtensionMotorsConnected() {
     return inputs.extensionMotorLeftConnected && inputs.extensionMotorRightConnected;
+  }
+
+  public double getClosedLoopError() {
+    return inputs.intakeVelocityClosedLoopError;
   }
 
   public boolean getIntakeDeployedSwitch() {
