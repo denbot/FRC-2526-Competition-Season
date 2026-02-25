@@ -7,9 +7,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public enum IndexerState {
-    @DefaultState INACTIVE,
-    ACTIVE,
-    REVERSE;
+    @DefaultState STOPPED,
+    RUNNING,
+    REVERSING;
 
     public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier leftTrigger, BooleanSupplier aButton, BooleanSupplier xButton) {
 
