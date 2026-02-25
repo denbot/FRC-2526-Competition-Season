@@ -244,10 +244,13 @@ public class RobotContainer {
         intake.setIntakeMaxLength()
         .alongWith(intake.runIntake(RotationsPerSecond.of(60))) 
         .alongWith(indexer.runIndexer())
-        .alongWith(shooter.reverseKicker()));
+        .alongWith(shooter.reverseKicker())
+                .finallyDo(() -> intake.setIntakeIdleLength())); // Once left trigger stops, the intake is set to the idle length
 
     // Retract intake in case of jam, etc
-    controller.leftBumper().whileTrue(intake.setIntakeMinLength());
+    controller.leftBumper().whileTrue(
+            intake.setIntakeMinLength()
+                    .finallyDo(() -> intake.setIntakeIdleLength())); // Once the bumper stops, the intake is set to the idle length
 
     // Individually run indexer
     controller.a().whileTrue(indexer.reverseIndexer());

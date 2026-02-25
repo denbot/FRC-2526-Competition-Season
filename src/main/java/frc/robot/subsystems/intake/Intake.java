@@ -27,22 +27,22 @@ public class Intake extends SubsystemBase {
     stateMachine
             .state(HopperState.IDLE)
             .to(HopperState.DEPLOYING)
-            .run(setIntakeMaxLengthNew());
+            .run(setIntakeMaxLength());
 
     stateMachine
             .state(HopperState.RETRACTED)
             .to(HopperState.DEPLOYING)
-            .run(setIntakeMaxLengthNew());
+            .run(setIntakeMaxLength());
 
     stateMachine
             .state(HopperState.DEPLOYED)
             .to(HopperState.RETRACTING_TO_IDLE)
-            .run(setIntakeIdleLengthNew());
+            .run(setIntakeIdleLength());
 
     stateMachine
             .state(HopperState.DEPLOYED)
             .to(HopperState.RETRACTING_TO_RETRACTED)
-            .run(setIntakeMinLengthNew());
+            .run(setIntakeMinLength());
 
     stateMachine
             .state(HopperState.DEPLOYING)
@@ -92,51 +92,22 @@ public class Intake extends SubsystemBase {
           this.io.setIntakeExtension(position);});
   }
 
-  private Command setIntakeMaxLengthNew() {
-    return Commands.runOnce(() -> {
-      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
-      this.io.setIntakeMaxLength();
-    });
-  }
-
-  private Command setIntakeMinLengthNew() {
-    return Commands.runOnce(() -> {
-      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
-      this.io.setIntakeMinLength();
-    });
-  }
-
-  private Command setIntakeIdleLengthNew() {
-    return Commands.runOnce(() -> {
-      intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
-      this.io.setIntakeIdleLength();
-    });
-  }
-
   public Command setIntakeMaxLength() {
-    return Commands.runEnd(
-        () -> {
+    return Commands.runOnce(() -> {
           intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
-          this.io.setIntakeMaxLength();},
-        () -> {
-          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
-          this.io.setIntakeIdleLength();});
-  }
-
-  // technically unescesary
-  public Command setIntakeIdleLength() {
-    return Commands.runOnce(
-        () -> {
-          intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
-          this.io.setIntakeIdleLength();});
+          this.io.setIntakeMaxLength();
+    });
   }
 
   public Command setIntakeMinLength() {
-    return Commands.runEnd(
-        () -> {
-          intakeExtensionSetpoint = IntakeConstants.intakeMinExtensionPosition;
-          this.io.setIntakeMinLength();},
-        () -> {
+    return Commands.runOnce(() -> {
+          intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+          this.io.setIntakeMinLength();
+    });
+  }
+
+  public Command setIntakeIdleLength() {
+    return Commands.runOnce(() -> {
           intakeExtensionSetpoint = IntakeConstants.intakeIdleExtensionPosition;
           this.io.setIntakeIdleLength();});
   }
