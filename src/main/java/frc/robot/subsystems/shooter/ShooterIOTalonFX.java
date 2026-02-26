@@ -183,6 +183,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     public void stopKicker(){
-        kickerMotor.setControl(new VelocityVoltage(RotationsPerSecond.of(-15)));
+        kickerMotor.setControl(new CoastOut());
     }
 }
