@@ -101,7 +101,7 @@ public class Intake extends SubsystemBase {
 
   public Command setIntakeMinLength() {
     return Commands.runOnce(() -> {
-          intakeExtensionSetpoint = IntakeConstants.intakeMaxExtensionPosition;
+          intakeExtensionSetpoint = IntakeConstants.intakeMinExtensionPosition;
           this.io.setIntakeMinLength();
     });
   }
