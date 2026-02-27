@@ -251,7 +251,7 @@ public class RobotContainer {
     // "Outtake" command extends intake and runs all subsystems in reverse
     controller.x().whileTrue(
         shooter.reverseKicker()
-        .alongWith(indexer.reverseIndexer())
+        .alongWith(indexer.reverseIndexer()));
     
     // Run static spinner, constant speed and no auto aiming
     controller.y().whileTrue(shooter.runSpinner());
