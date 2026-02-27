@@ -43,6 +43,26 @@ public class Intake extends SubsystemBase {
             .run(setIntakeMinLength());
 
     stateMachine
+            .state(IntakeState.STOPPED)
+            .to(IntakeState.RUNNING)
+            .run(runIntake(RotationsPerSecond.of(60)));
+
+    stateMachine
+            .state(IntakeState.STOPPED)
+            .to(IntakeState.REVERSING)
+            .run(runIntake(RotationsPerSecond.of(-60)));
+
+    stateMachine
+            .state(IntakeState.RUNNING)
+            .to(IntakeState.STOPPED)
+            .run(stopIntake());
+
+    stateMachine
+            .state(IntakeState.REVERSING)
+            .to(IntakeState.STOPPED)
+            .run(stopIntake());
+
+    stateMachine
             .state(HopperState.DEPLOYING)
             .to(HopperState.DEPLOYED)
             .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);

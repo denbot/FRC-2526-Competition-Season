@@ -242,17 +242,15 @@ public class RobotContainer {
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
-        indexer.runIndexer()
-        .alongWith(intake.runIntake(RotationsPerSecond.of(60)))
-        .alongWith(shooter.reverseKicker()));
+        intake.setIntakeMaxLength()
+        .alongWith(indexer.runIndexer()));
 
     // Individually run indexer
     controller.a().whileTrue(indexer.reverseIndexer());
 
     // "Outtake" command extends intake and runs all subsystems in reverse
     controller.x().whileTrue(
-        intake.runIntake(RotationsPerSecond.of(-60))
-        .alongWith(shooter.reverseKicker())
+        shooter.reverseKicker()
         .alongWith(indexer.reverseIndexer()));
     
     // Run static spinner, constant speed and no auto aiming
