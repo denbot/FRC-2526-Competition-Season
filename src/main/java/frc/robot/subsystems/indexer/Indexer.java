@@ -30,7 +30,7 @@ public class Indexer extends SubsystemBase{
     }
 
     public Command runIndexer(){
-        return Commands.runEnd(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint), ()-> this.io.stopIndexer());
+        return Commands.repeatingSequence(Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint)), Commands.waitSeconds(0.875), Commands.runOnce(()-> this.io.stopIndexer()), Commands.waitSeconds(0.125));
     }
 
     public Command reverseIndexer(){
