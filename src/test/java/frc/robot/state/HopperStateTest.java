@@ -31,6 +31,7 @@ public class HopperStateTest{
         machine = new RebuiltStateMachine();
         leftTrigger.set(false);
         leftBumper.set(false);
+        xButton.set(false);
         HopperState.setup(machine, leftTrigger::get, leftBumper::get, xButton::get);
     }
 
@@ -42,7 +43,7 @@ public class HopperStateTest{
     }
 
     @Test
-    public void hopperDeploys() {
+    public void hopperDeploysUsingLT() {
         leftTrigger.set(true);
         machine.poll();
 
@@ -51,7 +52,16 @@ public class HopperStateTest{
     }
 
     @Test
-    public void hopperRetractsToIdle() {
+    public void hopperDeploysUsingX() {
+        xButton.set(true);
+        machine.poll();
+
+        // Verify hopper begins to deploy
+        assertEquals(HopperState.DEPLOYING, machine.currentState().hopperState());
+    }
+
+    @Test
+    public void hopperRetractsToIdleUsingLT() {
         leftTrigger.set(true);
         machine.poll();
 
@@ -65,14 +75,50 @@ public class HopperStateTest{
     }
 
     @Test
-    public void hopperCanDeployFromIdle() {
+    public void hopperRetractsToIdleUsingX() {
+        xButton.set(true);
+        machine.poll();
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
+
+        xButton.set(false);
+        machine.poll();
+
+        // Verify hopper begins to retract to idle
+        assertEquals(HopperState.RETRACTING_TO_IDLE, machine.currentState().hopperState());
+    }
+
+    @Test
+    public void hopperCanDeployFromIdleUsingLT() {
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.IDLE));
 
         leftTrigger.set(true);
         machine.poll();
 
-        // Verify hopper begins to retract to idle
+        // Verify hopper begins to deploy
         assertEquals(HopperState.DEPLOYING, machine.currentState().hopperState());
+    }
+
+    @Test
+    public void hopperCanDeployFromIdleUsingX() {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.IDLE));
+
+        xButton.set(true);
+        machine.poll();
+
+        // Verify hopper begins to deploy
+        assertEquals(HopperState.DEPLOYING, machine.currentState().hopperState());
+    }
+
+    @Test
+    public void hopperCanFullyRetractFromDeployed() {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
+
+        leftBumper.set(true);
+        machine.poll();
+
+        // Verify hopper begins to retract to idle
+        assertEquals(HopperState.RETRACTING_TO_RETRACTED, machine.currentState().hopperState());
     }
 
     @Test
