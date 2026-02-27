@@ -7,5 +7,7 @@ import bot.den.foxflow.StateMachine;
 public record Rebuilt(
     RobotState robotState,
     MatchState matchState,
+    IntakeState intakeState,
+    HopperState hopperState,
     HubState hubState
 ) {}

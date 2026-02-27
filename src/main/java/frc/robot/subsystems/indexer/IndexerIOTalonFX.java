@@ -49,7 +49,6 @@ public class IndexerIOTalonFX implements IndexerIO{
             .withSlot0(
                 new Slot0Configs()
                     .withKP(.001)
-                    .withKS(0.0)
                     .withKV(0.1));
 
         indexMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -75,7 +74,7 @@ public class IndexerIOTalonFX implements IndexerIO{
     }
 
     public void runIndexerAtSpeed(AngularVelocity speed){
-        indexMotor.setControl(new VelocityVoltage(speed));
+        indexMotor.setControl(new VelocityVoltage(speed).withEnableFOC(false));
     }
 
     public void stopIndexer(){

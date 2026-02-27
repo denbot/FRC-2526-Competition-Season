@@ -75,15 +75,15 @@ public class ShooterIOTalonFX implements ShooterIO {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(70))
+                    .withStatorCurrentLimit(60))
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(.001)
+                    .withKP(.1)
                     .withKS(0.0703125)
-                    .withKV(0.11500000059604645));
+                    .withKV(0.1200000059604645));
 
         var rightSpinnerMotorConfig =
         new TalonFXConfiguration()
@@ -91,15 +91,15 @@ public class ShooterIOTalonFX implements ShooterIO {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(70))
+                    .withStatorCurrentLimit(60))
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(.001)
+                    .withKP(.1)
                     .withKS(0.0703125)
-                    .withKV(0.11500000059604645));
+                    .withKV(0.1200000059604645));
 
         var kickerMotorConfig =
         new TalonFXConfiguration()
@@ -107,16 +107,15 @@ public class ShooterIOTalonFX implements ShooterIO {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(70))
+                    .withStatorCurrentLimit(60))
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
             .withSlot0(
                 new Slot0Configs()
                     .withKP(0.1)
-                    .withKD(0)
-                    .withKS(0.25)
-                    .withKV(0.09));
+                    .withKS(0.09)
+                    .withKV(0.25));
 
 
         leftSpinnerMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -172,7 +171,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     public void setSpinnerVelocity(AngularVelocity velocity){
-        leftSpinnerMotor.setControl(new VelocityVoltage(velocity));
+        leftSpinnerMotor.setControl(new VelocityVoltage(velocity).withEnableFOC(false));
     }
 
     public void stopSpinner(){
@@ -180,10 +179,10 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     public void setKickerVelocity(AngularVelocity velocity){
-        kickerMotor.setControl(new VelocityVoltage(velocity));
+        kickerMotor.setControl(new VelocityVoltage(velocity).withEnableFOC(false));
     }
 
     public void stopKicker(){
-        kickerMotor.setControl(new VelocityVoltage(RotationsPerSecond.of(-15)));
+        kickerMotor.setControl(new VelocityVoltage(RotationsPerSecond.of(-15)).withEnableFOC(false));
     }
 }
