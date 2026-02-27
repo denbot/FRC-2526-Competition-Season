@@ -242,7 +242,6 @@ public class RobotContainer {
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
         intake.setIntakeMaxLength()
-        .alongWith(intake.runIntake(RotationsPerSecond.of(60))) 
         .alongWith(indexer.runIndexer()));
 
     // Retract intake in case of jam, etc
@@ -253,8 +252,7 @@ public class RobotContainer {
 
     // "Outtake" command extends intake and runs all subsystems in reverse
     controller.x().whileTrue(
-        intake.runIntake(RotationsPerSecond.of(-60))
-        .alongWith(shooter.reverseKicker())
+        shooter.reverseKicker()
         .alongWith(indexer.reverseIndexer())
         .alongWith(intake.setIntakeMaxLength()));
     
