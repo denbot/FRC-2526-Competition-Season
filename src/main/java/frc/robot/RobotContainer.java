@@ -241,15 +241,8 @@ public class RobotContainer {
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
-<<<<<<< intake-cleanup
         indexer.runIndexer()
         .alongWith(shooter.reverseKicker()));
-=======
-        intake.setIntakeMaxLength()
-        .alongWith(intake.runIntake(RotationsPerSecond.of(60))) 
-        .alongWith(indexer.runIndexer()));
->>>>>>> main
-
 
     // Individually run indexer
     controller.a().whileTrue(indexer.reverseIndexer());
