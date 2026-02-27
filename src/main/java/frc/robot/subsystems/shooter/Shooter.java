@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,8 +46,9 @@ public class Shooter extends SubsystemBase{
             Math.pow(robotPose.getX() - targetPose.getX(), 2) +
             Math.pow(robotPose.getY() - targetPose.getY(), 2)));
 
+        SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
         double x = distance.in(Meters);
-        return RotationsPerSecond.of((Math.pow(x, 2) / 6) + (2.5 * x) + 39.3); // TODO This function is guesswork and estimation
+        return RotationsPerSecond.of((Math.pow(x, 2) *0.893293) + (1.75793 * x) + 40.677).plus(spinnerVelocityOffset); // TODO This function is guesswork and estimation
     }
 
     //TODO move this to be implemented in the runSpinner command, refference intake.java for example
@@ -63,7 +65,7 @@ public class Shooter extends SubsystemBase{
     }
 
     public Command runSpinner(){
-        return Commands.runEnd(() -> this.io.setSpinnerVelocity(defaultSpinnerSpeed), () -> this.io.stopSpinner());
+        return Commands.runEnd(() -> this.io.setSpinnerVelocity(defaultSpinnerSpeed.plus(spinnerVelocityOffset)), () -> this.io.stopSpinner());
     }
     public Command stopSpinner(){
         return Commands.runOnce(() -> this.io.stopSpinner());

@@ -241,8 +241,14 @@ public class RobotContainer {
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
+<<<<<<< intake-cleanup
         indexer.runIndexer()
         .alongWith(shooter.reverseKicker()));
+=======
+        intake.setIntakeMaxLength()
+        .alongWith(intake.runIntake(RotationsPerSecond.of(60))) 
+        .alongWith(indexer.runIndexer()));
+>>>>>>> main
 
 
     // Individually run indexer
@@ -255,6 +261,14 @@ public class RobotContainer {
     
     // Run static spinner, constant speed and no auto aiming
     controller.y().whileTrue(shooter.runSpinner());
+
+    controller.povUp().onTrue(
+        Commands.runOnce(
+            () -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
+    
+    controller.povDown().onTrue(
+        Commands.runOnce(
+            () ->shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
 }
 
 public Pose2d getRobotPosition(){
