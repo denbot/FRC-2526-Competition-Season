@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.state.HopperState;
+import frc.robot.state.IntakeState;
 import frc.robot.state.RebuiltStateMachine;
 import org.littletonrobotics.junction.Logger;
 
@@ -28,21 +29,35 @@ public class Intake extends SubsystemBase {
             .state(HopperState.IDLE)
             .to(HopperState.DEPLOYING)
             .run(setIntakeMaxLength());
-
     stateMachine
             .state(HopperState.RETRACTED)
             .to(HopperState.DEPLOYING)
             .run(setIntakeMaxLength());
-
     stateMachine
             .state(HopperState.DEPLOYED)
             .to(HopperState.RETRACTING_TO_IDLE)
             .run(setIntakeIdleLength());
-
     stateMachine
             .state(HopperState.DEPLOYED)
             .to(HopperState.RETRACTING_TO_RETRACTED)
             .run(setIntakeMinLength());
+
+    stateMachine
+            .state(IntakeState.STOPPED)
+            .to(IntakeState.RUNNING)
+            .run(runIntake(RotationsPerSecond.of(60)));
+    stateMachine
+            .state(IntakeState.STOPPED)
+            .to(IntakeState.REVERSING)
+            .run(runIntake(RotationsPerSecond.of(-60)));
+    stateMachine
+            .state(IntakeState.RUNNING)
+            .to(IntakeState.STOPPED)
+            .run(stopIntake());
+    stateMachine
+            .state(IntakeState.REVERSING)
+            .to(IntakeState.STOPPED)
+            .run(stopIntake());
 
     stateMachine
             .state(HopperState.DEPLOYING)
