@@ -17,20 +17,11 @@ public enum HopperState {
         stateMachine
                 .state(HopperState.RETRACTED)
                 .to(HopperState.DEPLOYING)
-                .transitionWhen(leftTrigger);
+                .transitionWhen(() -> leftTrigger.getAsBoolean() || xButton.getAsBoolean());
         stateMachine
                 .state(HopperState.IDLE)
                 .to(HopperState.DEPLOYING)
-                .transitionWhen(leftTrigger);
-
-        stateMachine
-                .state(HopperState.RETRACTED)
-                .to(HopperState.DEPLOYING)
-                .transitionWhen(xButton);
-        stateMachine
-                .state(HopperState.IDLE)
-                .to(HopperState.DEPLOYING)
-                .transitionWhen(xButton);
+                .transitionWhen(() -> leftTrigger.getAsBoolean() || xButton.getAsBoolean());
 
         stateMachine
                 .state(HopperState.DEPLOYED)
