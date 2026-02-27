@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Leds;
 
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -15,7 +15,7 @@ import frc.robot.subsystems.vision.Limelights;
 
 
 public class Leds extends SubsystemBase{
-	private int numLeds = 10; // Test number, currently unknown
+	private int numLeds = 23;
 	private AddressableLED led;
 	private AddressableLEDBuffer ledBuffer;
 	private Limelights limelights;
@@ -28,6 +28,7 @@ public class Leds extends SubsystemBase{
 	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive){
 		this.led = new AddressableLED(0);
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
+
 		this.leftHalf = this.ledBuffer.createView(0, numLeds/2);
 		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds);
 
@@ -56,7 +57,7 @@ public class Leds extends SubsystemBase{
 			baseLeft.blink(Seconds.of(0.5)).applyTo(leftHalf);
 			
 			// Get a value between 0-90 degrees (clamped by min.max) for how far off the dirve base is from aiming at the hub 
-			double degreesOff = Math.max(Math.min(Math.abs(drive.findAngleForShooting(drive.getPose()).getDegrees() - drive.getPose().getRotation().getDegrees()), 90), 0);
+			double degreesOff = Math.min(Math.abs(drive.findAngleForShooting(drive.getPose()).getDegrees() - drive.getPose().getRotation().getDegrees()), 90);
 			
 			// Apply a mask to the graident from 0-1 for how close the drive base is to aiming fully
 			baseRight.mask(LEDPattern.progressMaskLayer(() -> (90 - degreesOff) / 90)).applyTo(this.rightHalf);
