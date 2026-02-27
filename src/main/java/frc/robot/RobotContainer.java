@@ -51,6 +51,7 @@ import frc.robot.subsystems.vision.LimelightIOReal;
 import frc.robot.subsystems.vision.LimelightIOSim;
 import frc.robot.subsystems.vision.Limelights;
 
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -244,9 +245,6 @@ public class RobotContainer {
         intake.setIntakeMaxLength()
         .alongWith(indexer.runIndexer()));
 
-    // Retract intake in case of jam, etc
-    controller.leftBumper().whileTrue(intake.setIntakeMinLength());
-
     // Individually run indexer
     controller.a().whileTrue(indexer.reverseIndexer());
 
@@ -254,7 +252,6 @@ public class RobotContainer {
     controller.x().whileTrue(
         shooter.reverseKicker()
         .alongWith(indexer.reverseIndexer())
-        .alongWith(intake.setIntakeMaxLength()));
     
     // Run static spinner, constant speed and no auto aiming
     controller.y().whileTrue(shooter.runSpinner());
