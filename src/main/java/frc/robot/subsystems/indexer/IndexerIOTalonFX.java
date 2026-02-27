@@ -74,7 +74,7 @@ public class IndexerIOTalonFX implements IndexerIO{
     }
 
     public void runIndexerAtSpeed(AngularVelocity speed){
-        indexMotor.setControl(new VelocityVoltage(speed));
+        indexMotor.setControl(new VelocityVoltage(speed).withEnableFOC(false));
     }
 
     public void stopIndexer(){

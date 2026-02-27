@@ -171,7 +171,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     public void setSpinnerVelocity(AngularVelocity velocity){
-        leftSpinnerMotor.setControl(new VelocityVoltage(velocity));
+        leftSpinnerMotor.setControl(new VelocityVoltage(velocity).withEnableFOC(false));
     }
 
     public void stopSpinner(){
@@ -179,10 +179,10 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     public void setKickerVelocity(AngularVelocity velocity){
-        kickerMotor.setControl(new VelocityVoltage(velocity));
+        kickerMotor.setControl(new VelocityVoltage(velocity).withEnableFOC(false));
     }
 
     public void stopKicker(){
-        kickerMotor.setControl(new CoastOut());
+        kickerMotor.setControl(new VelocityVoltage(RotationsPerSecond.of(-15)).withEnableFOC(false));
     }
 }

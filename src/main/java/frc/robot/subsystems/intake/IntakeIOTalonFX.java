@@ -160,23 +160,23 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     public void setIntakeVelocity(AngularVelocity velocity) {
-        intakeMotor.setControl(new VelocityVoltage(velocity));
+        intakeMotor.setControl(new VelocityVoltage(velocity).withEnableFOC(false));
     }
 
     public void setIntakeExtensionLength(Angle position) {
-        extensionMotorLeft.setControl(new PositionVoltage(position));
+        extensionMotorLeft.setControl(new PositionVoltage(position).withEnableFOC(false));
     }
 
     public void setIntakeMaxLength() {
-        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMaxExtensionPosition));
+        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMaxExtensionPosition).withEnableFOC(false));
     }
     
     public void setIntakeIdleLength() {
-        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeIdleExtensionPosition));
+        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeIdleExtensionPosition).withEnableFOC(false));
     }
 
     public void setIntakeMinLength() {
-        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition));
+        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false));
     }
 
     public void stopIntake() {
