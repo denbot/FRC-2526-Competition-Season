@@ -26,11 +26,7 @@ public enum HopperState {
         stateMachine
                 .state(HopperState.DEPLOYED)
                 .to(HopperState.RETRACTING_TO_IDLE)
-                .transitionWhen(() -> !leftTrigger.getAsBoolean() && !xButton.getAsBoolean());
-        stateMachine
-                .state(HopperState.RETRACTING_TO_IDLE)
-                .to(HopperState.RETRACTING_TO_RETRACTED)
-                .transitionWhen(leftBumper);
+                .transitionWhen(() -> !leftTrigger.getAsBoolean() && !xButton.getAsBoolean() && !leftBumper.getAsBoolean());
         stateMachine
                 .state(HopperState.DEPLOYED)
                 .to(HopperState.RETRACTING_TO_RETRACTED)
