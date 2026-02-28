@@ -3,6 +3,8 @@ package frc.robot.subsystems.shooter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import frc.robot.state.RebuiltStateMachine;
+import frc.robot.state.ShooterState;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,8 +27,13 @@ public class Shooter extends SubsystemBase{
     private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
     private AngularVelocity spinnerVelocityOffset = RotationsPerSecond.of(0);
 
-    public Shooter(ShooterIO io){
+    public Shooter(ShooterIO io, RebuiltStateMachine stateMachine){
         this.io = io;
+
+//        stateMachine
+//                .state(ShooterState.STOPPED)
+//                .to(ShooterState.SPINNING_UP_ADAPTIVE)
+//                .run();
     }
 
     @Override

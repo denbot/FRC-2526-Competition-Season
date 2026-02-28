@@ -40,51 +40,51 @@ public class ShooterStateTest {
         CommandScheduler.getInstance().run(); // Call run() to execute end() methods
     }
 
-    @ParameterizedTest
-    @MethodSource("buttonCombinations")
-    void shooterSpinsUpWhenRightBumperOrYButtonHeld(boolean rightBumper, boolean yButton) {
-        this.rightBumper.set(rightBumper);
-        this.yButton.set(yButton);
+    @Test
+    void shooterSpinsUpWhenRightBumperHeld() {
+        rightBumper.set(true);
         machine.poll();
 
-        assertEquals(ShooterState.SPINNING_UP, machine.currentState().shooterState());
+        assertEquals(ShooterState.SPINNING_UP_ADAPTIVE, machine.currentState().shooterState());
     }
 
-    @ParameterizedTest
-    @MethodSource("buttonCombinations")
-    void shooterDoesntStopWhenButtonsNotReleased(boolean rightBumper, boolean yButton) {
-        this.rightBumper.set(true);
-        this.yButton.set(true);
+    @Test
+    void shooterStopsFromSpinningUpWhenRightBumperReleased() {
+        rightBumper.set(true);
         machine.poll();
 
-        // Double-check spinner is spinning up
-        assertEquals(ShooterState.SPINNING_UP, machine.currentState().shooterState());
+        // Double-check that the shooter is spinning up
+        assertEquals(ShooterState.SPINNING_UP_ADAPTIVE, machine.currentState().shooterState());
 
-        this.rightBumper.set(rightBumper);
-        this.yButton.set(yButton);
+        rightBumper.set(false);
         machine.poll();
-        assertNotEquals(ShooterState.STOPPED, machine.currentState().shooterState());
+        assertEquals(ShooterState.STOPPED, machine.currentState().shooterState());
     }
 
-    @ParameterizedTest
-    @MethodSource("buttonCombinations")
-    void shooterStopsFromSpinningUpWhenAllButtonsReleased(boolean rightBumper, boolean yButton) {
-        this.rightBumper.set(rightBumper);
-        this.yButton.set(yButton);
+    @Test
+    void shooterSpinsUpWhenYButtonHeld() {
+        yButton.set(true);
         machine.poll();
 
-        // Double-check spinner is spinning up
-        assertEquals(ShooterState.SPINNING_UP, machine.currentState().shooterState());
+        assertEquals(ShooterState.SPINNING_UP_FIXED, machine.currentState().shooterState());
+    }
 
-        this.rightBumper.set(false);
-        this.yButton.set(false);
+    @Test
+    void shooterStopsFromSpinningUpWhenYButtonReleased() {
+        yButton.set(true);
+        machine.poll();
+
+        // Double-check that the shooter is spinning up
+        assertEquals(ShooterState.SPINNING_UP_FIXED, machine.currentState().shooterState());
+
+        yButton.set(false);
         machine.poll();
         assertEquals(ShooterState.STOPPED, machine.currentState().shooterState());
     }
 
     @ParameterizedTest
     @MethodSource("buttonCombinations")
-    void shooterStopsFromAtSpeedWhenAllButtonsReleased(boolean rightBumper, boolean yButton) {
+    void shooterStopsFromAtSpeedWhenButtonsReleased(boolean rightBumper, boolean yButton) {
         this.rightBumper.set(rightBumper);
         this.yButton.set(yButton);
 

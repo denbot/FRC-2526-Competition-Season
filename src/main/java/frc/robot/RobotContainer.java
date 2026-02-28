@@ -103,7 +103,7 @@ public class RobotContainer {
 
         indexer = new Indexer(new IndexerIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
-        shooter = new Shooter(new ShooterIOTalonFX());
+        shooter = new Shooter(new ShooterIOTalonFX(), stateMachine);
         limelights = new Limelights(new LimelightIOReal(), drive);
         CommandScheduler.getInstance().schedule(hubStatusAlert);
 
@@ -135,7 +135,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        shooter = new Shooter(new ShooterIOSim());
+        shooter = new Shooter(new ShooterIOSim(), stateMachine);
         indexer = new Indexer(new IndexerIOSim());
         intake = new Intake(new IntakeIOSim(), stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
@@ -150,7 +150,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        shooter = new Shooter(new ShooterIO() {});
+        shooter = new Shooter(new ShooterIO() {}, stateMachine);
         intake = new Intake(new IntakeIO() {}, stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
         CommandScheduler.getInstance().schedule(hubStatusAlert);

@@ -1,24 +1,34 @@
 package frc.robot.state;
 
 import bot.den.foxflow.DefaultState;
+import frc.robot.subsystems.shooter.Shooter;
 
 import java.util.function.BooleanSupplier;
 
 public enum ShooterState {
     @DefaultState STOPPED,
-    SPINNING_UP,
+    SPINNING_UP_FIXED,
+    SPINNING_UP_ADAPTIVE,
     AT_SPEED;
 
     public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightBumper, BooleanSupplier yButton) {
         // Shooter functions
         stateMachine
                 .state(ShooterState.STOPPED)
-                .to(ShooterState.SPINNING_UP)
-                .transitionWhen(() -> rightBumper.getAsBoolean() || yButton.getAsBoolean());
+                .to(ShooterState.SPINNING_UP_ADAPTIVE)
+                .transitionWhen(rightBumper);
         stateMachine
-                .state(ShooterState.SPINNING_UP)
+                .state(ShooterState.STOPPED)
+                .to(ShooterState.SPINNING_UP_FIXED)
+                .transitionWhen(yButton);
+        stateMachine
+                .state(ShooterState.SPINNING_UP_ADAPTIVE)
                 .to(ShooterState.STOPPED)
-                .transitionWhen(() -> !rightBumper.getAsBoolean() && !yButton.getAsBoolean());
+                .transitionWhen(() -> !rightBumper.getAsBoolean());
+        stateMachine
+                .state(ShooterState.SPINNING_UP_FIXED)
+                .to(ShooterState.STOPPED)
+                .transitionWhen(() -> !yButton.getAsBoolean());
         stateMachine
                 .state(ShooterState.AT_SPEED)
                 .to(ShooterState.STOPPED)
