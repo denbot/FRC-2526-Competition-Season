@@ -10,7 +10,7 @@ public enum KickerState {
     RUNNING,
     REVERSING;
 
-    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier leftTrigger, BooleanSupplier xButton) {
+    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier leftTrigger, BooleanSupplier xButton) {
         // Kicker functions
     }
 }
