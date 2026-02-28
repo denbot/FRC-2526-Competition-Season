@@ -6,7 +6,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static frc.robot.helpers.TestHelpers.setDriverStationState;
@@ -61,49 +65,38 @@ public class KickerStateTest {
         assertEquals(KickerState.STOPPED, machine.currentState().kickerState());
     }
 
-    @Test
-    void leftTriggerCausesKickerToReverse() {
-        leftTrigger.set(true);
+    @ParameterizedTest
+    @MethodSource("buttonCombinations")
+    void kickerReversesWhenXButtonOrLeftTriggerUsed(AtomicBoolean leftTrigger, AtomicBoolean xButton) {
+        this.leftTrigger.set(leftTrigger.get());
+        this.xButton.set(xButton.get());
         machine.poll();
 
         assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
     }
 
-    @Test
-    void kickerStopsIfLeftTriggerReleased() {
-        leftTrigger.set(true);
+    @ParameterizedTest
+    @MethodSource("buttonCombinations")
+    void kickerPerformsWhenXButtonOrLeftTriggerUsed(AtomicBoolean leftTrigger, AtomicBoolean xButton) {
+        this.leftTrigger.set(leftTrigger.get());
+        this.xButton.set(xButton.get());
         machine.poll();
 
         // Double check that it's reversing
         assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
 
-        // Release the trigger
-        leftTrigger.set(false);
+        // Release the button
+        this.leftTrigger.set(false);
+        this.xButton.set(false);
         machine.poll();
 
         assertEquals(KickerState.STOPPED, machine.currentState().kickerState());
     }
 
-    @Test
-    void xButtonCausesKickerToReverse() {
-        xButton.set(true);
-        machine.poll();
-
-        assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
-    }
-
-    @Test
-    void kickerStopsIfXButtonReleased() {
-        xButton.set(true);
-        machine.poll();
-
-        // Double check that it's reversing
-        assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
-
-        // Release the trigger
-        xButton.set(false);
-        machine.poll();
-
-        assertEquals(KickerState.STOPPED, machine.currentState().kickerState());
+    private static List<Arguments> buttonCombinations() {
+        return List.of(
+                Arguments.arguments(false, true),
+                Arguments.arguments(false, true),
+                Arguments.arguments(false, true));
     }
 }
