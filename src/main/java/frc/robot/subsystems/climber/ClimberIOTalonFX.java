@@ -38,7 +38,7 @@ public class ClimberIOTalonFX implements ClimberIO{
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(40))
+                    .withStatorCurrentLimit(60))
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
@@ -71,10 +71,10 @@ public class ClimberIOTalonFX implements ClimberIO{
     }
 
     public void setClimberMaxExtension(){
-        climberMotor.setControl(new PositionVoltage(ClimberConstants.CLIMBER_MAX_EXTENSION_LENGTH.magnitude() * ClimberConstants.CLIMBER_ROTATION_TO_METER_RATIO));
+        climberMotor.setControl(new PositionVoltage(ClimberConstants.CLIMBER_MAX_EXTENSION_SETPOINT.magnitude()));
     }
 
     public void setClimberMinExtension(){
-        climberMotor.setControl(new PositionVoltage(ClimberConstants.CLIMBER_MIN_EXTENSION_LENGTH.magnitude() * ClimberConstants.CLIMBER_ROTATION_TO_METER_RATIO));
+        climberMotor.setControl(new PositionVoltage(ClimberConstants.CLIMBER_MAX_EXTENSION_SETPOINT.magnitude()));
     }
 }

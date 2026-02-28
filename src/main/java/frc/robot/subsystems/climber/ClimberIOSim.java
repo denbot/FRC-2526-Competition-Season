@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class ClimberIOSim implements ClimberIO{
-    private static final DCMotor climberMotor = DCMotor.getKrakenX44(1);
+    private static final DCMotor climberMotor = DCMotor.getKrakenX60(1);
     private DCMotorSim climberMotorSim;
     private SimpleMotorFeedforward climberFeedforward = new SimpleMotorFeedforward(0.0, 0.0);
     private PIDController climberMotorController = new PIDController(0.0, 0.0, 0.0);
@@ -43,11 +43,11 @@ public class ClimberIOSim implements ClimberIO{
 
     public void setClimberMaxExtension(){
         climberMotorAppliedVoltsFF = climberFeedforward.calculate(climberMotorSim.getAngularPosition().in(Degrees));
-        climberMotorController.setSetpoint((ClimberConstants.CLIMBER_MAX_EXTENSION_LENGTH.magnitude() * ClimberConstants.CLIMBER_ROTATION_TO_METER_RATIO));
+        climberMotorController.setSetpoint(ClimberConstants.CLIMBER_MAX_EXTENSION_SETPOINT.magnitude());
     }
     public void setClimberMinExtension(Angle position){
         climberMotorAppliedVoltsFF = climberFeedforward.calculate(climberMotorSim.getAngularPosition().in(Degrees));
-        climberMotorController.setSetpoint((ClimberConstants.CLIMBER_MIN_EXTENSION_LENGTH.magnitude() * ClimberConstants.CLIMBER_ROTATION_TO_METER_RATIO));
+        climberMotorController.setSetpoint(ClimberConstants.CLIMBER_MIN_EXTENSION_SETPOINT.magnitude());
     }
 
 }

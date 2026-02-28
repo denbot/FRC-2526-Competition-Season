@@ -26,7 +26,7 @@ public class Climber extends SubsystemBase{
         // Log key variables
         io.updateInputs(inputs);
         Logger.processInputs("Climber", inputs);
-        Logger.recordOutput("Indexer Speed Setpoint", climberMotorPositionSetpoint);
+        Logger.recordOutput("Climber Position Setpoint", climberMotorPositionSetpoint);
     }
 
     public Command setClimberMaxExtension(){
