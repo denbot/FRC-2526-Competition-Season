@@ -19,8 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class IntakeTest {
 
-    final AtomicBoolean leftTrigger = new AtomicBoolean();
-    final AtomicBoolean xButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
     private Intake intake;
 
@@ -48,7 +46,6 @@ public class IntakeTest {
         machine.poll();
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYING));
         machine.poll();
-        intake.setIntakeMaxLength();
         SimHooks.stepTiming(100);
         assertEquals(HopperState.DEPLOYED, machine.currentState().hopperState());
     }
@@ -59,7 +56,6 @@ public class IntakeTest {
         machine.poll();
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYING));
         machine.poll();
-        intake.setIntakeMaxLength();
         SimHooks.stepTiming(100);
         assertEquals(HopperState.DEPLOYED, machine.currentState().hopperState());
     }
@@ -70,7 +66,6 @@ public class IntakeTest {
         machine.poll();
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.RETRACTING_TO_IDLE));
         machine.poll();
-        intake.setIntakeIdleLength();
         SimHooks.stepTiming(100);
         assertEquals(HopperState.IDLE, machine.currentState().hopperState());
     }
@@ -81,7 +76,6 @@ public class IntakeTest {
         machine.poll();
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.RETRACTING_TO_RETRACTED));
         machine.poll();
-        intake.setIntakeMinLength();
         SimHooks.stepTiming(100);
         assertEquals(HopperState.RETRACTED, machine.currentState().hopperState());
     }
