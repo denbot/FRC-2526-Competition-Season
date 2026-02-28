@@ -177,6 +177,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    autoBuilder.testAll();
 
     // HubState.setup(stateMachine, () -> );
     IntakeState.setup(
