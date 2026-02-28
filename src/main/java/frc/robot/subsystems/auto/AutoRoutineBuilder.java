@@ -113,7 +113,7 @@ public class AutoRoutineBuilder {
                 drive, drive.isBlue() 
                 ? PointsOfInterest.centerOfHubBlue 
                 : PointsOfInterest.centerOfHubRed))
-            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive) // Auto aim at the hub
+            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)) // Auto aim at the hub
             .until(() -> Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
             .andThen(
                 // Continue running spinner at speed
@@ -122,14 +122,12 @@ public class AutoRoutineBuilder {
                     ? PointsOfInterest.centerOfHubBlue 
                     : PointsOfInterest.centerOfHubRed)
                 // Run indexer and kicker to feed shooter with fuel
-                .alongWith(indexer.runIndexer())
-                .alongWith(shooter.runKicker())
+                .alongWith(indexer.runIndexer()).withTimeout(6)
+                .alongWith(shooter.runKicker()).withTimeout(6)
                 // wait 4 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
                 .alongWith(
                     Commands.waitSeconds(4)
-                    .andThen(intake.setIntakeMinLength()))
-                // stop running everything after 6 seconds
-                .withTimeout(6))), "Shoot");
+                    .andThen(intake.setIntakeMinLength())).withTimeout(6)), "Shoot");
         }
 
     public void addAlignScorePosition(autoOptions scoreLocation){
