@@ -7,9 +7,8 @@ import java.util.function.BooleanSupplier;
 
 public enum KickerState {
     @DefaultState STOPPED,
-    SPINNING_UP,
-    READY_TO_SHOOT,
-    SHOOTING;
+    RUNNING,
+    REVERSING;
 
     public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier leftTrigger, BooleanSupplier xButton) {
         // Kicker functions
