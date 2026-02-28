@@ -27,7 +27,7 @@ public class AutoRoutineBuilder {
     private ArrayList<Command> commands;
     private ArrayList<String> commandNames;
     private Intake intake;
-    private Shooter shooter;
+    public Shooter shooter;
     private Indexer indexer;
     private Drive drive;
 
