@@ -77,7 +77,7 @@ public class KickerStateTest {
 
     @ParameterizedTest
     @MethodSource("buttonCombinations")
-    void kickerPerformsWhenXButtonOrLeftTriggerUsed(AtomicBoolean leftTrigger, AtomicBoolean xButton) {
+    void kickerStopsWhenXButtonOrLeftTriggerReleased(AtomicBoolean leftTrigger, AtomicBoolean xButton) {
         this.leftTrigger.set(leftTrigger.get());
         this.xButton.set(xButton.get());
         machine.poll();
