@@ -12,5 +12,14 @@ public enum KickerState {
 
     public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier leftTrigger, BooleanSupplier xButton) {
         // Kicker functions
+        stateMachine
+                .state(KickerState.STOPPED)
+                .to(KickerState.REVERSING)
+                .transitionWhen(() -> leftTrigger.getAsBoolean() || xButton.getAsBoolean());
+
+        stateMachine
+                .state(KickerState.REVERSING)
+                .to(KickerState.STOPPED)
+                .transitionWhen(() -> !leftTrigger.getAsBoolean() && !xButton.getAsBoolean());
     }
 }

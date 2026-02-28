@@ -67,9 +67,9 @@ public class KickerStateTest {
 
     @ParameterizedTest
     @MethodSource("buttonCombinations")
-    void kickerReversesWhenXButtonOrLeftTriggerUsed(AtomicBoolean leftTrigger, AtomicBoolean xButton) {
-        this.leftTrigger.set(leftTrigger.get());
-        this.xButton.set(xButton.get());
+    void kickerReversesWhenXButtonOrLeftTriggerUsed(boolean leftTrigger, boolean xButton) {
+        this.leftTrigger.set(leftTrigger);
+        this.xButton.set(xButton);
         machine.poll();
 
         assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
@@ -77,9 +77,9 @@ public class KickerStateTest {
 
     @ParameterizedTest
     @MethodSource("buttonCombinations")
-    void kickerStopsWhenXButtonOrLeftTriggerReleased(AtomicBoolean leftTrigger, AtomicBoolean xButton) {
-        this.leftTrigger.set(leftTrigger.get());
-        this.xButton.set(xButton.get());
+    void kickerStopsWhenXButtonOrLeftTriggerReleased(boolean leftTrigger, boolean xButton) {
+        this.leftTrigger.set(leftTrigger);
+        this.xButton.set(xButton);
         machine.poll();
 
         // Double check that it's reversing
@@ -93,10 +93,28 @@ public class KickerStateTest {
         assertEquals(KickerState.STOPPED, machine.currentState().kickerState());
     }
 
+    @ParameterizedTest
+    @MethodSource("buttonCombinations")
+    void kickerDoesntStopWhenXButtonOrLeftTriggerStillHeld(boolean leftTrigger, boolean xButton) {
+        this.leftTrigger.set(true);
+        this.xButton.set(true);
+        machine.poll();
+
+        // Double check that it's reversing
+        assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
+
+        // Release 1 or none of the buttons
+        this.leftTrigger.set(leftTrigger);
+        this.xButton.set(xButton);
+        machine.poll();
+
+        assertNotEquals(KickerState.STOPPED, machine.currentState().kickerState());
+    }
+
     private static List<Arguments> buttonCombinations() {
         return List.of(
                 Arguments.arguments(false, true),
-                Arguments.arguments(false, true),
-                Arguments.arguments(false, true));
+                Arguments.arguments(true, false),
+                Arguments.arguments(true, true));
     }
 }
