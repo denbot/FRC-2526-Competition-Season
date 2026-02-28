@@ -1,8 +1,6 @@
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
+import frc.robot.Constants;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.state.ShooterState;
 import org.littletonrobotics.junction.Logger;
@@ -18,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
 
+import static edu.wpi.first.units.Units.*;
+
 public class Shooter extends SubsystemBase{
     private final ShooterIO io;
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
@@ -27,13 +27,26 @@ public class Shooter extends SubsystemBase{
     private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
     private AngularVelocity spinnerVelocityOffset = RotationsPerSecond.of(0);
 
-    public Shooter(ShooterIO io, RebuiltStateMachine stateMachine){
+    public Shooter(ShooterIO io, RebuiltStateMachine stateMachine, Drive drive){
         this.io = io;
 
-//        stateMachine
-//                .state(ShooterState.STOPPED)
-//                .to(ShooterState.SPINNING_UP_ADAPTIVE)
-//                .run();
+        stateMachine
+                .state(ShooterState.STOPPED)
+                .to(ShooterState.SPINNING_UP_ADAPTIVE)
+                .run(runSpinnerAddaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed));
+        stateMachine
+                .state(ShooterState.STOPPED)
+                .to(ShooterState.SPINNING_UP_FIXED)
+                .run(runSpinner());
+
+        stateMachine
+                .state(ShooterState.SPINNING_UP_ADAPTIVE)
+                .to(ShooterState.AT_SPEED)
+                .transitionWhen(() -> Math.abs(getRightSpinnerClosedLoopError()) < 1);
+        stateMachine
+                .state(ShooterState.SPINNING_UP_FIXED)
+                .to(ShooterState.AT_SPEED)
+                .transitionWhen(() -> Math.abs(getRightSpinnerClosedLoopError()) < 1);
     }
 
     @Override

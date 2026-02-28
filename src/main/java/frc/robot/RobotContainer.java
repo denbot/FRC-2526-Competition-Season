@@ -103,7 +103,7 @@ public class RobotContainer {
 
         indexer = new Indexer(new IndexerIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
-        shooter = new Shooter(new ShooterIOTalonFX(), stateMachine);
+        shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
         limelights = new Limelights(new LimelightIOReal(), drive);
         CommandScheduler.getInstance().schedule(hubStatusAlert);
 
@@ -135,7 +135,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        shooter = new Shooter(new ShooterIOSim(), stateMachine);
+        shooter = new Shooter(new ShooterIOSim(), stateMachine, drive);
         indexer = new Indexer(new IndexerIOSim());
         intake = new Intake(new IntakeIOSim(), stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
@@ -150,7 +150,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        shooter = new Shooter(new ShooterIO() {}, stateMachine);
+        shooter = new Shooter(new ShooterIO() {}, stateMachine, drive);
         intake = new Intake(new IntakeIO() {}, stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
         CommandScheduler.getInstance().schedule(hubStatusAlert);
@@ -230,14 +230,12 @@ public class RobotContainer {
 
     // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
     controller.rightBumper().whileTrue(
-        shooter.runSpinnerAddaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed)
-        .alongWith(
             DriveCommands.joystickDriveAtAngle(
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> drive.findAngleForShooting(drive.getPose()))
-            .andThen(Commands.runOnce(() -> drive.stopWithX()))));
+            .andThen(Commands.runOnce(() -> drive.stopWithX())));
     
     // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
     controller.rightTrigger().whileTrue(
