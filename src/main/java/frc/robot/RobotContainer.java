@@ -275,8 +275,18 @@ public class RobotContainer {
         .alongWith(indexer.reverseIndexer()));
     
     // Run static spinner, constant speed and no auto aiming
-    controller.y().whileTrue(shooter.runSpinner());
-}
+    controller.y().whileTrue(
+        shooter.runSpinner()
+            .until(() -> 
+                Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1 
+                && shooter.getLeftSpinnerVelocity().magnitude() > 30
+                && controller.rightTrigger().getAsBoolean() == true) // Run only the spin up and until the spinner is at speed
+            .andThen(
+                // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
+                shooter.runSpinner() 
+                .alongWith(shooter.runKicker())
+                .alongWith(indexer.runIndexer())));
+    }
 
 public Pose2d getRobotPosition(){
     return drive.getPose();

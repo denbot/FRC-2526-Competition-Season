@@ -35,7 +35,7 @@ public class Leds extends SubsystemBase{
 	private AddressableLEDBufferView rightHalf;
 	private RebuiltStateMachine stateMachine;
 	private Timer timeUntilTransition;
-	private Time targetWaitTime;
+	private Time targetWaitTime = Seconds.of(0);
 	private Boolean isBlueActive = false;
 
 	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
@@ -43,7 +43,7 @@ public class Leds extends SubsystemBase{
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
 		this.leftHalf = this.ledBuffer.createView(0, numLeds/2);
-		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds);
+		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds-1);
 
 		this.led.setLength(this.ledBuffer.getLength());
 		this.led.setData(ledBuffer);
@@ -54,6 +54,8 @@ public class Leds extends SubsystemBase{
 		this.shooter = shooter;
 		this.drive = drive;
 		this.stateMachine = stateMachine;
+
+		this.timeUntilTransition = new Timer();
 
 		this.stateMachine.state(HubState.ACTIVE).to(HubState.INACTIVE).run(Commands.runOnce(() -> this.isBlueActive = drive.isBlue() ? false : true));
 		this.stateMachine.state(HubState.INACTIVE).to(HubState.ACTIVE).run(Commands.runOnce(() -> this.isBlueActive = drive.isBlue() ? true : false));
