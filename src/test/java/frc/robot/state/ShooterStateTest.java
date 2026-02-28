@@ -62,12 +62,13 @@ public class ShooterStateTest {
 
         this.rightBumper.set(rightBumper);
         this.yButton.set(yButton);
+        machine.poll();
         assertNotEquals(ShooterState.STOPPED, machine.currentState().shooterState());
     }
 
     @ParameterizedTest
     @MethodSource("buttonCombinations")
-    void shooterStopsWhenAllButtonsReleased(boolean rightBumper, boolean yButton) {
+    void shooterStopsFromSpinningUpWhenAllButtonsReleased(boolean rightBumper, boolean yButton) {
         this.rightBumper.set(rightBumper);
         this.yButton.set(yButton);
         machine.poll();
@@ -77,6 +78,21 @@ public class ShooterStateTest {
 
         this.rightBumper.set(false);
         this.yButton.set(false);
+        machine.poll();
+        assertEquals(ShooterState.STOPPED, machine.currentState().shooterState());
+    }
+
+    @ParameterizedTest
+    @MethodSource("buttonCombinations")
+    void shooterStopsFromAtSpeedWhenAllButtonsReleased(boolean rightBumper, boolean yButton) {
+        this.rightBumper.set(rightBumper);
+        this.yButton.set(yButton);
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
+
+        this.rightBumper.set(false);
+        this.yButton.set(false);
+        machine.poll();
         assertEquals(ShooterState.STOPPED, machine.currentState().shooterState());
     }
 
