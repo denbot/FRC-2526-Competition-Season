@@ -1,7 +1,6 @@
 package frc.robot.subsystems.auto;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -14,9 +13,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.PointsOfInterest;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
@@ -107,16 +106,30 @@ public class AutoRoutineBuilder {
     }
 
     public void addShootCommand(){
-        addAction(DriveCommands.autoJoystickDriveAtAngle(drive), "Aim At Hub");
         addAction(
-            this.shooter.runSpinner()
-            .alongWith(
-                Commands.waitUntil(() -> Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 3))
-                .andThen(
-                    new ParallelCommandGroup(
-                        this.indexer.runIndexer(), 
-                        this.shooter.runKicker()))
-            .withTimeout(Seconds.of(5)), "Shoot");
+            intake.setIntakeMaxLength() // extend intake for maximum storage space
+            // Run the spinner up to speed until it is at speed
+            .alongWith(shooter.runSpinnerAddaptive(
+                drive, drive.isBlue() 
+                ? PointsOfInterest.centerOfHubBlue 
+                : PointsOfInterest.centerOfHubRed))
+            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive) // Auto aim at the hub
+            .until(() -> Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1) // Run only the spin up and auto aim commands until the spinner is at speed
+            .andThen(
+                // Continue running spinner at speed
+                shooter.runSpinnerAddaptive(
+                    drive, drive.isBlue() 
+                    ? PointsOfInterest.centerOfHubBlue 
+                    : PointsOfInterest.centerOfHubRed)
+                // Run indexer and kicker to feed shooter with fuel
+                .alongWith(indexer.runIndexer())
+                .alongWith(shooter.runKicker())
+                // wait 4 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
+                .alongWith(
+                    Commands.waitSeconds(4)
+                    .andThen(intake.setIntakeMinLength()))
+                // stop running everything after 6 seconds
+                .withTimeout(6))), "Shoot");
         }
 
     public void addAlignScorePosition(autoOptions scoreLocation){
