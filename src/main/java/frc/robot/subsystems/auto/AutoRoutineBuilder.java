@@ -108,13 +108,15 @@ public class AutoRoutineBuilder {
 
     public void addShootCommand(){
         addAction(DriveCommands.autoJoystickDriveAtAngle(drive), "Aim At Hub");
-        addAction(this.shooter.runSpinner()
-            .alongWith((new ParallelCommandGroup(
-                this.indexer.runIndexer(), 
-                this.shooter.runKicker()))
-                .onlyIf(
-                    () -> (Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1)))
-            .withTimeout(Seconds.of(3)), "Shoot");
+        addAction(
+            this.shooter.runSpinner()
+            .alongWith(
+                Commands.waitUntil(() -> Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 3))
+                .andThen(
+                    new ParallelCommandGroup(
+                        this.indexer.runIndexer(), 
+                        this.shooter.runKicker()))
+            .withTimeout(Seconds.of(5)), "Shoot");
         }
 
     public void addAlignScorePosition(autoOptions scoreLocation){
@@ -158,9 +160,9 @@ public class AutoRoutineBuilder {
         this.addExitAlliance(autoOptions.BORDER_LEFT);
         //this.addExitAlliance(autoOptions.BORDER_RIGHT);
 
-        this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_CENTER);
-        this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
-        this.addSweep(autoOptions.BORDER_RIGHT, autoOptions.SWEEP_CENTER);
+        //this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_CENTER);
+        //this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
+        //this.addSweep(autoOptions.BORDER_RIGHT, autoOptions.SWEEP_CENTER);
         this.addSweep(autoOptions.BORDER_RIGHT, autoOptions.SWEEP_EDGE);
 
         this.addShootCommand();
