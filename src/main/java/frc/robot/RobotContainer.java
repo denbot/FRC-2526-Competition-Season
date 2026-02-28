@@ -14,10 +14,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.HubStatusAlert;
 import frc.robot.generated.TunerConstants;
 import frc.robot.state.HopperState;
 import frc.robot.state.HubState;
@@ -72,6 +74,7 @@ public class RobotContainer {
   private Shooter shooter;
   private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
+  private HubStatusAlert hubStatusAlert;
 
   // Controller
   private OperatorController operatorController;
@@ -102,6 +105,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX());
         limelights = new Limelights(new LimelightIOReal(), drive);
+        CommandScheduler.getInstance().schedule(hubStatusAlert);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -149,6 +153,7 @@ public class RobotContainer {
         shooter = new Shooter(new ShooterIO() {});
         intake = new Intake(new IntakeIO() {}, stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
+        CommandScheduler.getInstance().schedule(hubStatusAlert);
         break;
     }
 
