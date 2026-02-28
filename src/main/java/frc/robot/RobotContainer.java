@@ -12,7 +12,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,6 +28,7 @@ import frc.robot.state.HubState;
 import frc.robot.state.IntakeState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.subsystems.Control.OperatorController;
+import frc.robot.subsystems.Leds.Leds;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
 import frc.robot.subsystems.drive.Drive;
@@ -74,6 +77,8 @@ public class RobotContainer {
   private Shooter shooter;
   private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
+  private Leds leds;
+  
   private HubStatusAlert hubStatusAlert;
 
   // Controller
@@ -157,6 +162,8 @@ public class RobotContainer {
         break;
     }
 
+    leds = new Leds(limelights, controller, shooter, drive, stateMachine);
+
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
     operatorController = new OperatorController(autoBuilder);
@@ -183,6 +190,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    autoBuilder.testAll();
 
     // HubState.setup(stateMachine, () -> );
     IntakeState.setup(
@@ -237,11 +245,6 @@ public class RobotContainer {
             () -> drive.findAngleForShooting(drive.getPose()))
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
     
-    // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
-    controller.rightTrigger().whileTrue(
-        shooter.runKicker()
-        .alongWith(indexer.runIndexer())
-        .onlyIf(() -> Math.abs(shooter.getRightSpinnerClosedLoopError())<1));
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
@@ -258,14 +261,6 @@ public class RobotContainer {
     
     // Run static spinner, constant speed and no auto aiming
     controller.y().whileTrue(shooter.runSpinner());
-
-    controller.povUp().onTrue(
-        Commands.runOnce(
-            () -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
-    
-    controller.povDown().onTrue(
-        Commands.runOnce(
-            () ->shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
 }
 
 public Pose2d getRobotPosition(){

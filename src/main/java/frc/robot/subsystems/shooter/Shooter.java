@@ -67,8 +67,8 @@ public class Shooter extends SubsystemBase{
             Math.pow(robotPose.getY() - targetPose.getY(), 2)));
 
         SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
-        double x = distance.in(Meters);
-        return RotationsPerSecond.of((Math.pow(x, 2) *0.893293) + (1.75793 * x) + 40.677).plus(spinnerVelocityOffset); // TODO This function is guesswork and estimation
+        double x = distance.in(Meters); 
+        return RotationsPerSecond.of((Math.min(80, Math.pow(x, 2) *0.893293 + (1.75793 * x) + 40.677))).plus(spinnerVelocityOffset); // TODO This function is guesswork and estimation
     }
 
     //TODO move this to be implemented in the runSpinner command, refference intake.java for example
