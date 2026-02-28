@@ -73,7 +73,7 @@ public class Limelights extends SubsystemBase{
         return inputs.frontTagCount;
     }
     
-    public int geTotalTagCount(){
+    public int getTotalTagCount(){
         return inputs.totalTagCount;
     }
 }
