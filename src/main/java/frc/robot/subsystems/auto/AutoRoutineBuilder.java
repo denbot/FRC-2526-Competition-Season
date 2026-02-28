@@ -64,21 +64,21 @@ public class AutoRoutineBuilder {
         if(startSide == autoOptions.BORDER_LEFT){
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_LEFT)
-                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60)).alongWith(this.indexer.runIndexer()).alongWith(this.shooter.reverseKicker())), "Sweep Edge Left");
+                .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Edge Left");
             }
             else{
                 addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
-                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60)).alongWith(this.indexer.runIndexer()).alongWith(this.shooter.reverseKicker())), "Sweep Center Left");
+                .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Center Left");
             }
         }
         else{
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_RIGHT)
-                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60)).alongWith(this.indexer.runIndexer()).alongWith(this.shooter.reverseKicker())), "Sweep Edge Right");
+                .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Edge Right");
             }
             else{
                 addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_RIGHT)
-                .raceWith(this.intake.runIntake(RotationsPerSecond.of(60)).alongWith(this.indexer.runIndexer()).alongWith(this.shooter.reverseKicker())), "Sweep Center Right");
+                .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Center Right");
             }
         }
     }
