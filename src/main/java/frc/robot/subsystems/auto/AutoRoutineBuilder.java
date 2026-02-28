@@ -114,7 +114,7 @@ public class AutoRoutineBuilder {
                 ? PointsOfInterest.centerOfHubBlue 
                 : PointsOfInterest.centerOfHubRed))
             .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive) // Auto aim at the hub
-            .until(() -> Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1) // Run only the spin up and auto aim commands until the spinner is at speed
+            .until(() -> Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
             .andThen(
                 // Continue running spinner at speed
                 shooter.runSpinnerAddaptive(
