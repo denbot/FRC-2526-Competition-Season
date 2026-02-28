@@ -135,4 +135,58 @@ public class IndexerStateTest {
 
         assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
     }
+
+    @Test
+    void indexerReversesIfXAndAButtonPressed() {
+        xButton.set(true);
+        aButton.set(true);
+        machine.poll();
+
+        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
+    }
+
+    @Test
+    void indexerStopsIfXAndAButtonReleased() {
+        xButton.set(true);
+        aButton.set(true);
+        machine.poll();
+
+        // Double check that it's running
+        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
+
+        // Release the trigger
+
+        xButton.set(false);
+        aButton.set(false);
+        machine.poll();
+
+        assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
+    }
+
+    @Test
+    void indexerBecomesActiveIfLeftAndRightTriggerPressed() {
+        leftTrigger.set(true);
+        rightTrigger.set(true);
+        machine.poll();
+
+        assertEquals(IndexerState.RUNNING, machine.currentState().indexerState());
+    }
+
+    @Test
+    void indexerStopsIfLeftAndRightTriggerReleased() {
+        rightTrigger.set(true);
+        leftTrigger.set(true);
+        machine.poll();
+
+        // Double check that it's running
+        assertEquals(IndexerState.RUNNING, machine.currentState().indexerState());
+
+        // Release the trigger
+
+        rightTrigger.set(false);
+        leftTrigger.set(false);
+        machine.poll();
+
+        assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
+    }
 }
