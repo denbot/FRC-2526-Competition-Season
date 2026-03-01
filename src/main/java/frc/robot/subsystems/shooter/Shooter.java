@@ -40,6 +40,19 @@ public class Shooter extends SubsystemBase{
                 .run(runSpinner());
 
         stateMachine
+                .state(ShooterState.SPINNING_UP_FIXED)
+                .to(ShooterState.STOPPED)
+                .run(stopSpinner());
+        stateMachine
+                .state(ShooterState.SPINNING_UP_ADAPTIVE)
+                .to(ShooterState.STOPPED)
+                .run(stopSpinner());
+        stateMachine
+                .state(ShooterState.AT_SPEED)
+                .to(ShooterState.STOPPED)
+                .run(stopSpinner());
+
+        stateMachine
                 .state(ShooterState.SPINNING_UP_ADAPTIVE)
                 .to(ShooterState.AT_SPEED)
                 .transitionWhen(() -> Math.abs(getRightSpinnerClosedLoopError()) < 1);
