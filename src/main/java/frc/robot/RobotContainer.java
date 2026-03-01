@@ -12,18 +12,23 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.HubStatusAlert;
 import frc.robot.generated.TunerConstants;
 import frc.robot.state.HopperState;
 import frc.robot.state.HubState;
 import frc.robot.state.IntakeState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.subsystems.Control.OperatorController;
+import frc.robot.subsystems.Leds.Leds;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
 import frc.robot.subsystems.drive.Drive;
@@ -51,6 +56,7 @@ import frc.robot.subsystems.vision.LimelightIOReal;
 import frc.robot.subsystems.vision.LimelightIOSim;
 import frc.robot.subsystems.vision.Limelights;
 
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -71,6 +77,9 @@ public class RobotContainer {
   private Shooter shooter;
   private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
+  private Leds leds;
+  
+  private HubStatusAlert hubStatusAlert;
 
   // Controller
   private OperatorController operatorController;
@@ -101,6 +110,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX());
         limelights = new Limelights(new LimelightIOReal(), drive);
+        CommandScheduler.getInstance().schedule(hubStatusAlert);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -148,8 +158,11 @@ public class RobotContainer {
         shooter = new Shooter(new ShooterIO() {});
         intake = new Intake(new IntakeIO() {}, stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
+        CommandScheduler.getInstance().schedule(hubStatusAlert);
         break;
     }
+
+    leds = new Leds(limelights, controller, shooter, drive, stateMachine);
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
@@ -177,6 +190,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    autoBuilder.testAll();
 
     // HubState.setup(stateMachine, () -> );
     IntakeState.setup(
@@ -224,50 +238,44 @@ public class RobotContainer {
 
     // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
     controller.rightBumper().whileTrue(
-        shooter.runSpinnerAddaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed)
+        shooter.runSpinnerAddaptive(drive, drive.isBlue() 
+            ? Constants.PointsOfInterest.centerOfHubBlue
+            : Constants.PointsOfInterest.centerOfHubRed)
+        .until(() -> 
+            Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1 
+            && shooter.getLeftSpinnerVelocity().magnitude() > 30
+            && controller.rightTrigger().getAsBoolean() == true) // Run only the spin up and until the spinner is at speed
+            .andThen(
+                // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
+                shooter.runSpinnerAddaptive(drive, drive.isBlue() 
+                ? Constants.PointsOfInterest.centerOfHubBlue
+                : Constants.PointsOfInterest.centerOfHubRed)
+                .alongWith(shooter.runKicker())
+                .alongWith(indexer.runIndexer()))
         .alongWith(
             DriveCommands.joystickDriveAtAngle(
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> drive.findAngleForShooting(drive.getPose()))
-            .andThen(Commands.runOnce(() -> drive.stopWithX()))));
+        .andThen(Commands.runOnce(() -> drive.stopWithX()))));
     
-    // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
-    controller.rightTrigger().whileTrue(
-        shooter.runKicker()
-        .alongWith(indexer.runIndexer())
-        .onlyIf(() -> Math.abs(shooter.getRightSpinnerClosedLoopError())<1));
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
         intake.setIntakeMaxLength()
-        .alongWith(intake.runIntake(RotationsPerSecond.of(60))) 
         .alongWith(indexer.runIndexer()));
-
-    // Retract intake in case of jam, etc
-    controller.leftBumper().whileTrue(intake.setIntakeMinLength());
 
     // Individually run indexer
     controller.a().whileTrue(indexer.reverseIndexer());
 
     // "Outtake" command extends intake and runs all subsystems in reverse
     controller.x().whileTrue(
-        intake.runIntake(RotationsPerSecond.of(-60))
-        .alongWith(shooter.reverseKicker())
-        .alongWith(indexer.reverseIndexer())
-        .alongWith(intake.setIntakeMaxLength()));
+        shooter.reverseKicker()
+        .alongWith(indexer.reverseIndexer()));
     
     // Run static spinner, constant speed and no auto aiming
     controller.y().whileTrue(shooter.runSpinner());
-
-    controller.povUp().onTrue(
-        Commands.runOnce(
-            () -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
-    
-    controller.povDown().onTrue(
-        Commands.runOnce(
-            () ->shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
 }
 
 public Pose2d getRobotPosition(){

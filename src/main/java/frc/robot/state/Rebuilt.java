@@ -8,6 +8,7 @@ public record Rebuilt(
     RobotState robotState,
     MatchState matchState,
     IntakeState intakeState,
+    IndexerState indexerState,
     HopperState hopperState,
     KickerState kickerState,
     HubState hubState
