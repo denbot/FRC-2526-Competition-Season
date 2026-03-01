@@ -112,12 +112,26 @@ public class HopperStateTest{
 
     @Test
     public void hopperCanFullyRetractFromDeployed() {
+        leftTrigger.set(true);
+        xButton.set(true);
+
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
 
         leftBumper.set(true);
         machine.poll();
 
-        // Verify hopper begins to retract to idle
+        // Verify hopper begins to retract to retracted
+        assertEquals(HopperState.RETRACTING_TO_RETRACTED, machine.currentState().hopperState());
+    }
+
+    @Test
+    public void hopperCanFullyRetractFromDeployedEvenWhenTryingToIdle() {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
+
+        leftBumper.set(true);
+        machine.poll();
+
+        // Verify hopper begins to retract to retracted
         assertEquals(HopperState.RETRACTING_TO_RETRACTED, machine.currentState().hopperState());
     }
 
@@ -128,7 +142,7 @@ public class HopperStateTest{
         leftBumper.set(true);
         machine.poll();
 
-        // Verify hopper begins to retract to idle
+        // Verify hopper begins to retract to retracted
         assertEquals(HopperState.RETRACTING_TO_RETRACTED, machine.currentState().hopperState());
     }
 }

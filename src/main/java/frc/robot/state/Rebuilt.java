@@ -10,6 +10,7 @@ public record Rebuilt(
     IntakeState intakeState,
     IndexerState indexerState,
     HopperState hopperState,
+    ShooterState shooterState,
     KickerState kickerState,
     HubState hubState
 ) {}

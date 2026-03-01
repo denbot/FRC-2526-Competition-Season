@@ -108,7 +108,7 @@ public class RobotContainer {
 
         indexer = new Indexer(new IndexerIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
-        shooter = new Shooter(new ShooterIOTalonFX());
+        shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
         limelights = new Limelights(new LimelightIOReal(), drive);
         CommandScheduler.getInstance().schedule(hubStatusAlert);
 
@@ -140,7 +140,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        shooter = new Shooter(new ShooterIOSim());
+        shooter = new Shooter(new ShooterIOSim(), stateMachine, drive);
         indexer = new Indexer(new IndexerIOSim());
         intake = new Intake(new IntakeIOSim(), stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
@@ -155,7 +155,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        shooter = new Shooter(new ShooterIO() {});
+        shooter = new Shooter(new ShooterIO() {}, stateMachine, drive);
         intake = new Intake(new IntakeIO() {}, stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
         CommandScheduler.getInstance().schedule(hubStatusAlert);
@@ -238,27 +238,12 @@ public class RobotContainer {
 
     // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
     controller.rightBumper().whileTrue(
-        shooter.runSpinnerAddaptive(drive, drive.isBlue() 
-            ? Constants.PointsOfInterest.centerOfHubBlue
-            : Constants.PointsOfInterest.centerOfHubRed)
-        .until(() -> 
-            Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1 
-            && shooter.getLeftSpinnerVelocity().magnitude() > 30
-            && controller.rightTrigger().getAsBoolean() == true) // Run only the spin up and until the spinner is at speed
-            .andThen(
-                // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
-                shooter.runSpinnerAddaptive(drive, drive.isBlue() 
-                ? Constants.PointsOfInterest.centerOfHubBlue
-                : Constants.PointsOfInterest.centerOfHubRed)
-                .alongWith(shooter.runKicker())
-                .alongWith(indexer.runIndexer()))
-        .alongWith(
             DriveCommands.joystickDriveAtAngle(
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> drive.findAngleForShooting(drive.getPose()))
-        .andThen(Commands.runOnce(() -> drive.stopWithX()))));
+            .andThen(Commands.runOnce(() -> drive.stopWithX())));
     
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
@@ -273,9 +258,6 @@ public class RobotContainer {
     controller.x().whileTrue(
         shooter.reverseKicker()
         .alongWith(indexer.reverseIndexer()));
-    
-    // Run static spinner, constant speed and no auto aiming
-    controller.y().whileTrue(shooter.runSpinner());
 }
 
 public Pose2d getRobotPosition(){
