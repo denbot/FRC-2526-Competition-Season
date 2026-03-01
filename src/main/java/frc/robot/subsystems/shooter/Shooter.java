@@ -26,31 +26,36 @@ public class Shooter extends SubsystemBase{
     private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(60);
     private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
     private AngularVelocity spinnerVelocityOffset = RotationsPerSecond.of(0);
+    
+    private final Drive drive;
+    
+    private Command shooterCommand;
 
     public Shooter(ShooterIO io, RebuiltStateMachine stateMachine, Drive drive){
         this.io = io;
+        this.drive = drive;
 
         stateMachine
                 .state(ShooterState.STOPPED)
                 .to(ShooterState.SPINNING_UP_ADAPTIVE)
-                .run(runSpinnerAddaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed));
+                .run(setShooterCommandAdaptive());
         stateMachine
                 .state(ShooterState.STOPPED)
                 .to(ShooterState.SPINNING_UP_FIXED)
-                .run(runSpinner());
+                .run(setShooterCommandFixed());
 
         stateMachine
                 .state(ShooterState.SPINNING_UP_FIXED)
                 .to(ShooterState.STOPPED)
-                .run(stopSpinner());
+                .run(cancelShooterCommand());
         stateMachine
                 .state(ShooterState.SPINNING_UP_ADAPTIVE)
                 .to(ShooterState.STOPPED)
-                .run(stopSpinner());
+                .run(cancelShooterCommand());
         stateMachine
                 .state(ShooterState.AT_SPEED)
                 .to(ShooterState.STOPPED)
-                .run(stopSpinner());
+                .run(cancelShooterCommand());
 
         stateMachine
                 .state(ShooterState.SPINNING_UP_ADAPTIVE)
@@ -70,6 +75,20 @@ public class Shooter extends SubsystemBase{
         Logger.recordOutput("Spinner Velocity Setpoint", spinnerVelocitySetpoint);
         Logger.recordOutput("Kicker Velocity Setpoint", kickerVelocitySetpoint);
     }
+    
+    private Command setShooterCommandAdaptive() {
+        this.shooterCommand = runSpinnerAdaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed);
+        return this.shooterCommand;
+    }
+
+    private Command setShooterCommandFixed() {
+        this.shooterCommand = runSpinner();
+        return this.shooterCommand;
+    }
+
+    private Command cancelShooterCommand() {
+        return Commands.runOnce(() -> shooterCommand.cancel());
+    }
 
     public AngularVelocity getIdealSpeed(Pose2d robotPose, Pose2d targetPose){
         // TODO replace target pose withs state machine based identification and logic for aiming
@@ -84,7 +103,7 @@ public class Shooter extends SubsystemBase{
         return RotationsPerSecond.of((Math.min(80, Math.pow(x, 2) *0.893293 + (1.75793 * x) + 40.677))).plus(spinnerVelocityOffset); // TODO This function is guesswork and estimation
     }
 
-    //TODO move this to be implemented in the runSpinner command, refference intake.java for example
+    //TODO move this to be implemented in the runSpinner command, reference intake.java for example
     public void setSpinnerVelocitySetpoint(AngularVelocity speed){
         spinnerVelocitySetpoint = speed.plus(spinnerVelocityOffset);
     }
@@ -93,7 +112,7 @@ public class Shooter extends SubsystemBase{
         spinnerVelocityOffset = spinnerVelocityOffset.plus(speed);
     }
 
-    public Command runSpinnerAddaptive(Drive drive, Pose2d targetPose){
+    public Command runSpinnerAdaptive(Drive drive, Pose2d targetPose){
         return Commands.runEnd(() -> this.io.setSpinnerVelocity(this.getIdealSpeed(drive.getPose(), targetPose)), () -> this.io.stopSpinner());
     }
 
