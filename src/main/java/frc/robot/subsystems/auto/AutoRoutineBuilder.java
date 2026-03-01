@@ -109,7 +109,7 @@ public class AutoRoutineBuilder {
         addAction(
             intake.setIntakeMaxLength() // extend intake for maximum storage space
             // Run the spinner up to speed until it is at speed
-            .alongWith(shooter.runSpinnerAddaptive(
+            .alongWith(shooter.runSpinnerAdaptive(
                 drive, drive.isBlue() 
                 ? PointsOfInterest.centerOfHubBlue 
                 : PointsOfInterest.centerOfHubRed))
@@ -117,7 +117,7 @@ public class AutoRoutineBuilder {
             .until(() -> Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
             .andThen(
                 // Continue running spinner at speed
-                shooter.runSpinnerAddaptive(
+                shooter.runSpinnerAdaptive(
                     drive, drive.isBlue() 
                     ? PointsOfInterest.centerOfHubBlue 
                     : PointsOfInterest.centerOfHubRed)
