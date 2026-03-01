@@ -258,9 +258,6 @@ public class RobotContainer {
     controller.x().whileTrue(
         shooter.reverseKicker()
         .alongWith(indexer.reverseIndexer()));
-    
-    // Run static spinner, constant speed and no auto aiming
-    controller.y().whileTrue(shooter.runSpinner());
 }
 
 public Pose2d getRobotPosition(){
