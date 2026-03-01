@@ -15,14 +15,14 @@ public class IndexerIOSim implements IndexerIO{
     private static final DCMotor indexMotor = DCMotor.getKrakenX44(1);
     private DCMotorSim indexMotorSim;
     private SimpleMotorFeedforward indexFeedforward = new SimpleMotorFeedforward(0.0, 0.11500000059604645);
-    private PIDController indexMotorController = new PIDController(0.001, 0.0, 0.0);
+    private PIDController indexMotorController = new PIDController(1, 0.0, 0.0);
     private double indexMotorAppliedVoltsPID = 0;
     private double indexMotorAppliedVoltsFF = 0;
 
     public IndexerIOSim(){
         indexMotorSim = 
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(indexMotor, 0.002, 2), 
+            LinearSystemId.createDCMotorSystem(indexMotor, 0.02, 2), 
             indexMotor);   
     }
 
