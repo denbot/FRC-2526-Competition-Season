@@ -3,7 +3,9 @@ package frc.robot.subsystems.intake;
 import static frc.robot.util.PhoenixUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -34,8 +36,11 @@ public class IntakeIOTalonFX implements IntakeIO {
     private final TalonFX extensionMotorLeft =
         new TalonFX(IntakeConstants.EXTENSION_MOTOR_LEFT_ID, OperatorConstants.canivoreCANBus);
    
-        private final TalonFX extensionMotorRight =
+    private final TalonFX extensionMotorRight =
         new TalonFX(IntakeConstants.EXTENSION_MOTOR_RIGHT_ID, OperatorConstants.canivoreCANBus);
+
+    private final Orchestra startupJingle = new Orchestra("pacman.chrp");
+    private final Orchestra intermission = new Orchestra("IntermissionShort.chrp");
 
     private final Debouncer intakeMotorDebounce = new Debouncer(0.5);
     private final Debouncer extensionMotorLeftDebounce = new Debouncer(0.5);
@@ -76,10 +81,13 @@ public class IntakeIOTalonFX implements IntakeIO {
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
                 .withFeedback(
                     new FeedbackConfigs()
-                    .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
+                        .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(34)); // TODO
+                        .withKP(34))
+                .withAudio(
+                    new AudioConfigs().withAllowMusicDurDisable(true)
+                );
 
         var extensionMotorRightConfig =
             new TalonFXConfiguration()
@@ -92,7 +100,10 @@ public class IntakeIOTalonFX implements IntakeIO {
                     .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(34)); // TODO
+                        .withKP(34))
+                .withAudio(
+                    new AudioConfigs().withAllowMusicDurDisable(true)
+                );
 
         intakeMotor.setNeutralMode(NeutralModeValue.Coast);
 
@@ -129,6 +140,11 @@ public class IntakeIOTalonFX implements IntakeIO {
             extensionMotorRight.getIsProLicensed().getValue() ? 200 : 50, extensionRightVelocity, extensionRightCurrentAmps, extensionRightStallCurrentAmps, extensionRightPositionRot);
 
         extensionMotorRight.setControl(new Follower(extensionMotorLeft.getDeviceID(), MotorAlignmentValue.Opposed));
+    
+        startupJingle.addInstrument(extensionMotorLeft);
+        startupJingle.addInstrument(extensionMotorRight);
+        intermission.addInstrument(extensionMotorLeft);
+        intermission.addInstrument(extensionMotorRight);
     }
 
     @Override
@@ -181,5 +197,21 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     public void stopIntake() {
         intakeMotor.setControl(new CoastOut());
+    }
+
+    public void startJingle(){
+        startupJingle.play();
+    }
+
+    public void startIntermission(){
+        intermission.play();
+    }
+    
+    public void stopJingle(){
+        startupJingle.stop();
+    }
+
+    public void stopIntermission(){
+        intermission.stop();
     }
 }

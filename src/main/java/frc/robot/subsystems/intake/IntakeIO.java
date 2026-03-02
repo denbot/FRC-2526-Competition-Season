@@ -44,4 +44,11 @@ public interface IntakeIO {
 
   public default void stopIntake() {}
 
+  public default void startJingle(){}
+
+  public default void startIntermission(){}
+
+  public default void stopJingle(){}
+
+  public default void stopIntermission(){}
 }
