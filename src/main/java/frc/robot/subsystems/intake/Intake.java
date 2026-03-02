@@ -89,12 +89,10 @@ public class Intake extends SubsystemBase {
   }
 
   public Command runIntake(AngularVelocity speed) {
-    return Commands.runEnd(
+    return Commands.runOnce(
         () -> {
           intakeVelocitySetpoint = speed;
-          this.io.setIntakeVelocity(speed);}, 
-          () -> { intakeVelocitySetpoint = RotationsPerSecond.of(0);
-          this.io.stopIntake();});
+          this.io.setIntakeVelocity(speed);});
   }
 
   public Command stopIntake() {
