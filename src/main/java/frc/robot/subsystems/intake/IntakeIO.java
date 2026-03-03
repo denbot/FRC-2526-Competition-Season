@@ -24,6 +24,7 @@ public interface IntakeIO {
     public AngularVelocity intakeVelocityRotPerSec = RevolutionsPerSecond.zero();
     public AngularVelocity extensionVelocityLeft = RevolutionsPerSecond.zero();
     public AngularVelocity extensionVelocityRight = RevolutionsPerSecond.zero();
+    public double extensionClosedLoopError = 0.0;
     public Angle intakePositionRots = Degree.zero();
     public Angle extensionLeftPositionRots = Degree.zero();
     public Angle extensionRightPositionRots = Degree.zero();
@@ -44,4 +45,11 @@ public interface IntakeIO {
 
   public default void stopIntake() {}
 
+  public default void startJingle(){}
+
+  public default void startIntermission(){}
+
+  public default void stopJingle(){}
+
+  public default void stopIntermission(){}
 }

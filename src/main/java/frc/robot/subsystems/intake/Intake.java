@@ -34,11 +34,43 @@ public class Intake extends SubsystemBase {
             .to(HopperState.DEPLOYING)
             .run(setIntakeMaxLength());
     stateMachine
+            .state(HopperState.RETRACTING_TO_IDLE)
+            .to(HopperState.DEPLOYING)
+            .run(setIntakeMaxLength());
+    stateMachine
+            .state(HopperState.RETRACTING_TO_RETRACTED)
+            .to(HopperState.DEPLOYING)
+            .run(setIntakeMaxLength());
+    stateMachine
             .state(HopperState.DEPLOYED)
             .to(HopperState.RETRACTING_TO_IDLE)
             .run(setIntakeIdleLength());
     stateMachine
+            .state(HopperState.DEPLOYING)
+            .to(HopperState.RETRACTING_TO_IDLE)
+            .run(setIntakeIdleLength());
+    stateMachine
+            .state(HopperState.RETRACTING_TO_RETRACTED)
+            .to(HopperState.RETRACTING_TO_IDLE)
+            .run(setIntakeIdleLength());
+    stateMachine
+            .state(HopperState.RETRACTED)
+            .to(HopperState.RETRACTING_TO_IDLE)
+            .run(setIntakeIdleLength());
+    stateMachine
+            .state(HopperState.DEPLOYING)
+            .to(HopperState.RETRACTING_TO_RETRACTED)
+            .run(setIntakeMinLength());
+    stateMachine
             .state(HopperState.DEPLOYED)
+            .to(HopperState.RETRACTING_TO_RETRACTED)
+            .run(setIntakeMinLength());
+    stateMachine
+            .state(HopperState.RETRACTING_TO_IDLE)
+            .to(HopperState.RETRACTING_TO_RETRACTED)
+            .run(setIntakeMinLength());
+    stateMachine
+            .state(HopperState.IDLE)
             .to(HopperState.RETRACTING_TO_RETRACTED)
             .run(setIntakeMinLength());
 
@@ -65,17 +97,17 @@ public class Intake extends SubsystemBase {
     stateMachine
             .state(HopperState.DEPLOYING)
             .to(HopperState.DEPLOYED)
-            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+            .transitionWhen(() -> Math.abs(inputs.extensionClosedLoopError) < 0.05);
 
     stateMachine
             .state(HopperState.RETRACTING_TO_IDLE)
             .to(HopperState.IDLE)
-            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+            .transitionWhen(() -> Math.abs(inputs.extensionClosedLoopError) < 0.05);
 
     stateMachine
             .state(HopperState.RETRACTING_TO_RETRACTED)
             .to(HopperState.RETRACTED)
-            .transitionWhen(() -> intakeExtensionSetpoint.minus(inputs.extensionLeftPositionRots).abs(Degrees) < 5);
+            .transitionWhen(() -> Math.abs(inputs.extensionClosedLoopError) < 0.05);
     // TODO Also check extensionRightPositionRots
   }
 
@@ -183,5 +215,21 @@ public class Intake extends SubsystemBase {
   
   public Angle getExtensionRightPositionRots() {
     return inputs.extensionRightPositionRots;
+  }
+
+  public void startJingle(){
+    this.io.startJingle();
+  }
+
+  public void startIntermission(){
+    this.io.startIntermission();
+  }
+
+  public void stopJingle(){
+    this.io.stopJingle();
+  }
+
+  public void stopIntermission(){
+    this.io.stopIntermission();
   }
 }
