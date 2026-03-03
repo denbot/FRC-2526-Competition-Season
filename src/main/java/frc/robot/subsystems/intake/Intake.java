@@ -34,11 +34,39 @@ public class Intake extends SubsystemBase {
             .to(HopperState.DEPLOYING)
             .run(setIntakeMaxLength());
     stateMachine
+            .state(HopperState.RETRACTING_TO_IDLE)
+            .to(HopperState.DEPLOYING)
+            .run(setIntakeMaxLength());
+    stateMachine
+            .state(HopperState.RETRACTING_TO_RETRACTED)
+            .to(HopperState.DEPLOYING)
+            .run(setIntakeMaxLength());
+    stateMachine
             .state(HopperState.DEPLOYED)
             .to(HopperState.RETRACTING_TO_IDLE)
             .run(setIntakeIdleLength());
     stateMachine
+            .state(HopperState.DEPLOYING)
+            .to(HopperState.RETRACTING_TO_IDLE)
+            .run(setIntakeIdleLength());
+    stateMachine
+            .state(HopperState.RETRACTING_TO_RETRACTED)
+            .to(HopperState.RETRACTING_TO_IDLE)
+            .run(setIntakeIdleLength());
+    stateMachine
+            .state(HopperState.DEPLOYING)
+            .to(HopperState.RETRACTING_TO_RETRACTED)
+            .run(setIntakeMinLength());
+    stateMachine
             .state(HopperState.DEPLOYED)
+            .to(HopperState.RETRACTING_TO_RETRACTED)
+            .run(setIntakeMinLength());
+    stateMachine
+            .state(HopperState.RETRACTING_TO_IDLE)
+            .to(HopperState.RETRACTING_TO_RETRACTED)
+            .run(setIntakeMinLength());
+    stateMachine
+            .state(HopperState.IDLE)
             .to(HopperState.RETRACTING_TO_RETRACTED)
             .run(setIntakeMinLength());
 
