@@ -190,7 +190,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-    autoBuilder.testAll();
 
     // HubState.setup(stateMachine, () -> );
     IntakeState.setup(
@@ -275,5 +274,21 @@ public void updateRobotPose(){
    */
   public Command getAutonomousCommand() {
     return autoBuilder.getAutoRoutine();
+  }
+
+    public void startJingle(){
+    intake.startJingle();
+  }
+
+  public void startIntermission(){
+    intake.startIntermission();
+  }
+
+  public void stopJingle(){
+    intake.stopJingle();
+  }
+
+  public void stopIntermission(){
+    intake.stopIntermission();
   }
 }

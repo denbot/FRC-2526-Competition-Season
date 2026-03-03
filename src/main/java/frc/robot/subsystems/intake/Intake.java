@@ -216,4 +216,20 @@ public class Intake extends SubsystemBase {
   public Angle getExtensionRightPositionRots() {
     return inputs.extensionRightPositionRots;
   }
+
+  public void startJingle(){
+    this.io.startJingle();
+  }
+
+  public void startIntermission(){
+    this.io.startIntermission();
+  }
+
+  public void stopJingle(){
+    this.io.stopJingle();
+  }
+
+  public void stopIntermission(){
+    this.io.stopIntermission();
+  }
 }
