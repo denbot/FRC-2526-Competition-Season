@@ -23,11 +23,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HubStatusAlert;
 import frc.robot.generated.TunerConstants;
-import frc.robot.state.HopperState;
-import frc.robot.state.HubState;
-import frc.robot.state.IntakeState;
-import frc.robot.state.RebuiltStateMachine;
-import frc.robot.state.ShooterState;
+import frc.robot.state.*;
 import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.Leds.Leds;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
@@ -204,6 +200,13 @@ public class RobotContainer {
             stateMachine,
             controller.leftTrigger(),
             controller.leftBumper(),
+            controller.x()
+    );
+
+    KickerState.setup(
+            stateMachine,
+            controller.rightTrigger(),
+            controller.leftTrigger(),
             controller.x()
     );
 
