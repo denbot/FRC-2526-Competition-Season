@@ -263,8 +263,7 @@ public class RobotContainer {
 
     // "Outtake" command extends intake and runs all subsystems in reverse
     controller.x().whileTrue(
-        shooter.reverseKicker()
-        .alongWith(indexer.reverseIndexer()));
+        indexer.reverseIndexer());
 }
 
 public Pose2d getRobotPosition(){
