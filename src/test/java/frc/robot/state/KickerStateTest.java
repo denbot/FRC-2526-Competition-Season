@@ -53,7 +53,7 @@ public class KickerStateTest {
     }
 
     @ParameterizedTest
-    @MethodSource("shooterStates")
+    @MethodSource("notAtSpeedShooterStates")
     void rightTriggerDoesntCauseKickerToRunIfNotAtSpeed(ShooterState state) {
         CommandScheduler.getInstance().schedule(machine.transitionTo(state));
 
@@ -65,6 +65,8 @@ public class KickerStateTest {
 
     @Test
     void kickerStopsIfRightTriggerReleased() {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
+
         rightTrigger.set(true);
         machine.poll();
 
@@ -76,6 +78,23 @@ public class KickerStateTest {
         machine.poll();
 
         assertEquals(KickerState.STOPPED, machine.currentState().kickerState());
+    }
+
+    @ParameterizedTest
+    @MethodSource("notAtSpeedShooterStates")
+    void kickerStopsIfShooterStops(ShooterState state) {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
+
+        rightTrigger.set(true);
+        machine.poll();
+
+        // Double check that it's running
+        assertEquals(KickerState.RUNNING, machine.currentState().kickerState());
+
+        CommandScheduler.getInstance().schedule(machine.transitionTo(state));
+        machine.poll();
+
+        assertNotEquals(KickerState.RUNNING, machine.currentState().kickerState());
     }
 
     @ParameterizedTest
@@ -131,7 +150,7 @@ public class KickerStateTest {
                 Arguments.arguments(true, true));
     }
 
-    private static List<Arguments> shooterStates() {
+    private static List<Arguments> notAtSpeedShooterStates() {
         return List.of(
                 Arguments.arguments(ShooterState.STOPPED),
                 Arguments.arguments(ShooterState.SPINNING_UP_ADAPTIVE),
