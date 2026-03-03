@@ -24,6 +24,7 @@ public interface IntakeIO {
     public AngularVelocity intakeVelocityRotPerSec = RevolutionsPerSecond.zero();
     public AngularVelocity extensionVelocityLeft = RevolutionsPerSecond.zero();
     public AngularVelocity extensionVelocityRight = RevolutionsPerSecond.zero();
+    public double extensionClosedLoopError = 0.0;
     public Angle intakePositionRots = Degree.zero();
     public Angle extensionLeftPositionRots = Degree.zero();
     public Angle extensionRightPositionRots = Degree.zero();
