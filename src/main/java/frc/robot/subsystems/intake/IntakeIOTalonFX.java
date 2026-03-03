@@ -55,6 +55,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     private final StatusSignal<Current> extensionRightStallCurrentAmps = extensionMotorRight.getMotorStallCurrent();
     private final StatusSignal<Angle> extensionLeftPositionRot = extensionMotorLeft.getPosition();
     private final StatusSignal<Angle> extensionRightPositionRot = extensionMotorRight.getPosition();
+    private final StatusSignal<Double> extensionClosedLoopError = extensionMotorLeft.getClosedLoopError();
 
     public IntakeIOTalonFX() {
         var intakeMotorConfig =
@@ -150,6 +151,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         inputs.intakePositionRots = intakePositionRot.getValue();
         inputs.extensionLeftPositionRots = extensionLeftPositionRot.getValue();
         inputs.extensionRightPositionRots = extensionRightPositionRot.getValue();
+        inputs.extensionClosedLoopError = extensionClosedLoopError.getValue();
 
         inputs.stallCurrentIntake = intakeStallCurrentAmps.getValue();
         inputs.stallCurrentExtensionLeft = extensionLeftStallCurrentAmps.getValue();
