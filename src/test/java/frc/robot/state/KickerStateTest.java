@@ -43,15 +43,28 @@ public class KickerStateTest {
     }
 
     @Test
-    void rightTriggerCausesKickerToRun() { // TODO: Check if the flywheels are up to speed
+    void rightTriggerCausesKickerToRunIfAtSpeed() {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
+
         rightTrigger.set(true);
         machine.poll();
 
         assertEquals(KickerState.RUNNING, machine.currentState().kickerState());
     }
 
+    @ParameterizedTest
+    @MethodSource("shooterStates")
+    void rightTriggerDoesntCauseKickerToRunIfNotAtSpeed(ShooterState state) {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(state));
+
+        rightTrigger.set(true);
+        machine.poll();
+
+        assertNotEquals(KickerState.RUNNING, machine.currentState().kickerState());
+    }
+
     @Test
-    void kickerStopsIfRightTriggerReleased() { // TODO: Check if the flywheels are up to speed
+    void kickerStopsIfRightTriggerReleased() {
         rightTrigger.set(true);
         machine.poll();
 
@@ -116,5 +129,12 @@ public class KickerStateTest {
                 Arguments.arguments(false, true),
                 Arguments.arguments(true, false),
                 Arguments.arguments(true, true));
+    }
+
+    private static List<Arguments> shooterStates() {
+        return List.of(
+                Arguments.arguments(ShooterState.STOPPED),
+                Arguments.arguments(ShooterState.SPINNING_UP_ADAPTIVE),
+                Arguments.arguments(ShooterState.SPINNING_UP_FIXED));
     }
 }
