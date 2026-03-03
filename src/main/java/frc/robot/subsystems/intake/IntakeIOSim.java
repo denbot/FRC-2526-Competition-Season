@@ -75,7 +75,7 @@ public class IntakeIOSim implements IntakeIO {
         inputs.intakePositionRots = Angle.ofBaseUnits(intakeMotorSim.getAngularPositionRotations(), Rotations);
         inputs.extensionLeftPositionRots =  Angle.ofBaseUnits(extensionLeftMotorSim.getAngularPositionRotations(), Rotations);
         inputs.extensionRightPositionRots =  Angle.ofBaseUnits(extensionRightMotorSim.getAngularPositionRotations(), Rotations);
-
+        inputs.extensionClosedLoopError = extensionLeftController.getError();
         inputs.stallCurrentIntake = null;
         inputs.stallCurrentExtensionLeft = null;
         inputs.stallCurrentExtensionRight = null;
