@@ -34,7 +34,7 @@ public class Leds extends SubsystemBase{
 	private AddressableLEDBufferView leftHalf;
 	private AddressableLEDBufferView rightHalf;
 	private RebuiltStateMachine stateMachine;
-	private Timer timeUntilTransition;
+	private final Timer timeUntilTransition = new Timer();
 	private Time targetWaitTime;
 	private Boolean isBlueActive = false;
 
@@ -43,7 +43,7 @@ public class Leds extends SubsystemBase{
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
 		this.leftHalf = this.ledBuffer.createView(0, numLeds/2);
-		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds);
+		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds - 1);
 
 		this.led.setLength(this.ledBuffer.getLength());
 		this.led.setData(ledBuffer);
