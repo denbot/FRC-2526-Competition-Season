@@ -162,7 +162,7 @@ public class RobotContainer {
         break;
     }
 
-    //leds = new Leds(limelights, controller, shooter, drive, stateMachine);
+    leds = new Leds(limelights, controller, shooter, drive, stateMachine);
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
@@ -257,7 +257,20 @@ public class RobotContainer {
     controller.x().whileTrue(
         shooter.reverseKicker()
         .alongWith(indexer.reverseIndexer()));
-}
+    
+    // Run static spinner, constant speed and no auto aiming
+    controller.y().whileTrue(
+        shooter.runSpinner()
+            .until(() -> 
+                Math.abs(shooter.getSpinnerClosedLoopError()) < 1 
+                && shooter.getLeftSpinnerVelocity().magnitude() > 30
+                && controller.rightTrigger().getAsBoolean() == true) // Run only the spin up and until the spinner is at speed
+            .andThen(
+                // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
+                shooter.runSpinner() 
+                .alongWith(shooter.runKicker())
+                .alongWith(indexer.runIndexer())));
+    }
 
 public Pose2d getRobotPosition(){
     return drive.getPose();

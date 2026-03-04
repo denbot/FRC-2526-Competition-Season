@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Control;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -13,9 +11,9 @@ import frc.robot.subsystems.auto.onTheFlySetpoints;
 public class OperatorController {
     private final CommandGenericHID operatorController1 = new CommandGenericHID(1);
     private final CommandGenericHID operatorController2 = new CommandGenericHID(2);
-    private final Trigger leftRightSwitch = operatorController1.button(12);
+    private final Trigger leftRightSwitch = operatorController1.button(8);
     private final Trigger edgeCenterSwitch = operatorController1.button(11);
-    private final Trigger trenchBumpSwitch = operatorController1.button(8);
+    private final Trigger trenchBumpSwitch = operatorController1.button(12);
     private final Trigger neutralZoneFeedButton = operatorController1.button(1);
     private final Trigger neutralZoneScoreButton = operatorController1.button(2);
     private final Trigger humanPlayerButton = operatorController1.button(3);
@@ -92,14 +90,5 @@ public class OperatorController {
             ? SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH)
             : SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
         // TODO: .andThen(ClimbCommand);
-        
-        // Joystick steps spinner velocity
-        operatorController1.axisGreaterThan(1, 0.5).onTrue(
-            Commands.runOnce(
-                () -> autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
-
-        operatorController1.axisLessThan(1, -0.5).onTrue(
-            Commands.runOnce(
-                () -> autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
-    }
+        }
 }
