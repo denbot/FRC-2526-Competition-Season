@@ -96,7 +96,7 @@ public class Leds extends SubsystemBase{
 			LEDPattern baseRight = LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kYellow, Color.kPurple); // Base color for auto aim
 
 			// Blink green if spinner is at speed, blink red if not
-			if (shooter.getLeftSpinnerClosedLoopError() > 1) baseLeft = LEDPattern.solid(Color.kRed);
+			if (shooter.getSpinnerClosedLoopError() > 1) baseLeft = LEDPattern.solid(Color.kRed);
 			baseLeft.blink(Seconds.of(0.5)).applyTo(leftHalf);
 			
 			// Get a value between 0-90 degrees (clamped by min.max) for how far off the dirve base is from aiming at the hub 

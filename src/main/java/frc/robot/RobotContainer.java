@@ -262,7 +262,7 @@ public class RobotContainer {
     controller.y().whileTrue(
         shooter.runSpinner()
             .until(() -> 
-                Math.abs(shooter.getLeftSpinnerClosedLoopError()) < 1 
+                Math.abs(shooter.getSpinnerClosedLoopError()) < 1 
                 && shooter.getLeftSpinnerVelocity().magnitude() > 30
                 && controller.rightTrigger().getAsBoolean() == true) // Run only the spin up and until the spinner is at speed
             .andThen(
