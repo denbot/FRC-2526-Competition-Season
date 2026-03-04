@@ -48,6 +48,10 @@ public class Indexer extends SubsystemBase{
             .to(IndexerState.STOPPED)
             .run(stopRepeatingCommand());
         stateMachine
+            .state(IndexerState.RUNNING)
+            .to(IndexerState.REVERSING)
+            .run(stopRepeatingCommand());
+        stateMachine
             .state(IndexerState.REVERSING)
             .to(IndexerState.STOPPED)
             .run(stopIndexer());
@@ -62,7 +66,7 @@ public class Indexer extends SubsystemBase{
     }
 
     private Command setRepeatingCommand() {
-        this.indexerCommand = Commands.repeatingSequence(Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint)), Commands.waitSeconds(0.875), Commands.runOnce(()-> this.io.stopIndexer()), Commands.waitSeconds(0.125)).finallyDo(() -> this.io.stopIndexer());
+        this.indexerCommand = runIndexer();
         return this.indexerCommand;
     }
 
