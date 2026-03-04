@@ -107,7 +107,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        indexer = new Indexer(new IndexerIOTalonFX());
+        indexer = new Indexer(new IndexerIOTalonFX(), stateMachine);
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
         limelights = new Limelights(new LimelightIOReal(), drive);
@@ -142,7 +142,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         shooter = new Shooter(new ShooterIOSim(), stateMachine, drive);
-        indexer = new Indexer(new IndexerIOSim());
+        indexer = new Indexer(new IndexerIOSim(), stateMachine);
         intake = new Intake(new IntakeIOSim(), stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
         break;
