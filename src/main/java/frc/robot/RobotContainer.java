@@ -25,6 +25,7 @@ import frc.robot.commands.HubStatusAlert;
 import frc.robot.generated.TunerConstants;
 import frc.robot.state.HopperState;
 import frc.robot.state.HubState;
+import frc.robot.state.IndexerState;
 import frc.robot.state.IntakeState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.subsystems.Control.OperatorController;
@@ -204,6 +205,14 @@ public class RobotContainer {
             controller.leftBumper(),
             controller.x()
     );
+
+    IndexerState.setup(
+            stateMachine, 
+            controller.rightTrigger(), 
+            controller.leftTrigger(), 
+            controller.a(), 
+            controller.x()
+    );
   }
 
   /**
@@ -247,16 +256,11 @@ public class RobotContainer {
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
-        intake.setIntakeMaxLength()
-        .alongWith(indexer.runIndexer()));
-
-    // Individually run indexer
-    controller.a().whileTrue(indexer.reverseIndexer());
+        intake.setIntakeMaxLength());
 
     // "Outtake" command extends intake and runs all subsystems in reverse
     controller.x().whileTrue(
-        shooter.reverseKicker()
-        .alongWith(indexer.reverseIndexer()));
+        shooter.reverseKicker());
 }
 
 public Pose2d getRobotPosition(){
