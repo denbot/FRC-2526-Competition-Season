@@ -11,9 +11,9 @@ import frc.robot.subsystems.auto.onTheFlySetpoints;
 public class OperatorController {
     private final CommandGenericHID operatorController1 = new CommandGenericHID(1);
     private final CommandGenericHID operatorController2 = new CommandGenericHID(2);
-    private final Trigger leftRightSwitch = operatorController1.button(12);
+    private final Trigger leftRightSwitch = operatorController1.button(8);
     private final Trigger edgeCenterSwitch = operatorController1.button(11);
-    private final Trigger trenchBumpSwitch = operatorController1.button(8);
+    private final Trigger trenchBumpSwitch = operatorController1.button(12);
     private final Trigger neutralZoneFeedButton = operatorController1.button(1);
     private final Trigger neutralZoneScoreButton = operatorController1.button(2);
     private final Trigger humanPlayerButton = operatorController1.button(3);
@@ -31,10 +31,10 @@ public class OperatorController {
         neutralZoneScoreButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added neutral score to auto routine");
-                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_LEFT : autoOptions.BORDER_RIGHT;
+                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
                 autoBuilder.addExitAlliance(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
-                autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP);
+                autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.RAMP : autoOptions.TRENCH);
                 autoBuilder.addShootCommand(); 
             }).ignoringDisable(true));
 
@@ -42,7 +42,7 @@ public class OperatorController {
         neutralZoneFeedButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added neutral feed to auto routine");
-                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_LEFT : autoOptions.BORDER_RIGHT;
+                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
                 autoBuilder.addExitAlliance(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
                 autoBuilder.addShootCommand(); 
@@ -60,7 +60,7 @@ public class OperatorController {
             () -> {
                 System.out.println("Added climb to auto routine");
                 autoBuilder.addClimbCommand(
-                    leftRightSwitch.getAsBoolean() ? autoOptions.CLIMB_LEFT : autoOptions.CLIMB_RIGHT);
+                    leftRightSwitch.getAsBoolean() ? autoOptions.CLIMB_RIGHT : autoOptions.CLIMB_LEFT);
             }).ignoringDisable(true));  
         
         // add aim and shoot command
@@ -87,8 +87,8 @@ public class OperatorController {
         // in teleop, flipping this switch toggles an auto climb
         teleopAutoClimbSwitch.onTrue(
             leftRightSwitch.getAsBoolean()
-            ? SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH)
-            : SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH));
+            ? SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH)
+            : SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
         // TODO: .andThen(ClimbCommand);
         }
 }
