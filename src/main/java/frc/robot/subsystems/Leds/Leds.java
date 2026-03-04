@@ -34,8 +34,13 @@ public class Leds extends SubsystemBase{
 	private AddressableLEDBufferView leftHalf;
 	private AddressableLEDBufferView rightHalf;
 	private RebuiltStateMachine stateMachine;
+<<<<<<< small_bug_fixes
 	private Timer timeUntilTransition;
 	private Time targetWaitTime = Seconds.of(0);
+=======
+	private final Timer timeUntilTransition = new Timer();
+	private Time targetWaitTime;
+>>>>>>> main
 	private Boolean isBlueActive = false;
 
 	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
@@ -43,7 +48,11 @@ public class Leds extends SubsystemBase{
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
 		this.leftHalf = this.ledBuffer.createView(0, numLeds/2);
+<<<<<<< small_bug_fixes
 		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds-1);
+=======
+		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds - 1);
+>>>>>>> main
 
 		this.led.setLength(this.ledBuffer.getLength());
 		this.led.setData(ledBuffer);
