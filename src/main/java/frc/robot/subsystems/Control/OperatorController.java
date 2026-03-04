@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Control;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -33,10 +31,10 @@ public class OperatorController {
         neutralZoneScoreButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added neutral score to auto routine");
-                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
+                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_LEFT : autoOptions.BORDER_RIGHT;
                 autoBuilder.addExitAlliance(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
-                autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.RAMP : autoOptions.TRENCH);
+                autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP);
                 autoBuilder.addShootCommand(); 
             }).ignoringDisable(true));
 
@@ -44,7 +42,7 @@ public class OperatorController {
         neutralZoneFeedButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added neutral feed to auto routine");
-                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
+                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_LEFT : autoOptions.BORDER_RIGHT;
                 autoBuilder.addExitAlliance(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
                 autoBuilder.addShootCommand(); 
@@ -62,7 +60,7 @@ public class OperatorController {
             () -> {
                 System.out.println("Added climb to auto routine");
                 autoBuilder.addClimbCommand(
-                    leftRightSwitch.getAsBoolean() ? autoOptions.CLIMB_RIGHT : autoOptions.CLIMB_LEFT);
+                    leftRightSwitch.getAsBoolean() ? autoOptions.CLIMB_LEFT : autoOptions.CLIMB_RIGHT);
             }).ignoringDisable(true));  
         
         // add aim and shoot command
@@ -89,17 +87,8 @@ public class OperatorController {
         // in teleop, flipping this switch toggles an auto climb
         teleopAutoClimbSwitch.onTrue(
             leftRightSwitch.getAsBoolean()
-            ? SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH)
-            : SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
+            ? SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH)
+            : SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH));
         // TODO: .andThen(ClimbCommand);
-        
-        // Joystick steps spinner velocity
-        operatorController1.axisGreaterThan(1, 0.5).onTrue(
-            Commands.runOnce(
-                () -> autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
-
-        operatorController1.axisLessThan(1, -0.5).onTrue(
-            Commands.runOnce(
-                () -> autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
-    }
+        }
 }
