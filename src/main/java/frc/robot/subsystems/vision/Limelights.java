@@ -14,8 +14,8 @@ public class Limelights extends SubsystemBase{
     private final Drive drive;
 
     public enum Limelight {
-        BACK_LEFT("limelight-back-left", LimelightConstants.backLeftLimelightIP),
-        BACK_RIGHT("limelight-back-right", LimelightConstants.backRightLimelightIP),
+        BACK_LEFT("limelight-left", LimelightConstants.backLeftLimelightIP),
+        BACK_RIGHT("limelight-right", LimelightConstants.backRightLimelightIP),
         FRONT("limelight-front", LimelightConstants.frontLimelightIP);
 
         public final String name;
