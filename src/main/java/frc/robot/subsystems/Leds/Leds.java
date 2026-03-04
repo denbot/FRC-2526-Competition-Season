@@ -20,14 +20,13 @@ import frc.robot.state.MatchState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.vision.Limelights;
 
 
 public class Leds extends SubsystemBase{
 	private int numLeds = 23;
 	private AddressableLED led;
 	private AddressableLEDBuffer ledBuffer;
-	private Limelights limelights;
+//	private Limelights limelights;
 	private CommandXboxController controller;
 	private Shooter shooter;
 	private Drive drive;
@@ -38,7 +37,7 @@ public class Leds extends SubsystemBase{
 	private Time targetWaitTime;
 	private Boolean isBlueActive = false;
 
-	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
+	public Leds(CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
 		this.led = new AddressableLED(0);
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
@@ -50,7 +49,7 @@ public class Leds extends SubsystemBase{
 		this.led.start();
 
 		this.controller = controller;
-		this.limelights = limelights;
+//		this.limelights = limelights;
 		this.shooter = shooter;
 		this.drive = drive;
 		this.stateMachine = stateMachine;
@@ -104,7 +103,7 @@ public class Leds extends SubsystemBase{
 			baseRight.mask(LEDPattern.progressMaskLayer(() -> (90 - degreesOff) / 90)).applyTo(this.rightHalf);
 		}
 		// Limelights
-		else if (limelights.getTotalTagCount() >= 3) LEDPattern.solid(Color.kGreen).applyTo(this.ledBuffer);
+//		else if (limelights.getTotalTagCount() >= 3) LEDPattern.solid(Color.kGreen).applyTo(this.ledBuffer);
 		else LEDPattern.solid(Color.kRed).applyTo(this.ledBuffer);;
 
 		this.led.setData(this.ledBuffer);
