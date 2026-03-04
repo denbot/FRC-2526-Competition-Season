@@ -141,6 +141,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
     robotContainer.stopIntermission();
+    robotContainer.stopJingle();
   }
 
   /** This function is called periodically during operator control. */
