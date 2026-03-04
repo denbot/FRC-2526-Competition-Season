@@ -48,7 +48,10 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 
+import frc.robot.subsystems.vision.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static frc.robot.subsystems.vision.VisionConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -66,7 +69,8 @@ public class RobotContainer {
   private Shooter shooter;
   private AutoRoutineBuilder autoBuilder;
   private Leds leds;
-  
+  private final Vision vision;
+
   private HubStatusAlert hubStatusAlert;
 
   // Controller
@@ -93,6 +97,12 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+        vision =
+                new Vision(
+                        drive::addVisionMeasurement,
+                        new VisionIOLimelight(cameraLeftName, drive::getRotation),
+                        new VisionIOLimelight(cameraRightName, drive::getRotation),
+                        new VisionIOLimelight(cameraFrontName, drive::getRotation));
 
         indexer = new Indexer(new IndexerIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
@@ -127,6 +137,13 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        vision =
+                new Vision(
+                        drive::addVisionMeasurement,
+                        new VisionIOPhotonVisionSim(cameraLeftName, robotToCameraLeft, drive::getPose),
+                        new VisionIOPhotonVisionSim(cameraRightName, robotToCameraRight, drive::getPose),
+                        new VisionIOPhotonVisionSim(cameraFrontName, robotToCameraFront, drive::getPose));
+
         shooter = new Shooter(new ShooterIOSim(), stateMachine, drive);
         indexer = new Indexer(new IndexerIOSim());
         intake = new Intake(new IntakeIOSim(), stateMachine);
@@ -141,6 +158,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
         shooter = new Shooter(new ShooterIO() {}, stateMachine, drive);
         intake = new Intake(new IntakeIO() {}, stateMachine);
         CommandScheduler.getInstance().schedule(hubStatusAlert);
