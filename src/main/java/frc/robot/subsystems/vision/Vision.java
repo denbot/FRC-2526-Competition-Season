@@ -45,7 +45,7 @@ public class Vision extends SubsystemBase {
         for (int i = 0; i < inputs.length; i++) {
             disconnectedAlerts[i] =
                     new Alert(
-                            "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+                            "Vision camera " + i + " is disconnected.", AlertType.kWarning);
         }
     }
 
@@ -62,7 +62,7 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         for (int i = 0; i < io.length; i++) {
             io[i].updateInputs(inputs[i]);
-            Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
+            Logger.processInputs("Vision/Camera" + i, inputs[i]);
         }
 
         // Initialize logging values
@@ -85,9 +85,7 @@ public class Vision extends SubsystemBase {
             // Add tag poses
             for (int tagId : inputs[cameraIndex].tagIds) {
                 var tagPose = aprilTagLayout.getTagPose(tagId);
-                if (tagPose.isPresent()) {
-                    tagPoses.add(tagPose.get());
-                }
+                tagPose.ifPresent(tagPoses::add);
             }
 
             // Loop over pose observations
@@ -142,16 +140,16 @@ public class Vision extends SubsystemBase {
 
             // Log camera metadata
             Logger.recordOutput(
-                    "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
+                    "Vision/Camera" + cameraIndex + "/TagPoses",
                     tagPoses.toArray(new Pose3d[0]));
             Logger.recordOutput(
-                    "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
+                    "Vision/Camera" + cameraIndex + "/RobotPoses",
                     robotPoses.toArray(new Pose3d[0]));
             Logger.recordOutput(
-                    "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
+                    "Vision/Camera" + cameraIndex + "/RobotPosesAccepted",
                     robotPosesAccepted.toArray(new Pose3d[0]));
             Logger.recordOutput(
-                    "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
+                    "Vision/Camera" + cameraIndex + "/RobotPosesRejected",
                     robotPosesRejected.toArray(new Pose3d[0]));
             allTagPoses.addAll(tagPoses);
             allRobotPoses.addAll(robotPoses);
@@ -169,8 +167,8 @@ public class Vision extends SubsystemBase {
     }
 
     @FunctionalInterface
-    public static interface VisionConsumer {
-        public void accept(
+    public interface VisionConsumer {
+        void accept(
                 Pose2d visionRobotPoseMeters,
                 double timestampSeconds,
                 Matrix<N3, N1> visionMeasurementStdDevs);
