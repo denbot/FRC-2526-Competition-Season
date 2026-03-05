@@ -25,6 +25,7 @@ import frc.robot.commands.HubStatusAlert;
 import frc.robot.generated.TunerConstants;
 import frc.robot.state.HopperState;
 import frc.robot.state.HubState;
+import frc.robot.state.IndexerState;
 import frc.robot.state.IntakeState;
 import frc.robot.state.MatchState;
 import frc.robot.state.RebuiltStateMachine;
@@ -107,7 +108,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        indexer = new Indexer(new IndexerIOTalonFX());
+        indexer = new Indexer(new IndexerIOTalonFX(), stateMachine);
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
         limelights = new Limelights(new LimelightIOReal(), drive);
@@ -142,7 +143,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         shooter = new Shooter(new ShooterIOSim(), stateMachine, drive);
-        indexer = new Indexer(new IndexerIOSim());
+        indexer = new Indexer(new IndexerIOSim(), stateMachine);
         intake = new Intake(new IntakeIOSim(), stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
         break;
@@ -205,6 +206,13 @@ public class RobotContainer {
             controller.x()
     );
 
+    IndexerState.setup(
+            stateMachine, 
+            controller.rightTrigger(), 
+            controller.leftTrigger(), 
+            controller.a(), 
+            controller.x()
+    );
     MatchState.setup(stateMachine);
   }
 
@@ -249,30 +257,12 @@ public class RobotContainer {
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
-        intake.setIntakeMaxLength()
-        .alongWith(indexer.runIndexer()));
-
-    // Individually run indexer
-    controller.a().whileTrue(indexer.reverseIndexer());
+        intake.setIntakeMaxLength());
 
     // "Outtake" command extends intake and runs all subsystems in reverse
     controller.x().whileTrue(
-        shooter.reverseKicker()
-        .alongWith(indexer.reverseIndexer()));
-    
-    // Run static spinner, constant speed and no auto aiming
-    controller.y().whileTrue(
-        shooter.runSpinner()
-            .until(() -> 
-                Math.abs(shooter.getSpinnerClosedLoopError()) < 1 
-                && shooter.getLeftSpinnerVelocity().magnitude() > 30
-                && controller.rightTrigger().getAsBoolean() == true) // Run only the spin up and until the spinner is at speed
-            .andThen(
-                // "Shoot" command, runs kicker and indexer into the shooter only if the shooter is at speed
-                shooter.runSpinner() 
-                .alongWith(shooter.runKicker())
-                .alongWith(indexer.runIndexer())));
-    }
+        shooter.reverseKicker());
+}
 
 public Pose2d getRobotPosition(){
     return drive.getPose();

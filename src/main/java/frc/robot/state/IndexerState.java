@@ -15,11 +15,27 @@ public enum IndexerState {
         stateMachine
                 .state(IndexerState.STOPPED)
                 .to(IndexerState.RUNNING)
-                .transitionWhen(() -> leftTrigger.getAsBoolean() || rightTrigger.getAsBoolean()); // Transition to running when trigger is pressed
+                .transitionWhen(leftTrigger); // Transition to running when trigger is pressed
+        stateMachine
+                .state(IndexerState.STOPPED, ShooterState.AT_SPEED)
+                .to(IndexerState.RUNNING)
+                .transitionWhen(rightTrigger); // Transition to running when trigger is pressed     
         stateMachine
                 .state(IndexerState.RUNNING)
                 .to(IndexerState.STOPPED)
                 .transitionWhen(() -> (!leftTrigger.getAsBoolean() && !rightTrigger.getAsBoolean())); // Transition to inactive when trigger is let go
+        stateMachine
+                .state(IndexerState.RUNNING, ShooterState.STOPPED)
+                .to(IndexerState.STOPPED)
+                .transitionWhen(() -> (!leftTrigger.getAsBoolean())); // Transition to inactive when left trigger is let go and shooter isn't at speed
+        stateMachine
+                .state(IndexerState.RUNNING, ShooterState.SPINNING_UP_ADAPTIVE)
+                .to(IndexerState.STOPPED)
+                .transitionWhen(() -> (!leftTrigger.getAsBoolean())); // Transition to inactive when left trigger is let go and shooter isn't at speed
+        stateMachine
+                .state(IndexerState.RUNNING, ShooterState.SPINNING_UP_FIXED)
+                .to(IndexerState.STOPPED)
+                .transitionWhen(() -> (!leftTrigger.getAsBoolean())); // Transition to inactive when left trigger is let go and shooter isn't at speed
 
         stateMachine
                 .state(IndexerState.STOPPED)

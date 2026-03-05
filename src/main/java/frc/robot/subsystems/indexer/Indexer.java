@@ -10,6 +10,9 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.state.IndexerState;
+import frc.robot.state.RebuiltStateMachine;
 
 public class Indexer extends SubsystemBase{
     private final IndexerIO io;
@@ -17,8 +20,39 @@ public class Indexer extends SubsystemBase{
 
     private AngularVelocity indexMotorSpeedSetpoint = RotationsPerSecond.of(30);
 
-    public Indexer(IndexerIO io){
+    public Indexer(IndexerIO io, RebuiltStateMachine stateMachine){
         this.io = io;
+
+        stateMachine
+            .state(IndexerState.STOPPED)
+            .to(IndexerState.RUNNING)
+            .run(runIndexer());
+        stateMachine
+            .state(IndexerState.REVERSING)
+            .to(IndexerState.RUNNING)
+            .run(runIndexer());
+        
+        stateMachine
+            .state(IndexerState.STOPPED)
+            .to(IndexerState.REVERSING)
+            .run(reverseIndexer());
+        stateMachine
+            .state(IndexerState.RUNNING)
+            .to(IndexerState.REVERSING)
+            .run(reverseIndexer());
+        
+        stateMachine
+            .state(IndexerState.RUNNING)
+            .to(IndexerState.STOPPED)
+            .run(stopIndexer());
+        stateMachine
+            .state(IndexerState.RUNNING)
+            .to(IndexerState.REVERSING)
+            .run(stopIndexer());
+        stateMachine
+            .state(IndexerState.REVERSING)
+            .to(IndexerState.STOPPED)
+            .run(stopIndexer());
     }
 
     @Override
@@ -30,20 +64,15 @@ public class Indexer extends SubsystemBase{
     }
 
     public Command runIndexer(){
-        return Commands.repeatingSequence(
-            Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint)), 
-            Commands.waitSeconds(0.875), 
-            Commands.runOnce(()-> this.io.stopIndexer()), 
-            Commands.waitSeconds(0.125))
-            .finallyDo(() -> this.io.stopIndexer());
+        return Commands.repeatingSequence(Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint), this), Commands.waitSeconds(0.875), Commands.runOnce(()-> this.io.stopIndexer(), this), Commands.waitSeconds(0.125)).finallyDo(() -> this.io.stopIndexer());
     }
 
     public Command reverseIndexer(){
-        return Commands.runEnd(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint.times(-1)), ()-> this.io.stopIndexer());
+        return Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint.times(-1)), this);
     }
 
     public Command stopIndexer(){
-        return Commands.runOnce(()-> this.io.stopIndexer());
+        return Commands.runOnce(()-> this.io.stopIndexer(), this);
     }
 
     public void setIndexMotorSpeedSetpoint(AngularVelocity speed){
