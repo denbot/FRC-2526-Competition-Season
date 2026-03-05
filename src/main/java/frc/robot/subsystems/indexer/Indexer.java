@@ -20,11 +20,6 @@ public class Indexer extends SubsystemBase{
 
     private AngularVelocity indexMotorSpeedSetpoint = RotationsPerSecond.of(30);
 
-    private Command indexerCommand;
-    private Command stoppedCommand;
-
-    private int x = 0;
-
     public Indexer(IndexerIO io, RebuiltStateMachine stateMachine){
         this.io = io;
 
@@ -67,22 +62,6 @@ public class Indexer extends SubsystemBase{
         Logger.processInputs("Indexer", inputs);
         Logger.recordOutput("Indexer Speed Setpoint", indexMotorSpeedSetpoint);
     }
-
-    // private Command setRepeatingCommand() {
-    //     this.indexerCommand = runIndexer();
-    //     this.indexerCommand.addRequirements(this);
-    //     return this.indexerCommand;
-    // }
-
-    // private Command setStoppedCommand() {
-    //     this.stoppedCommand = Commands.runOnce(() -> x++);
-    //     this.stoppedCommand.addRequirements(this);
-    //     return this.stoppedCommand.;
-    // }
-
-    // private Command stopRepeatingCommand() {
-    //     return Commands.runOnce(() -> indexerCommand.cancel());
-    // }
 
     public Command runIndexer(){
         return Commands.repeatingSequence(Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint), this), Commands.waitSeconds(0.875), Commands.runOnce(()-> this.io.stopIndexer(), this), Commands.waitSeconds(0.125)).finallyDo(() -> this.io.stopIndexer());
