@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import frc.robot.Constants;
+import frc.robot.state.KickerState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.state.ShooterState;
 import org.littletonrobotics.junction.Logger;
@@ -66,6 +67,33 @@ public class Shooter extends SubsystemBase{
                 .state(ShooterState.SPINNING_UP_FIXED)
                 .to(ShooterState.AT_SPEED)
                 .transitionWhen(() -> Math.abs(getRightSpinnerClosedLoopError()) < 1);
+
+        stateMachine
+                .state(KickerState.STOPPED)
+                .to(KickerState.RUNNING)
+                .run(runKicker());
+        stateMachine
+                .state(KickerState.REVERSING)
+                .to(KickerState.RUNNING)
+                .run(runKicker());
+
+        stateMachine
+                .state(KickerState.STOPPED)
+                .to(KickerState.REVERSING)
+                .run(reverseKicker());
+        stateMachine
+                .state(KickerState.RUNNING)
+                .to(KickerState.REVERSING)
+                .run(reverseKicker());
+
+        stateMachine
+                .state(KickerState.RUNNING)
+                .to(KickerState.STOPPED)
+                .run(stopKicker());
+        stateMachine
+                .state(KickerState.REVERSING)
+                .to(KickerState.STOPPED)
+                .run(stopKicker());
     }
 
     @Override
@@ -125,10 +153,10 @@ public class Shooter extends SubsystemBase{
     }
 
     public Command runKicker(){
-        return Commands.runEnd(() -> this.io.setKickerVelocity(kickerVelocitySetpoint), () -> this.io.stopKicker());
+        return Commands.runOnce(() -> this.io.setKickerVelocity(kickerVelocitySetpoint));
     }
     public Command reverseKicker(){
-        return Commands.runEnd(() -> this.io.setKickerVelocity(kickerVelocitySetpoint.times(-0.25)), () -> this.io.stopKicker());
+        return Commands.runOnce(() -> this.io.setKickerVelocity(kickerVelocitySetpoint.times(-0.25)));
     }
     public Command stopKicker(){
         return Commands.runOnce(() -> this.io.stopKicker());
