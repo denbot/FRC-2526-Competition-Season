@@ -26,6 +26,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.state.HopperState;
 import frc.robot.state.HubState;
 import frc.robot.state.IntakeState;
+import frc.robot.state.MatchState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.Leds.Leds;
@@ -191,7 +192,6 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    // HubState.setup(stateMachine, () -> );
     IntakeState.setup(
             stateMachine,
             controller.leftTrigger(),
@@ -204,6 +204,8 @@ public class RobotContainer {
             controller.leftBumper(),
             controller.x()
     );
+
+    MatchState.setup(stateMachine);
   }
 
   /**
