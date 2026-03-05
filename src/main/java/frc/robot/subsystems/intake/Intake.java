@@ -11,8 +11,6 @@ import frc.robot.state.IntakeState;
 import frc.robot.state.RebuiltStateMachine;
 import org.littletonrobotics.junction.Logger;
 
-import java.util.function.BooleanSupplier;
-
 import static edu.wpi.first.units.Units.*;
 
 public class Intake extends SubsystemBase {
@@ -203,6 +201,10 @@ public class Intake extends SubsystemBase {
   
   public AngularVelocity getExtensionRightVelocityRotPerSec() {
     return inputs.extensionVelocityRight;
+  }
+
+  public double getExtensionClosedLoopError(){
+    return inputs.extensionClosedLoopError;
   }
 
   public Angle getIntakePositionRots() {

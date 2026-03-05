@@ -60,11 +60,11 @@ public class Shooter extends SubsystemBase{
         stateMachine
                 .state(ShooterState.SPINNING_UP_ADAPTIVE)
                 .to(ShooterState.AT_SPEED)
-                .transitionWhen(() -> Math.abs(getRightSpinnerClosedLoopError()) < 1);
+                .transitionWhen(() -> Math.abs(getSpinnerClosedLoopError()) < 1);
         stateMachine
                 .state(ShooterState.SPINNING_UP_FIXED)
                 .to(ShooterState.AT_SPEED)
-                .transitionWhen(() -> Math.abs(getRightSpinnerClosedLoopError()) < 1);
+                .transitionWhen(() -> Math.abs(getSpinnerClosedLoopError()) < 1);
     }
 
     @Override
@@ -168,11 +168,8 @@ public class Shooter extends SubsystemBase{
         return inputs.kickerPositionRots;
     }
 
-    public Double getLeftSpinnerClosedLoopError(){
+    public Double getSpinnerClosedLoopError(){
         return inputs.leftSpinnerClosedLoopError;
-    }
-    public Double getRightSpinnerClosedLoopError(){
-        return inputs.rightSpinnerClosedLoopError;
     }
     public Double getKickerClosedLoopError(){
         return inputs.kickerClosedLoopError;
