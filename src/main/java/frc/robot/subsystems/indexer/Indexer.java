@@ -21,6 +21,9 @@ public class Indexer extends SubsystemBase{
     private AngularVelocity indexMotorSpeedSetpoint = RotationsPerSecond.of(30);
 
     private Command indexerCommand;
+    private Command stoppedCommand;
+
+    private int x = 0;
 
     public Indexer(IndexerIO io, RebuiltStateMachine stateMachine){
         this.io = io;
@@ -28,11 +31,11 @@ public class Indexer extends SubsystemBase{
         stateMachine
             .state(IndexerState.STOPPED)
             .to(IndexerState.RUNNING)
-            .run(setRepeatingCommand());
+            .run(runIndexer());
         stateMachine
             .state(IndexerState.REVERSING)
             .to(IndexerState.RUNNING)
-            .run(setRepeatingCommand());
+            .run(runIndexer());
         
         stateMachine
             .state(IndexerState.STOPPED)
@@ -46,11 +49,11 @@ public class Indexer extends SubsystemBase{
         stateMachine
             .state(IndexerState.RUNNING)
             .to(IndexerState.STOPPED)
-            .run(stopRepeatingCommand());
+            .run(stopIndexer());
         stateMachine
             .state(IndexerState.RUNNING)
             .to(IndexerState.REVERSING)
-            .run(stopRepeatingCommand());
+            .run(stopIndexer());
         stateMachine
             .state(IndexerState.REVERSING)
             .to(IndexerState.STOPPED)
@@ -65,25 +68,32 @@ public class Indexer extends SubsystemBase{
         Logger.recordOutput("Indexer Speed Setpoint", indexMotorSpeedSetpoint);
     }
 
-    private Command setRepeatingCommand() {
-        this.indexerCommand = runIndexer();
-        return this.indexerCommand;
-    }
+    // private Command setRepeatingCommand() {
+    //     this.indexerCommand = runIndexer();
+    //     this.indexerCommand.addRequirements(this);
+    //     return this.indexerCommand;
+    // }
 
-    private Command stopRepeatingCommand() {
-        return Commands.runOnce(() -> indexerCommand.cancel());
-    }
+    // private Command setStoppedCommand() {
+    //     this.stoppedCommand = Commands.runOnce(() -> x++);
+    //     this.stoppedCommand.addRequirements(this);
+    //     return this.stoppedCommand.;
+    // }
+
+    // private Command stopRepeatingCommand() {
+    //     return Commands.runOnce(() -> indexerCommand.cancel());
+    // }
 
     public Command runIndexer(){
-        return Commands.repeatingSequence(Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint)), Commands.waitSeconds(0.875), Commands.runOnce(()-> this.io.stopIndexer()), Commands.waitSeconds(0.125)).finallyDo(() -> this.io.stopIndexer());
+        return Commands.repeatingSequence(Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint), this), Commands.waitSeconds(0.875), Commands.runOnce(()-> this.io.stopIndexer(), this), Commands.waitSeconds(0.125)).finallyDo(() -> this.io.stopIndexer());
     }
 
     public Command reverseIndexer(){
-        return Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint.times(-1)));
+        return Commands.runOnce(()-> this.io.runIndexerAtSpeed(indexMotorSpeedSetpoint.times(-1)), this);
     }
 
     public Command stopIndexer(){
-        return Commands.runOnce(()-> this.io.stopIndexer());
+        return Commands.runOnce(()-> this.io.stopIndexer(), this);
     }
 
     public void setIndexMotorSpeedSetpoint(AngularVelocity speed){
