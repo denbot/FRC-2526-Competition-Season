@@ -68,6 +68,8 @@ public class IndexerStateTest {
 
     @Test
     void indexerBecomesActiveIfRightTriggerPressed() {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
+        
         rightTrigger.set(true);
         machine.poll();
 
@@ -75,6 +77,8 @@ public class IndexerStateTest {
     }
     @Test
     void indexerStopsIfRightTriggerReleased() {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
+
         rightTrigger.set(true);
         machine.poll();
 

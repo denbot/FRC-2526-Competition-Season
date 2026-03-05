@@ -103,7 +103,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        indexer = new Indexer(new IndexerIOTalonFX());
+        indexer = new Indexer(new IndexerIOTalonFX(), stateMachine);
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
         limelights = new Limelights(new LimelightIOReal(), drive);
@@ -138,7 +138,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         shooter = new Shooter(new ShooterIOSim(), stateMachine, drive);
-        indexer = new Indexer(new IndexerIOSim());
+        indexer = new Indexer(new IndexerIOSim(), stateMachine);
         intake = new Intake(new IntakeIOSim(), stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
         break;
@@ -212,6 +212,13 @@ public class RobotContainer {
             controller.rightBumper(),
             controller.y()
     );
+    IndexerState.setup(
+            stateMachine, 
+            controller.rightTrigger(), 
+            controller.leftTrigger(), 
+            controller.a(), 
+            controller.x()
+    );
     MatchState.setup(stateMachine);
   }
 
@@ -256,15 +263,7 @@ public class RobotContainer {
     
     // "Run Intake" runs intake and indexer forward, reverses kicker 
     controller.leftTrigger().whileTrue(
-        intake.setIntakeMaxLength()
-        .alongWith(indexer.runIndexer()));
-
-    // Individually run indexer
-    controller.a().whileTrue(indexer.reverseIndexer());
-
-    // "Outtake" command extends intake and runs all subsystems in reverse
-    controller.x().whileTrue(
-        indexer.reverseIndexer());
+        intake.setIntakeMaxLength());
 }
 
 public Pose2d getRobotPosition(){
