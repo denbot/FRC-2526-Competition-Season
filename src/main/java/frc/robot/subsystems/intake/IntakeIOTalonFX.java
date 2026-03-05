@@ -14,6 +14,7 @@ import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -132,13 +133,15 @@ public class IntakeIOTalonFX implements IntakeIO {
 
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-            intakeMotor.getIsProLicensed().getValue() ? 200 : 50, intakeVelocity, intakeCurrentAmps, intakeStallCurrentAmps, intakePositionRot);
+            50, intakeVelocity, intakeCurrentAmps, intakeStallCurrentAmps, intakePositionRot);
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-            extensionMotorLeft.getIsProLicensed().getValue() ? 200 : 50, extensionLeftVelocity, extensionLeftCurrentAmps, extensionLeftStallCurrentAmps, extensionLeftPositionRot);
+            50, extensionLeftVelocity, extensionLeftCurrentAmps, extensionLeftStallCurrentAmps, extensionLeftPositionRot);
         
         BaseStatusSignal.setUpdateFrequencyForAll(
-            extensionMotorRight.getIsProLicensed().getValue() ? 200 : 50, extensionRightVelocity, extensionRightCurrentAmps, extensionRightStallCurrentAmps, extensionRightPositionRot);
+            50, extensionRightVelocity, extensionRightCurrentAmps, extensionRightStallCurrentAmps, extensionRightPositionRot);
+
+        ParentDevice.optimizeBusUtilizationForAll(intakeMotor, extensionMotorLeft, extensionMotorRight);
 
         extensionMotorRight.setControl(new Follower(extensionMotorLeft.getDeviceID(), MotorAlignmentValue.Opposed));
     
