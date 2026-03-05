@@ -112,6 +112,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    robotContainer.stopIntermission();
     robotContainer.stopJingle();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -141,6 +142,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
     robotContainer.stopIntermission();
+    robotContainer.stopJingle();
   }
 
   /** This function is called periodically during operator control. */
@@ -157,6 +159,8 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    robotContainer.stopIntermission();
+    robotContainer.stopJingle();
   }
 
   /** This function is called periodically during test mode. */
