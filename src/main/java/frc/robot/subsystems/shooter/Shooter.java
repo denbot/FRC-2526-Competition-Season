@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import frc.robot.Constants;
+import frc.robot.state.KickerState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.state.ShooterState;
 import org.littletonrobotics.junction.Logger;
@@ -12,6 +13,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
@@ -65,6 +67,33 @@ public class Shooter extends SubsystemBase{
                 .state(ShooterState.SPINNING_UP_FIXED)
                 .to(ShooterState.AT_SPEED)
                 .transitionWhen(() -> Math.abs(getSpinnerClosedLoopError()) < 1);
+
+        stateMachine
+                .state(KickerState.STOPPED)
+                .to(KickerState.RUNNING)
+                .run(runKicker());
+        stateMachine
+                .state(KickerState.REVERSING)
+                .to(KickerState.RUNNING)
+                .run(runKicker());
+
+        stateMachine
+                .state(KickerState.STOPPED)
+                .to(KickerState.REVERSING)
+                .run(reverseKicker());
+        stateMachine
+                .state(KickerState.RUNNING)
+                .to(KickerState.REVERSING)
+                .run(reverseKicker());
+
+        stateMachine
+                .state(KickerState.RUNNING)
+                .to(KickerState.STOPPED)
+                .run(stopKicker());
+        stateMachine
+                .state(KickerState.REVERSING)
+                .to(KickerState.STOPPED)
+                .run(stopKicker());
     }
 
     @Override
@@ -87,7 +116,7 @@ public class Shooter extends SubsystemBase{
     }
 
     private Command cancelShooterCommand() {
-        return Commands.runOnce(() -> shooterCommand.cancel());
+        return Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll());
     }
 
     public AngularVelocity getIdealSpeed(Pose2d robotPose, Pose2d targetPose){
@@ -124,10 +153,10 @@ public class Shooter extends SubsystemBase{
     }
 
     public Command runKicker(){
-        return Commands.runEnd(() -> this.io.setKickerVelocity(kickerVelocitySetpoint), () -> this.io.stopKicker());
+        return Commands.runOnce(() -> this.io.setKickerVelocity(kickerVelocitySetpoint));
     }
     public Command reverseKicker(){
-        return Commands.runEnd(() -> this.io.setKickerVelocity(kickerVelocitySetpoint.times(-0.25)), () -> this.io.stopKicker());
+        return Commands.runOnce(() -> this.io.setKickerVelocity(kickerVelocitySetpoint.times(-0.25)));
     }
     public Command stopKicker(){
         return Commands.runOnce(() -> this.io.stopKicker());
