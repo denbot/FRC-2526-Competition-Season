@@ -7,7 +7,11 @@ import frc.robot.subsystems.indexer.Indexer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static frc.robot.helpers.TestHelpers.setDriverStationState;
@@ -67,14 +71,15 @@ public class IndexerStateTest {
     }
 
     @Test
-    void indexerBecomesActiveIfRightTriggerPressed() {
+    void indexerBecomesActiveIfRightTriggerPressedAndShooterStateActive() {
         CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
-        
+
         rightTrigger.set(true);
         machine.poll();
 
         assertEquals(IndexerState.RUNNING, machine.currentState().indexerState());
     }
+
     @Test
     void indexerStopsIfRightTriggerReleased() {
         CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
@@ -92,82 +97,8 @@ public class IndexerStateTest {
 
         assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
     }
-    @Test
-    void indexerReversesIfAButtonPressed() {
-        aButton.set(true);
-        machine.poll();
 
-        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
-    }
-
-    @Test
-    void indexerStopsIfAButtonReleased() {
-        aButton.set(true);
-        machine.poll();
-
-        // Double check that it's running
-        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
-
-        // Release the trigger
-
-        aButton.set(false);
-        machine.poll();
-
-        assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
-    }
-
-    @Test
-    void indexerReversesIfXButtonPressed() {
-        xButton.set(true);
-        machine.poll();
-
-        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
-    }
-
-    @Test
-    void indexerStopsIfXButtonReleased() {
-        xButton.set(true);
-        machine.poll();
-
-        // Double check that it's running
-        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
-
-        // Release the trigger
-
-        xButton.set(false);
-        machine.poll();
-
-        assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
-    }
-
-    @Test
-    void indexerReversesIfXAndAButtonPressed() {
-        xButton.set(true);
-        aButton.set(true);
-        machine.poll();
-
-        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
-    }
-
-    @Test
-    void indexerStopsIfXAndAButtonReleased() {
-        xButton.set(true);
-        aButton.set(true);
-        machine.poll();
-
-        // Double check that it's running
-        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
-
-        // Release the trigger
-
-        xButton.set(false);
-        aButton.set(false);
-        machine.poll();
-
-        assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
-    }
-
-    @Test
+    @Test // Isnt be needed but is a just in case
     void indexerBecomesActiveIfLeftAndRightTriggerPressed() {
         leftTrigger.set(true);
         rightTrigger.set(true);
@@ -176,7 +107,7 @@ public class IndexerStateTest {
         assertEquals(IndexerState.RUNNING, machine.currentState().indexerState());
     }
 
-    @Test
+    @Test // Isnt be needed but is a just in case
     void indexerStopsIfLeftAndRightTriggerReleased() {
         rightTrigger.set(true);
         leftTrigger.set(true);
@@ -192,5 +123,59 @@ public class IndexerStateTest {
         machine.poll();
 
         assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
+    }
+
+    @ParameterizedTest
+    @MethodSource("notAtSpeedShooterStates")
+    void rightTriggerWontMakeIndexerActiveIfNotAtSpeed(ShooterState shooterState) {
+        CommandScheduler.getInstance().schedule(machine.transitionTo(shooterState));
+
+        rightTrigger.set(true);
+        machine.poll();
+
+        assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
+    }
+
+    @ParameterizedTest
+    @MethodSource("buttonCombinations")
+    void indexerReversesIfAOrXButtonReleased(boolean a, boolean x) {
+        aButton.set(a);
+        xButton.set(x);
+        machine.poll();
+
+        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
+    }
+
+    @ParameterizedTest
+    @MethodSource("buttonCombinations")
+    void indexerStopsReversingIfAllButtonsReleased(boolean a, boolean x) {
+        aButton.set(a);
+        xButton.set(x);
+        machine.poll();
+
+        // Double check that it's running
+        assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
+
+        // Release the buttons
+
+        aButton.set(false);
+        xButton.set(false);
+        machine.poll();
+
+        assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
+    }
+
+    private static List<Arguments> notAtSpeedShooterStates() {
+        return List.of(
+                Arguments.arguments(ShooterState.STOPPED),
+                Arguments.arguments(ShooterState.SPINNING_UP_ADAPTIVE),
+                Arguments.arguments(ShooterState.SPINNING_UP_FIXED));
+    }
+    
+    private static List<Arguments> buttonCombinations() {
+        return List.of(
+                Arguments.arguments(true, false),
+                Arguments.arguments(false, true),
+                Arguments.arguments(true, true));
     }
 }
