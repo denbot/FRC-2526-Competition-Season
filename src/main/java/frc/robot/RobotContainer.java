@@ -259,11 +259,6 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> drive.findAngleForShooting(drive.getPose()))
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
-    
-    
-    // "Run Intake" runs intake and indexer forward, reverses kicker 
-    controller.leftTrigger().whileTrue(
-        intake.setIntakeMaxLength());
 }
 
 public Pose2d getRobotPosition(){
