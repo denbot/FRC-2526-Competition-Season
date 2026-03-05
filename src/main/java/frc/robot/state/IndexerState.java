@@ -27,15 +27,15 @@ public enum IndexerState {
         stateMachine
                 .state(IndexerState.RUNNING, ShooterState.STOPPED)
                 .to(IndexerState.STOPPED)
-                .transitionWhen(() -> (!rightTrigger.getAsBoolean())); // Transition to inactive when trigger is let go
+                .transitionWhen(() -> (!rightTrigger.getAsBoolean() && !leftTrigger.getAsBoolean())); // Transition to inactive when trigger is let go
         stateMachine
                 .state(IndexerState.RUNNING, ShooterState.SPINNING_UP_ADAPTIVE)
                 .to(IndexerState.STOPPED)
-                .transitionWhen(() -> (!rightTrigger.getAsBoolean())); // Transition to inactive when trigger is let go
+                .transitionWhen(() -> (!rightTrigger.getAsBoolean() && !leftTrigger.getAsBoolean())); // Transition to inactive when trigger is let go
         stateMachine
                 .state(IndexerState.RUNNING, ShooterState.SPINNING_UP_FIXED)
                 .to(IndexerState.STOPPED)
-                .transitionWhen(() -> (!rightTrigger.getAsBoolean())); // Transition to inactive when trigger is let go
+                .transitionWhen(() -> (!rightTrigger.getAsBoolean() && !leftTrigger.getAsBoolean())); // Transition to inactive when trigger is let go
 
         stateMachine
                 .state(IndexerState.STOPPED)
