@@ -75,6 +75,7 @@ public class Robot extends LoggedRobot {
     // and put our autonomous chooser on the dashboard.
     SmartDashboard.putData(robotPosition);
     robotContainer = new RobotContainer();
+    robotContainer.startJingle();
   }
 
   /** This function is called periodically during all modes. */
@@ -111,6 +112,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    robotContainer.stopJingle();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -123,6 +125,11 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousPeriodic() {}
 
+  @Override
+  public void autonomousExit(){
+    robotContainer.startIntermission();
+  }
+
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
@@ -133,11 +140,17 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    robotContainer.stopIntermission();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
+
+  @Override
+  public void teleopExit(){
+    robotContainer.startJingle();
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override

@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.util.PhoenixUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -183,6 +182,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     public void stopKicker(){
-        kickerMotor.setControl(new VelocityVoltage(RotationsPerSecond.of(-15)).withEnableFOC(false));
+        kickerMotor.setControl(new CoastOut());
     }
 }

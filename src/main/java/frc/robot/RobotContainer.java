@@ -159,7 +159,7 @@ public class RobotContainer {
         break;
     }
 
-    //leds = new Leds(limelights, controller, shooter, drive, stateMachine);
+    leds = new Leds(limelights, controller, shooter, drive, stateMachine);
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
@@ -187,9 +187,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-    autoBuilder.testAll();
 
-    // HubState.setup(stateMachine, () -> );
     IntakeState.setup(
             stateMachine,
             controller.leftTrigger(),
@@ -214,6 +212,7 @@ public class RobotContainer {
             controller.rightBumper(),
             controller.y()
     );
+    MatchState.setup(stateMachine);
   }
 
   /**
@@ -283,5 +282,21 @@ public void updateRobotPose(){
    */
   public Command getAutonomousCommand() {
     return autoBuilder.getAutoRoutine();
+  }
+
+    public void startJingle(){
+    intake.startJingle();
+  }
+
+  public void startIntermission(){
+    intake.startIntermission();
+  }
+
+  public void stopJingle(){
+    intake.stopJingle();
+  }
+
+  public void stopIntermission(){
+    intake.stopIntermission();
   }
 }

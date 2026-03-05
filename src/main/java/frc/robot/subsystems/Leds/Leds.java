@@ -34,8 +34,8 @@ public class Leds extends SubsystemBase{
 	private AddressableLEDBufferView leftHalf;
 	private AddressableLEDBufferView rightHalf;
 	private RebuiltStateMachine stateMachine;
-	private Timer timeUntilTransition;
-	private Time targetWaitTime;
+	private final Timer timeUntilTransition = new Timer();
+	private Time targetWaitTime = Seconds.zero();
 	private Boolean isBlueActive = false;
 
 	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
@@ -43,7 +43,7 @@ public class Leds extends SubsystemBase{
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
 		this.leftHalf = this.ledBuffer.createView(0, numLeds/2);
-		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds);
+		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds - 1);
 
 		this.led.setLength(this.ledBuffer.getLength());
 		this.led.setData(ledBuffer);
@@ -94,7 +94,7 @@ public class Leds extends SubsystemBase{
 			LEDPattern baseRight = LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kYellow, Color.kPurple); // Base color for auto aim
 
 			// Blink green if spinner is at speed, blink red if not
-			if (shooter.getLeftSpinnerClosedLoopError() > 1) baseLeft = LEDPattern.solid(Color.kRed);
+			if (shooter.getSpinnerClosedLoopError() > 1) baseLeft = LEDPattern.solid(Color.kRed);
 			baseLeft.blink(Seconds.of(0.5)).applyTo(leftHalf);
 			
 			// Get a value between 0-90 degrees (clamped by min.max) for how far off the dirve base is from aiming at the hub 
