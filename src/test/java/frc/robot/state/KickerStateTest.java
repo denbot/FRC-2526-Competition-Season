@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class KickerStateTest {
 
     final AtomicBoolean rightTrigger = new AtomicBoolean();
-    final AtomicBoolean leftTrigger = new AtomicBoolean();
     final AtomicBoolean xButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
@@ -30,9 +29,8 @@ public class KickerStateTest {
         setDriverStationState(RobotState.DISABLED);
 
         machine = new RebuiltStateMachine();
-        leftTrigger.set(false);
         xButton.set(false);
-        KickerState.setup(machine, rightTrigger::get, leftTrigger::get, xButton::get);
+        KickerState.setup(machine, rightTrigger::get, xButton::get);
     }
 
     @AfterEach
@@ -97,57 +95,27 @@ public class KickerStateTest {
         assertNotEquals(KickerState.RUNNING, machine.currentState().kickerState());
     }
 
-    @ParameterizedTest
-    @MethodSource("buttonCombinations")
-    void kickerReversesWhenXButtonOrLeftTriggerUsed(boolean leftTrigger, boolean xButton) {
-        this.leftTrigger.set(leftTrigger);
-        this.xButton.set(xButton);
+    @Test
+    void kickerReversesWithXButton() {
+        xButton.set(true);
         machine.poll();
 
         assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
     }
 
-    @ParameterizedTest
-    @MethodSource("buttonCombinations")
-    void kickerStopsWhenXButtonOrLeftTriggerReleased(boolean leftTrigger, boolean xButton) {
-        this.leftTrigger.set(leftTrigger);
-        this.xButton.set(xButton);
+    @Test
+    void kickerStopsWhenXButtonReleased() {
+        xButton.set(true);
         machine.poll();
 
         // Double check that it's reversing
         assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
 
         // Release the button
-        this.leftTrigger.set(false);
-        this.xButton.set(false);
+        xButton.set(false);
         machine.poll();
 
         assertEquals(KickerState.STOPPED, machine.currentState().kickerState());
-    }
-
-    @ParameterizedTest
-    @MethodSource("buttonCombinations")
-    void kickerDoesntStopWhenXButtonOrLeftTriggerStillHeld(boolean leftTrigger, boolean xButton) {
-        this.leftTrigger.set(true);
-        this.xButton.set(true);
-        machine.poll();
-
-        // Double check that it's reversing
-        assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
-
-        // Release 1 or none of the buttons
-        this.leftTrigger.set(leftTrigger);
-        this.xButton.set(xButton);
-        machine.poll();
-
-        assertNotEquals(KickerState.STOPPED, machine.currentState().kickerState());
-    }
-
-    private static List<Arguments> buttonCombinations() {
-        return List.of(
-                Arguments.arguments(false, true),
-                Arguments.arguments(true, false),
-                Arguments.arguments(true, true));
     }
 
     private static List<Arguments> notAtSpeedShooterStates() {
