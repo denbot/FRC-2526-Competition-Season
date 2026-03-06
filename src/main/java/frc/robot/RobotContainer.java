@@ -167,11 +167,6 @@ public class RobotContainer {
     operatorController = new OperatorController(autoBuilder);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    autoBuilder.addExitAlliance(autoOptions.BORDER_LEFT);
-    autoBuilder.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
-    autoBuilder.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);    
-    autoBuilder.addShootCommand();
-
     // Mute controller disconnected warnings
     DriverStation.silenceJoystickConnectionWarning(true);
 
