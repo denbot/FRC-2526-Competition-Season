@@ -209,6 +209,7 @@ public class RobotContainer {
     KickerState.setup(
             stateMachine,
             controller.rightTrigger(),
+            controller.leftTrigger(),
             controller.x()
     );
 
