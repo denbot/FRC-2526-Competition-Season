@@ -259,6 +259,12 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> drive.findAngleForShooting(drive.getPose()))
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
+    
+    controller.povUp().onTrue(
+      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
+      
+    controller.povDown().onTrue(
+      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
 }
 
 public Pose2d getRobotPosition(){
