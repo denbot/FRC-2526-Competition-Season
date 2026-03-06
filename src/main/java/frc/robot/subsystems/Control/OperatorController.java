@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Control;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -90,5 +92,12 @@ public class OperatorController {
             ? SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH)
             : SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
         // TODO: .andThen(ClimbCommand);
-        }
+        operatorController1.axisGreaterThan(1, 0.5)
+            .onTrue(Commands.runOnce(() ->
+                autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
+                
+        operatorController1.axisLessThan(1, -0.5)
+            .onTrue(Commands.runOnce(() ->
+                autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
+    }
 }
