@@ -3,13 +3,10 @@ package frc.robot.subsystems.auto;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -63,21 +60,21 @@ public class AutoRoutineBuilder {
     public void addSweep(autoOptions startSide, autoOptions sweepAlignment){
         if(startSide == autoOptions.BORDER_LEFT){
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_LEFT)
+                addAction(getAutoAlignmentCommand(onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_LEFT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Edge Left");
             }
             else{
-                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
+                addAction(getAutoAlignmentCommand(onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Center Left");
             }
         }
         else{
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_RIGHT)
+                addAction(getAutoAlignmentCommand(onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_RIGHT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Edge Right");
             }
             else{
-                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_RIGHT)
+                addAction(getAutoAlignmentCommand(onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_RIGHT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Center Right");
             }
         }
@@ -217,9 +214,8 @@ public class AutoRoutineBuilder {
     }
 
     private Command getAutoAlignmentCommand(onTheFlySetpoints setpoint){
-        Optional<Alliance> alliance = DriverStation.getAlliance();
         Pose2d targetPose;
-        if(alliance.isPresent() && alliance.get() == Alliance.Red) targetPose = setpoint.redAlignmentPose;
+        if(drive.isBlue()) targetPose = setpoint.redAlignmentPose;
         else targetPose = setpoint.blueAlignmentPose;
 
         return AutoBuilder.pathfindToPose(
