@@ -170,6 +170,7 @@ public class RobotContainer {
     autoBuilder.addExitAlliance(autoOptions.BORDER_LEFT);
     autoBuilder.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
     autoBuilder.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);    
+    autoBuilder.addShootCommand();
 
     // Mute controller disconnected warnings
     DriverStation.silenceJoystickConnectionWarning(true);
