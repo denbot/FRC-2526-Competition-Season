@@ -28,6 +28,7 @@ import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.Leds.Leds;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
+import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -166,6 +167,10 @@ public class RobotContainer {
     operatorController = new OperatorController(autoBuilder);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
+    autoBuilder.addExitAlliance(autoOptions.BORDER_LEFT);
+    autoBuilder.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
+    autoBuilder.addReturnAlliance(autoOptions.BORDER_LEFT, autoOptions.TRENCH);    
+
     // Mute controller disconnected warnings
     DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -262,7 +267,7 @@ public class RobotContainer {
     
     controller.povUp().onTrue(
       Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
-      
+
     controller.povDown().onTrue(
       Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
 }
