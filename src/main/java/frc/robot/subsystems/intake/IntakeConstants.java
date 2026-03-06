@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 public class IntakeConstants {
   public static final Angle intakeMaxExtensionPosition = Rotations.of(0.21);
   public static final Angle intakeIdleExtensionPosition = Rotations.of(0.09);
-  public static final Angle intakeMinExtensionPosition = Rotations.of(0.05);
+  public static final Angle intakeMinExtensionPosition = Rotations.of(0.01);
   public static int INTAKE_MOTOR_ID = 40;
   public static int EXTENSION_MOTOR_LEFT_ID = 35;
   public static int EXTENSION_MOTOR_RIGHT_ID = 34;
