@@ -90,7 +90,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
         var extensionMotorRightConfig =
             new TalonFXConfiguration()
-                .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+                .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
