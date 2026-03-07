@@ -80,7 +80,7 @@ public class Drive extends SubsystemBase {
               TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
               WHEEL_COF,
               DCMotor.getKrakenX60(1)
-                  .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
+              .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
               TunerConstants.FrontLeft.SlipCurrent,
               1),
           getModuleTranslations());

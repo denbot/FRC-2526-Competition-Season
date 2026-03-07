@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ShooterStateTest {
     final AtomicBoolean rightBumper = new AtomicBoolean();
     final AtomicBoolean yButton = new AtomicBoolean();
+    final AtomicBoolean bButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
     @BeforeEach
@@ -30,7 +31,8 @@ public class ShooterStateTest {
         machine = new RebuiltStateMachine();
         rightBumper.set(false);
         yButton.set(false);
-        ShooterState.setup(machine, rightBumper::get, yButton::get);
+        bButton.set(false);
+        ShooterState.setup(machine, rightBumper::get, bButton::get, yButton::get);
     }
 
     @AfterEach

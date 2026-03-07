@@ -218,7 +218,8 @@ public class RobotContainer {
     ShooterState.setup(
             stateMachine,
             controller.rightBumper(),
-            controller.y()
+            controller.y(),
+            controller.b()
     );
     IndexerState.setup(
             stateMachine, 
@@ -261,6 +262,15 @@ public class RobotContainer {
 
     // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
     controller.rightBumper().whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> drive.findAngleForShooting(drive.getPose()))
+            .andThen(Commands.runOnce(() -> drive.stopWithX())));
+
+    // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
+    controller.b().whileTrue(
             DriveCommands.joystickDriveAtAngle(
             drive,
             () -> -controller.getLeftY(),
