@@ -40,15 +40,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final Debouncer rightSpinnerMotorDebounce = new Debouncer(0.5);
     private final Debouncer kickerMotorDebounce = new Debouncer(0.5);
 
-    /* Unused FOC Tuning
-    private static final VelocityTorqueCurrentFOC leftSpinnerFOC =
-        new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.spinnerAcceleration);
-    private static final VelocityTorqueCurrentFOC rightSpinnerFOC =
-        new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.spinnerAcceleration);
-    private static final VelocityTorqueCurrentFOC kickerFOC =
-        new VelocityTorqueCurrentFOC(0).withAcceleration(ShooterConstants.kickerAcceleration);
-    */
-
     private final StatusSignal<AngularVelocity> leftSpinnerVelocity = leftSpinnerMotor.getVelocity();
     private final StatusSignal<Current> leftSpinnerCurrentAmps = leftSpinnerMotor.getSupplyCurrent();
 
