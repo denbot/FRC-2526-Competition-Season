@@ -25,7 +25,7 @@ public class Shooter extends SubsystemBase{
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     private AngularVelocity spinnerVelocitySetpoint = RotationsPerSecond.of(60);
-    private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(60);
+    private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(50);
     private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
     private AngularVelocity spinnerVelocityOffset = RotationsPerSecond.of(0);
     
