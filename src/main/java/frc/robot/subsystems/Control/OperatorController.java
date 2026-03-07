@@ -31,8 +31,8 @@ public class OperatorController {
     
     public OperatorController(AutoRoutineBuilder autoBuilder){
 
-        blueWonAutoToggle.onTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(true); isBlue = true;}));
-        redWonAutoToggle.onTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(false); isBlue = false;}));
+        blueWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(true); isBlue = true;}));
+        redWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(false); isBlue = false;}));
         // Add neutral sweep + score  
         neutralZoneScoreButton.onTrue(Commands.runOnce(
             () -> {
