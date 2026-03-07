@@ -71,7 +71,8 @@ public class LimelightIOReal implements LimelightIO{
         inputs.backLeftConnected = isLimelightConnected(Limelight.BACK_LEFT);
         inputs.backRightConnected = isLimelightConnected(Limelight.BACK_RIGHT);
         inputs.frontConnected = isLimelightConnected(Limelight.FRONT);
-        inputs.allConnected = inputs.backLeftConnected&&inputs.backRightConnected&&inputs.frontConnected;
+        inputs.allConnected = inputs.frontConnected;
+        //inputs.allConnected = inputs.backLeftConnected&&inputs.backRightConnected&&inputs.frontConnected;
 
         // Tag count
         // pre-define to check for null cases
@@ -83,13 +84,14 @@ public class LimelightIOReal implements LimelightIO{
         inputs.backRightTagCount = poseEstimate2 == null ? 0 : poseEstimate2.tagCount;
         inputs.frontTagCount = poseEstimate3 == null ? 0 : poseEstimate3.tagCount;
 
-        inputs.totalTagCount = inputs.backLeftTagCount + inputs.backRightTagCount + inputs.frontTagCount;
+        inputs.totalTagCount = inputs.frontTagCount;
+        //inputs.totalTagCount = inputs.backLeftTagCount + inputs.backRightTagCount + inputs.frontTagCount;
 
     }
 
     public void getAllPoseEstimate(Drive drive){
-        getSinglePoseEstimate(drive, Limelight.BACK_LEFT);
-        getSinglePoseEstimate(drive, Limelight.BACK_RIGHT);
+        //getSinglePoseEstimate(drive, Limelight.BACK_LEFT);
+        //getSinglePoseEstimate(drive, Limelight.BACK_RIGHT);
         getSinglePoseEstimate(drive, Limelight.FRONT);
     }
 
