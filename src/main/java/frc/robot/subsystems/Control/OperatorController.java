@@ -27,8 +27,12 @@ public class OperatorController {
     // 3-way rotary switch, toggles A when left, neither when center, B when right
     public final Trigger blueWonAutoToggle = operatorController2.button(2);
     public final Trigger redWonAutoToggle = operatorController2.button(3);
+    private static boolean isBlue = true;
     
     public OperatorController(AutoRoutineBuilder autoBuilder){
+
+        blueWonAutoToggle.onTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(true); isBlue = true;}));
+        redWonAutoToggle.onTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(false); isBlue = false;}));
         // Add neutral sweep + score  
         neutralZoneScoreButton.onTrue(Commands.runOnce(
             () -> {
@@ -89,9 +93,10 @@ public class OperatorController {
         // in teleop, flipping this switch toggles an auto climb
         teleopAutoClimbSwitch.onTrue(
             leftRightSwitch.getAsBoolean()
-            ? SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH)
-            : SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
+            ? SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH)
+            : SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
         // TODO: .andThen(ClimbCommand);
+        
         operatorController1.axisGreaterThan(1, 0.5)
             .onTrue(Commands.runOnce(() ->
                 autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
@@ -99,5 +104,8 @@ public class OperatorController {
         operatorController1.axisLessThan(1, -0.5)
             .onTrue(Commands.runOnce(() ->
                 autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
+    }
+    public static boolean getIsBlue(){
+        return isBlue;
     }
 }

@@ -27,6 +27,7 @@ public class AutoRoutineBuilder {
     public Shooter shooter;
     private Indexer indexer;
     private Drive drive;
+    private boolean isBlue = true;
 
     public AutoRoutineBuilder(Intake intake, Shooter shooter, Indexer indexer, Drive drive){
         this.intake = intake;
@@ -52,29 +53,33 @@ public class AutoRoutineBuilder {
         SHOOT_RIGHT;
     }
 
+    public void setIsBlue(boolean isBlue){
+        this.isBlue = isBlue;
+    }
+
     public void addExitAlliance(autoOptions exitSide){
-        if(exitSide == autoOptions.BORDER_LEFT) addAction(getAutoAlignmentCommand(onTheFlySetpoints.TRENCH_LEFT_NEUTRAL), "Exit Aliance Left");
-        else addAction(getAutoAlignmentCommand(onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL), "Exit Aliance Right");
+        if(exitSide == autoOptions.BORDER_LEFT) addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL), "Exit Aliance Left");
+        else addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL), "Exit Aliance Right");
     }
     
     public void addSweep(autoOptions startSide, autoOptions sweepAlignment){
         if(startSide == autoOptions.BORDER_LEFT){
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                addAction(getAutoAlignmentCommand(onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_LEFT)
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_LEFT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Edge Left");
             }
             else{
-                addAction(getAutoAlignmentCommand(onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Center Left");
             }
         }
         else{
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                addAction(getAutoAlignmentCommand(onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_RIGHT)
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_RIGHT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Edge Right");
             }
             else{
-                addAction(getAutoAlignmentCommand(onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_RIGHT)
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_RIGHT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Center Right");
             }
         }
@@ -83,20 +88,20 @@ public class AutoRoutineBuilder {
     public void addReturnAlliance(autoOptions returnSide, autoOptions returnLocation){
         if(returnSide == autoOptions.BORDER_LEFT){
             if(returnLocation == autoOptions.TRENCH){
-                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.TRENCH_LEFT_NEUTRAL, onTheFlySetpoints.TRENCH_LEFT_ALLIANCE), "Return Left Through Trench");
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL, onTheFlySetpoints.TRENCH_LEFT_ALLIANCE), "Return Left Through Trench");
             
             }
             else{
-                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.RAMP_LEFT_NEUTRAL, onTheFlySetpoints.RAMP_LEFT_ALLIANCE), "Return Left Through Ramp");
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.RAMP_LEFT_NEUTRAL, onTheFlySetpoints.RAMP_LEFT_ALLIANCE), "Return Left Through Ramp");
             }
         }
         else{
             if(returnLocation == autoOptions.TRENCH){
-                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL, onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE), "Return Right Through Trench");
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL, onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE), "Return Right Through Trench");
             
             }
             else{
-                addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.RAMP_RIGHT_NEUTRAL, onTheFlySetpoints.RAMP_RIGHT_ALLIANCE), "Return Right Through Ramp");
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.RAMP_RIGHT_NEUTRAL, onTheFlySetpoints.RAMP_RIGHT_ALLIANCE), "Return Right Through Ramp");
             }
         }
         
@@ -130,15 +135,15 @@ public class AutoRoutineBuilder {
     public void addAlignScorePosition(autoOptions scoreLocation){
         switch (scoreLocation) {
             case SHOOT_LEFT:
-                addAction(getAutoAlignmentCommand(onTheFlySetpoints.SCORE_LEFT), "Align Shoot Left");
+                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_LEFT), "Align Shoot Left");
                 break;
 
             case SHOOT_RIGHT:
-                addAction(getAutoAlignmentCommand(onTheFlySetpoints.SCORE_RIGHT), "Align Shoot Right");
+                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_RIGHT), "Align Shoot Right");
                 break;
             
             case SHOOT_CENTER:
-                addAction(getAutoAlignmentCommand(onTheFlySetpoints.SCORE_CENTER), "Align Shoot Center");
+                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_CENTER), "Align Shoot Center");
                 break;
             default:
                 break;
@@ -146,7 +151,7 @@ public class AutoRoutineBuilder {
     }
     
     public void addHumanPlayerCommand(autoOptions endScorePosition){
-        addAction(getAutoAlignmentCommand(onTheFlySetpoints.HUMAN_PLAYER), "Align To Human Player");
+        addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.HUMAN_PLAYER), "Align To Human Player");
         addAction(Commands.waitSeconds(2), "Wait For HP");
         addAlignScorePosition(endScorePosition);
         addShootCommand();
@@ -155,11 +160,11 @@ public class AutoRoutineBuilder {
     public void addClimbCommand(autoOptions climbSide){
         // TODO add climb command
         if(climbSide == autoOptions.CLIMB_LEFT){
-            addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH), "Align Climb Left");
+            addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH), "Align Climb Left");
             // add climb command
         }
         else {
-            addAction(SequentialPathGenerator.getSequentialPath(onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH), "Align Climb Right");
+            addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH), "Align Climb Right");
             // add climb command
         }
     }
@@ -213,10 +218,10 @@ public class AutoRoutineBuilder {
         SmartDashboard.putStringArray("Auto Routine", commandNamesAsStringArray());
     }
 
-    private Command getAutoAlignmentCommand(onTheFlySetpoints setpoint){
+    private Command getAutoAlignmentCommand(boolean isBlue, onTheFlySetpoints setpoint){
         Pose2d targetPose;
-        if(drive.isBlue()) targetPose = setpoint.redAlignmentPose;
-        else targetPose = setpoint.blueAlignmentPose;
+        if(isBlue) targetPose = setpoint.blueAlignmentPose;
+        else targetPose = setpoint.redAlignmentPose;
 
         return AutoBuilder.pathfindToPose(
             targetPose,
