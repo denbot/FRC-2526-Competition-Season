@@ -8,6 +8,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -76,6 +78,10 @@ public class RobotContainer {
   private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
   private Leds leds;
+
+  private SlewRateLimiter xLim = new SlewRateLimiter(2);
+  private SlewRateLimiter yLim = new SlewRateLimiter(2);
+  private SlewRateLimiter oLim = new SlewRateLimiter(2);
   
   private HubStatusAlert hubStatusAlert;
 
@@ -235,9 +241,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -xLim.calculate(controller.getLeftY()),
+            () -> -yLim.calculate(controller.getLeftX()),
+            () -> -oLim.calculate(controller.getRightX())));
 
     // Lock to 0° when right stick button is held
     controller.rightStick()
