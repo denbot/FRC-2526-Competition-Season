@@ -140,12 +140,17 @@ public class AutoRoutineBuilder {
                 // Continue running spinner at speed
                 shooter.runSpinner() // Auto aim at the hub
                 // Run indexer and kicker to feed shooter with fuel
+
                 .alongWith(indexer.runIndexer()).withTimeout(6)
                 .alongWith(shooter.runKicker()).withTimeout(6)
                 // wait 4 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
                 .alongWith(
                     Commands.waitSeconds(4)
-                    .andThen(intake.setIntakeMinLength())).withTimeout(6)), "Shoot");
+                    .andThen(intake.setIntakeMinLength())).withTimeout(6))
+                .andThen(
+                    shooter.stopKicker()
+                    .alongWith(intake.stopIntake())
+                ), "Shoot");
         }
 
     public void addAlignScorePosition(autoOptions scoreLocation){
