@@ -2,6 +2,7 @@ package frc.robot.subsystems.Control;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -31,8 +32,8 @@ public class OperatorController {
     
     public OperatorController(AutoRoutineBuilder autoBuilder){
 
-        blueWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(true); isBlue = true;}).ignoringDisable(true));
-        redWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(false); isBlue = false;}).ignoringDisable(true));
+        blueWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(true); isBlue = true; SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
+        redWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(false); isBlue = false;SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
         // Add neutral sweep + score  
         neutralZoneScoreButton.onTrue(Commands.runOnce(
             () -> {

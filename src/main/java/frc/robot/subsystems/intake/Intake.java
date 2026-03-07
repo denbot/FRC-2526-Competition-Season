@@ -17,7 +17,7 @@ public class Intake extends SubsystemBase {
   public final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-  private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(60);
+  private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(80);
   private Angle intakeExtensionSetpoint = Rotations.zero();
 
   public Intake(IntakeIO io, RebuiltStateMachine stateMachine) {
