@@ -79,9 +79,9 @@ public class RobotContainer {
   private AutoRoutineBuilder autoBuilder;
   private Leds leds;
 
-  private SlewRateLimiter xLim = new SlewRateLimiter(2);
-  private SlewRateLimiter yLim = new SlewRateLimiter(2);
-  private SlewRateLimiter oLim = new SlewRateLimiter(2);
+  private SlewRateLimiter xLim = new SlewRateLimiter(3);
+  private SlewRateLimiter yLim = new SlewRateLimiter(3);
+  private SlewRateLimiter oLim = new SlewRateLimiter(3);
   
   private HubStatusAlert hubStatusAlert;
 
