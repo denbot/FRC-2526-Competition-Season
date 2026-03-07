@@ -108,7 +108,7 @@ public class AutoRoutineBuilder {
     }
 
     public void addShootCommand(){
-        addAction(
+        /*addAction(
             intake.setIntakeMaxLength() // extend intake for maximum storage space
             // Run the spinner up to speed until it is at speed
             .alongWith(shooter.runSpinnerAdaptive(
@@ -123,6 +123,22 @@ public class AutoRoutineBuilder {
                     drive, drive.isBlue() 
                     ? PointsOfInterest.centerOfHubBlue 
                     : PointsOfInterest.centerOfHubRed)
+                // Run indexer and kicker to feed shooter with fuel
+                .alongWith(indexer.runIndexer()).withTimeout(6)
+                .alongWith(shooter.runKicker()).withTimeout(6)
+                // wait 4 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
+                .alongWith(
+                    Commands.waitSeconds(4)
+                    .andThen(intake.setIntakeMinLength())).withTimeout(6)), "Shoot");
+        }*/
+        addAction(
+            intake.setIntakeMaxLength() // extend intake for maximum storage space
+            // Run the spinner up to speed until it is at speed
+            .alongWith(shooter.runSpinner()) // Auto aim at the hub
+            .until(() -> Math.abs(shooter.getSpinnerClosedLoopError()) < 12 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
+            .andThen(
+                // Continue running spinner at speed
+                shooter.runSpinner() // Auto aim at the hub
                 // Run indexer and kicker to feed shooter with fuel
                 .alongWith(indexer.runIndexer()).withTimeout(6)
                 .alongWith(shooter.runKicker()).withTimeout(6)

@@ -42,6 +42,7 @@ public class OperatorController {
                 autoBuilder.addExitAlliance(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
                 autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP);
+                autoBuilder.addAlignScorePosition(leftRightSwitch.getAsBoolean() ? autoOptions.SHOOT_RIGHT : autoOptions.SHOOT_LEFT);
                 autoBuilder.addShootCommand(); 
             }).ignoringDisable(true));
 
