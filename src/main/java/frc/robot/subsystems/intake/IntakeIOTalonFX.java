@@ -71,9 +71,9 @@ public class IntakeIOTalonFX implements IntakeIO {
                         .withSensorToMechanismRatio(IntakeConstants.INTAKE_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(.5)
-                        .withKI(1)
-                        .withKV(0.1));
+                        .withKP(0.1)
+                        .withKS(0.02)
+                        .withKV(0.125));
 
         var extensionMotorLeftConfig =
             new TalonFXConfiguration()
@@ -86,9 +86,8 @@ public class IntakeIOTalonFX implements IntakeIO {
                         .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(0.1)
-                        .withKS(0.02)
-                        .withKV(0.125))
+                    .withKP(34)
+                )
                 .withAudio(
                     new AudioConfigs().withAllowMusicDurDisable(true)
                 );
