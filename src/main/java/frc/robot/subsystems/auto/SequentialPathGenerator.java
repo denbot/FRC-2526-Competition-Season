@@ -1,9 +1,11 @@
 package frc.robot.subsystems.auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.OperatorConstants;
@@ -34,6 +36,21 @@ public class SequentialPathGenerator {
             finalPath.addCommands(
                 AutoBuilder.pathfindToPose(targetPose,
                 OperatorConstants.pathfindingConstraints));
+        }
+        return finalPath;
+    }
+    
+    public static Command getSequentialPath(boolean isBlue, double[] maxSpeeds, onTheFlySetpoints... setpoints){
+        SequentialCommandGroup finalPath = new SequentialCommandGroup();
+
+        for(int i = 0; i < setpoints.length; i++){
+            Pose2d targetPose;
+            if(!isBlue) targetPose = setpoints[i].redAlignmentPose;
+            else targetPose = setpoints[i].blueAlignmentPose;
+
+            finalPath.addCommands(
+                AutoBuilder.pathfindToPose(targetPose,
+                new PathConstraints(maxSpeeds[i], maxSpeeds[i], Units.degreesToRadians(540), Units.degreesToRadians(720))));
         }
         return finalPath;
     }

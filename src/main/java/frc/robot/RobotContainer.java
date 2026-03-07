@@ -198,35 +198,35 @@ public class RobotContainer {
     IntakeState.setup(
             stateMachine,
             controller.leftTrigger(),
-            controller.x()
+            controller.b()
     );
 
     HopperState.setup(
             stateMachine,
             controller.leftTrigger(),
             controller.leftBumper(),
-            controller.x()
+            controller.b()
     );
 
     KickerState.setup(
             stateMachine,
             controller.rightTrigger(),
             controller.leftTrigger(),
-            controller.x()
+            controller.b()
     );
 
     ShooterState.setup(
             stateMachine,
             controller.rightBumper(),
             controller.y(),
-            controller.b()
+            controller.x()
     );
     IndexerState.setup(
             stateMachine, 
             controller.rightTrigger(), 
             controller.leftTrigger(), 
             controller.a(), 
-            controller.x()
+            controller.b()
     );
     MatchState.setup(stateMachine);
   }

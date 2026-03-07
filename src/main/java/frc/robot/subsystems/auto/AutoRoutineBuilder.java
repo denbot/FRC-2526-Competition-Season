@@ -65,21 +65,21 @@ public class AutoRoutineBuilder {
     public void addSweep(autoOptions startSide, autoOptions sweepAlignment){
         if(startSide == autoOptions.BORDER_LEFT){
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_LEFT)
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, new double[]{2.0, 4.0}, onTheFlySetpoints.NEUTRAL_EDGE_LEFT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_LEFT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Edge Left");
             }
             else{
-                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, new double[]{2.0, 4.0}, onTheFlySetpoints.NEUTRAL_CENTER_LEFT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_LEFT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Center Left");
             }
         }
         else{
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
-                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_RIGHT)
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, new double[]{2.0, 4.0}, onTheFlySetpoints.NEUTRAL_EDGE_RIGHT, onTheFlySetpoints.NEUTRAL_EDGE_MID_FROM_RIGHT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Edge Right");
             }
             else{
-                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_RIGHT)
+                addAction(SequentialPathGenerator.getSequentialPath(isBlue, new double[]{2.0, 4.0}, onTheFlySetpoints.NEUTRAL_CENTER_RIGHT, onTheFlySetpoints.NEUTRAL_CENTER_MID_FROM_RIGHT)
                 .raceWith(this.intake.setIntakeMaxLength().alongWith(this.intake.runIntake(RotationsPerSecond.of(60))).alongWith(this.indexer.runIndexer())), "Sweep Center Right");
             }
         }
