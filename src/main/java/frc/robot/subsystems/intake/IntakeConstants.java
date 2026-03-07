@@ -14,6 +14,7 @@ public class IntakeConstants {
   public static int EXTENSION_MOTOR_LEFT_ID = 35;
   public static int EXTENSION_MOTOR_RIGHT_ID = 34;
   public static int EXTENSION_GEAR_RATIO = 23;
+  public static double INTAKE_GEAR_RATIO = 12.0/30.0;
   public static int DEPLOYED_DIO_PORT = 0; // TODO: find port
   public static int RETRACTED_DIO_PORT = 1; // TODO: find port
   public static final AngularVelocity intakeSpeed = RotationsPerSecond.of(60);

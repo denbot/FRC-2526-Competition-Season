@@ -66,6 +66,9 @@ public class IntakeIOTalonFX implements IntakeIO {
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
+                .withFeedback(
+                    new FeedbackConfigs()
+                        .withSensorToMechanismRatio(IntakeConstants.INTAKE_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
                         .withKP(.5)
@@ -83,7 +86,9 @@ public class IntakeIOTalonFX implements IntakeIO {
                         .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(34))
+                        .withKP(0.1)
+                        .withKS(0.02)
+                        .withKV(0.125))
                 .withAudio(
                     new AudioConfigs().withAllowMusicDurDisable(true)
                 );
