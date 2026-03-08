@@ -424,6 +424,8 @@ public class Drive extends SubsystemBase {
             rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
         }
     }
+
+    Logger.recordOutput("Ideal Angle Found", rotation);
         
     return rotation;
   }

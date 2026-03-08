@@ -151,9 +151,9 @@ public class ShooterIOTalonFX implements ShooterIO {
         inputs.rightSpinnerPositionRots = rightSpinnerPositionRot.getValue();
         inputs.kickerPositionRots = kickerPositionRot.getValue();
 
-        inputs.leftSpinnerClosedLoopError = leftSpinnerClosedLoopError.getValueAsDouble();
-        inputs.rightSpinnerClosedLoopError = rightSpinnerClosedLoopError.getValueAsDouble();
-        inputs.kickerClosedLoopError = kickerClosedLoopError.getValueAsDouble();
+        inputs.leftSpinnerClosedLoopError = leftSpinnerClosedLoopError.getValue();
+        inputs.rightSpinnerClosedLoopError = rightSpinnerClosedLoopError.getValue();
+        inputs.kickerClosedLoopError = kickerClosedLoopError.getValue();
 
         inputs.leftSpinnerCurrentAmps = leftSpinnerCurrentAmps.getValue();
         inputs.rightSpinnerCurrentAmps = rightSpinnerCurrentAmps.getValue();
