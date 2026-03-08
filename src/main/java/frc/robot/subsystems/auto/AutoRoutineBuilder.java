@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.PointsOfInterest;
-import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
@@ -173,6 +171,7 @@ public class AutoRoutineBuilder {
     }
     
     public void addHumanPlayerCommand(autoOptions endScorePosition){
+        addAction(Commands.runOnce(() -> intake.setIntakeIdleLength()), "Set Intake to Idle");
         addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.HUMAN_PLAYER), "Align To Human Player");
         addAction(Commands.waitSeconds(2), "Wait For HP");
         addAlignScorePosition(endScorePosition);
