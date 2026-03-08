@@ -25,7 +25,7 @@ public class Shooter extends SubsystemBase{
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     private AngularVelocity spinnerVelocitySetpoint = RotationsPerSecond.of(60);
-    private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(60);
+    private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(50);
     private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
     private AngularVelocity spinnerVelocityOffset = RotationsPerSecond.of(0);
     
@@ -129,7 +129,7 @@ public class Shooter extends SubsystemBase{
 
         SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
         double x = distance.in(Meters); 
-        return RotationsPerSecond.of((Math.min(80, Math.pow(x, 2) *0.893293 + (1.75793 * x) + 40.677))).plus(spinnerVelocityOffset); // TODO This function is guesswork and estimation
+        return RotationsPerSecond.of((Math.min(80, Math.pow(x, 2) *0.893293 + (1.75793 * x) + 28.677))).plus(spinnerVelocityOffset); // TODO This function is guesswork and estimation
     }
 
     //TODO move this to be implemented in the runSpinner command, reference intake.java for example

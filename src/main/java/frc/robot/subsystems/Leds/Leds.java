@@ -24,7 +24,7 @@ import frc.robot.subsystems.vision.Limelights;
 
 
 public class Leds extends SubsystemBase{
-	private int numLeds = 23;
+	private int numLeds = 46;
 	private AddressableLED led;
 	private AddressableLEDBuffer ledBuffer;
 	private Limelights limelights;

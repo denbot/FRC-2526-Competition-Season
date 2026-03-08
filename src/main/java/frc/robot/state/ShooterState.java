@@ -11,7 +11,7 @@ public enum ShooterState {
     SPINNING_UP_ADAPTIVE,
     AT_SPEED;
 
-    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightBumper, BooleanSupplier yButton) {
+    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightBumper, BooleanSupplier yButton, BooleanSupplier bButton) {
         // Shooter functions
         stateMachine
                 .state(ShooterState.STOPPED)
@@ -20,7 +20,7 @@ public enum ShooterState {
         stateMachine
                 .state(ShooterState.STOPPED)
                 .to(ShooterState.SPINNING_UP_FIXED)
-                .transitionWhen(yButton);
+                .transitionWhen(() -> yButton.getAsBoolean() || bButton.getAsBoolean());
         stateMachine
                 .state(ShooterState.SPINNING_UP_ADAPTIVE)
                 .to(ShooterState.STOPPED)
@@ -28,10 +28,10 @@ public enum ShooterState {
         stateMachine
                 .state(ShooterState.SPINNING_UP_FIXED)
                 .to(ShooterState.STOPPED)
-                .transitionWhen(() -> !yButton.getAsBoolean());
+                .transitionWhen(() -> !yButton.getAsBoolean() && !bButton.getAsBoolean());
         stateMachine
                 .state(ShooterState.AT_SPEED)
                 .to(ShooterState.STOPPED)
-                .transitionWhen(() -> !rightBumper.getAsBoolean() && !yButton.getAsBoolean());
+                .transitionWhen(() -> !rightBumper.getAsBoolean() && !yButton.getAsBoolean() && !bButton.getAsBoolean());
     }
 }

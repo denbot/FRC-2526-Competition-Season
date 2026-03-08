@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class KickerStateTest {
 
     final AtomicBoolean rightTrigger = new AtomicBoolean();
+    final AtomicBoolean leftTrigger = new AtomicBoolean();
     final AtomicBoolean xButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
@@ -30,7 +31,7 @@ public class KickerStateTest {
 
         machine = new RebuiltStateMachine();
         xButton.set(false);
-        KickerState.setup(machine, rightTrigger::get, xButton::get);
+        KickerState.setup(machine, rightTrigger::get, leftTrigger::get, xButton::get);
     }
 
     @AfterEach

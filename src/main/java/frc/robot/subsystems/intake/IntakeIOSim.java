@@ -12,9 +12,9 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class IntakeIOSim implements IntakeIO {
-    private static final DCMotor intakeMotor = DCMotor.getKrakenX60Foc(1);
-    private static final DCMotor extensionLeftMotor = DCMotor.getKrakenX60Foc(1);
-    private static final DCMotor extensionRightMotor = DCMotor.getKrakenX60Foc(1);
+    private static final DCMotor intakeMotor = DCMotor.getKrakenX60(1);
+    private static final DCMotor extensionLeftMotor = DCMotor.getKrakenX60(1);
+    private static final DCMotor extensionRightMotor = DCMotor.getKrakenX60(1);
 
     private DCMotorSim intakeMotorSim;
     private DCMotorSim extensionLeftMotorSim;

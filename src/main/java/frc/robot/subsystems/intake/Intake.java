@@ -17,7 +17,7 @@ public class Intake extends SubsystemBase {
   public final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-  private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(60);
+  private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(100);
   private Angle intakeExtensionSetpoint = Rotations.zero();
 
   public Intake(IntakeIO io, RebuiltStateMachine stateMachine) {
@@ -75,12 +75,12 @@ public class Intake extends SubsystemBase {
     stateMachine
             .state(IntakeState.STOPPED)
             .to(IntakeState.RUNNING)
-            .run(runIntake(RotationsPerSecond.of(60)));
+            .run(runIntake(RotationsPerSecond.of(100)));
 
     stateMachine
             .state(IntakeState.STOPPED)
             .to(IntakeState.REVERSING)
-            .run(runIntake(RotationsPerSecond.of(-60)));
+            .run(runIntake(RotationsPerSecond.of(-100)));
 
     stateMachine
             .state(IntakeState.RUNNING)

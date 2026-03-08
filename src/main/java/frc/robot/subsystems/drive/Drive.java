@@ -47,6 +47,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.PointsOfInterest;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.auto.onTheFlySetpoints;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -78,8 +79,8 @@ public class Drive extends SubsystemBase {
               TunerConstants.FrontLeft.WheelRadius,
               TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
               WHEEL_COF,
-              DCMotor.getKrakenX60Foc(1)
-                  .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
+              DCMotor.getKrakenX60(1)
+              .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
               TunerConstants.FrontLeft.SlipCurrent,
               1),
           getModuleTranslations());
@@ -428,6 +429,6 @@ public class Drive extends SubsystemBase {
   }
 
   public boolean isBlue() {
-      return DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
+      return OperatorController.getIsBlue();
   }
 }

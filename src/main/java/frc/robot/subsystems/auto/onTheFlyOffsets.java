@@ -27,11 +27,11 @@ public enum onTheFlyOffsets {
     CLIMB_LEFT_FINISH(1.65, 0.4, 0),
     CLIMB_RIGHT_SETUP(2.5, -0.4, 0),
     CLIMB_RIGHT_FINISH(1.65, -0.4, 0),
-    HUMAN_PLAYER(0.5, 0, 180),
+    HUMAN_PLAYER(0.805, 0, 180),
     // Default Score Location Offsets
-    SCORE_LEFT(2, -2, 135),
-    SCORE_RIGHT(2, 2, -135),
-    SCORE_CENTER(2, 0, 180);
+    SCORE_LEFT(1.3, -1.3, 135),
+    SCORE_RIGHT(1.3, 1.3, -135),
+    SCORE_CENTER(1, 0, 180);
 
     public final Transform2d transform;
 
