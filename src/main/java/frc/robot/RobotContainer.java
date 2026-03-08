@@ -83,7 +83,7 @@ public class RobotContainer {
   private SlewRateLimiter yLim = new SlewRateLimiter(3);
   private SlewRateLimiter oLim = new SlewRateLimiter(3);
   
-  private HubStatusAlert hubStatusAlert;
+  private HubStatusAlert hubStatusAlert = new HubStatusAlert();
 
   // Controller
   private OperatorController operatorController;
@@ -114,7 +114,6 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
         limelights = new Limelights(new LimelightIOReal(), drive);
-        CommandScheduler.getInstance().schedule(hubStatusAlert);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -162,7 +161,6 @@ public class RobotContainer {
         shooter = new Shooter(new ShooterIO() {}, stateMachine, drive);
         intake = new Intake(new IntakeIO() {}, stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
-        CommandScheduler.getInstance().schedule(hubStatusAlert);
         break;
     }
 
