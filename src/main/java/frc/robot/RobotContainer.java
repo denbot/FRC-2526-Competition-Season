@@ -270,7 +270,7 @@ public class RobotContainer {
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
 
     // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
-    controller.b().whileTrue(
+    controller.x().whileTrue(
             DriveCommands.joystickDriveAtAngle(
             drive,
             () -> -controller.getLeftY(),

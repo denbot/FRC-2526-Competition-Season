@@ -75,7 +75,7 @@ public class Robot extends LoggedRobot {
     // and put our autonomous chooser on the dashboard.
     SmartDashboard.putData(robotPosition);
     robotContainer = new RobotContainer();
-    // fucky shit happening robotContainer.startJingle();
+    robotContainer.startJingle();
   }
 
   /** This function is called periodically during all modes. */
@@ -112,8 +112,8 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    //robotContainer.stopIntermission();
-    //robotContainer.stopJingle();
+    robotContainer.stopIntermission();
+    robotContainer.stopJingle();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -128,7 +128,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit(){
-    //robotContainer.startIntermission();
+    robotContainer.startIntermission();
   }
 
   /** This function is called once when teleop is enabled. */
@@ -142,8 +142,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    //robotContainer.stopIntermission();
-    //robotContainer.stopJingle();
+    robotContainer.stopIntermission();
+    robotContainer.stopJingle();
   }
 
   /** This function is called periodically during operator control. */
@@ -152,7 +152,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopExit(){
-    //robotContainer.startJingle();
+    robotContainer.startJingle();
   }
 
   /** This function is called once when test mode is enabled. */
@@ -160,8 +160,8 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    //robotContainer.stopIntermission();
-    //robotContainer.stopJingle();
+    robotContainer.stopIntermission();
+    robotContainer.stopJingle();
   }
 
   /** This function is called periodically during test mode. */
