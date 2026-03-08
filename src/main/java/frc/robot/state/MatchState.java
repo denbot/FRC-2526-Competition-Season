@@ -62,7 +62,7 @@ public enum MatchState implements LimitsStateTransitions<MatchState> {
     @Override
     public boolean canTransitionState(MatchState newState) {
         return (switch (this) {
-            case NONE -> Set.of(AUTO, TRANSITION_SHIFT);
+            case NONE -> Set.of(NONE, AUTO, TRANSITION_SHIFT);
             case AUTO, END_GAME -> Set.of(NONE, TRANSITION_SHIFT);
             case TRANSITION_SHIFT -> Set.of(NONE, SHIFT_1);
             case SHIFT_1 -> Set.of(NONE, SHIFT_2);
