@@ -1,7 +1,6 @@
 package frc.robot.state;
 
 import bot.den.foxflow.DefaultState;
-import frc.robot.subsystems.shooter.Shooter;
 
 import java.util.function.BooleanSupplier;
 
