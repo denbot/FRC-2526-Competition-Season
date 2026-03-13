@@ -108,7 +108,7 @@ dependencies {
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 
     implementation 'com.github.denbot.FoxFlow:foxflow:v1.3.1'
-    annotationProcessor 'com.github.denbot:foxflow-annotations:v1.3.1'
+    annotationProcessor 'com.github.denbot.FoxFlow:foxflow-annotations:v1.3.1'
 }
 
 test {
