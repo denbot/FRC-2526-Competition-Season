@@ -22,7 +22,7 @@ public class IndexerStateTest {
     final AtomicBoolean rightTrigger = new AtomicBoolean();
     final AtomicBoolean leftTrigger = new AtomicBoolean();
     final AtomicBoolean aButton = new AtomicBoolean();
-    final AtomicBoolean xButton = new AtomicBoolean();
+    final AtomicBoolean bButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
     @BeforeEach
@@ -35,8 +35,8 @@ public class IndexerStateTest {
         rightTrigger.set(false);
         leftTrigger.set(false);
         aButton.set(false);
-        xButton.set(false);
-        IndexerState.setup(machine, rightTrigger::get, leftTrigger::get, aButton::get, xButton::get);
+        bButton.set(false);
+        IndexerState.setup(machine, rightTrigger::get, leftTrigger::get, aButton::get, bButton::get);
     }
 
     @AfterEach
@@ -138,9 +138,9 @@ public class IndexerStateTest {
 
     @ParameterizedTest
     @MethodSource("buttonCombinations")
-    void indexerReversesIfAOrXButtonReleased(boolean a, boolean x) {
+    void indexerReversesIfAOrbButtonReleased(boolean a, boolean x) {
         aButton.set(a);
-        xButton.set(x);
+        bButton.set(x);
         machine.poll();
 
         assertEquals(IndexerState.REVERSING, machine.currentState().indexerState());
@@ -150,7 +150,7 @@ public class IndexerStateTest {
     @MethodSource("buttonCombinations")
     void indexerStopsReversingIfAllButtonsReleased(boolean a, boolean x) {
         aButton.set(a);
-        xButton.set(x);
+        bButton.set(x);
         machine.poll();
 
         // Double check that it's running
@@ -159,7 +159,7 @@ public class IndexerStateTest {
         // Release the buttons
 
         aButton.set(false);
-        xButton.set(false);
+        bButton.set(false);
         machine.poll();
 
         assertEquals(IndexerState.STOPPED, machine.currentState().indexerState());
