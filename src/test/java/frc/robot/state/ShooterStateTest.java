@@ -84,24 +84,51 @@ public class ShooterStateTest {
         assertEquals(ShooterState.STOPPED, machine.currentState().shooterState());
     }
 
+    @Test
+    void shooterSpinsUpWhenXButtonHeld() {
+        xButton.set(true);
+        machine.poll();
+
+        assertEquals(ShooterState.SPINNING_UP_FIXED, machine.currentState().shooterState());
+    }
+
+    @Test
+    void shooterStopsFromSpinningUpWhenXButtonReleased() {
+        xButton.set(true);
+        machine.poll();
+
+        // Double-check that the shooter is spinning up
+        assertEquals(ShooterState.SPINNING_UP_FIXED, machine.currentState().shooterState());
+
+        xButton.set(false);
+        machine.poll();
+        assertEquals(ShooterState.STOPPED, machine.currentState().shooterState());
+    }
+
     @ParameterizedTest
     @MethodSource("buttonCombinations")
-    void shooterStopsFromAtSpeedWhenButtonsReleased(boolean rightBumper, boolean yButton) {
+    void shooterStopsFromAtSpeedWhenButtonsReleased(boolean rightBumper, boolean yButton, boolean xButton) {
         this.rightBumper.set(rightBumper);
         this.yButton.set(yButton);
+        this.xButton.set(xButton);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(ShooterState.AT_SPEED));
 
         this.rightBumper.set(false);
         this.yButton.set(false);
+        this.xButton.set(false);
         machine.poll();
         assertEquals(ShooterState.STOPPED, machine.currentState().shooterState());
     }
 
     private static List<Arguments> buttonCombinations() {
         return List.of(
-                Arguments.arguments(true, false),
-                Arguments.arguments(false, true),
-                Arguments.arguments(true, true));
+                Arguments.arguments(true, false, false),
+                Arguments.arguments(false, true, false),
+                Arguments.arguments(false, false, true),
+                Arguments.arguments(true, true, false),
+                Arguments.arguments(true, false, true),
+                Arguments.arguments(false, true, true),
+                Arguments.arguments(true, true, true));
     }
 }

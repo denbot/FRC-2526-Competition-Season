@@ -97,7 +97,7 @@ public class KickerStateTest {
     }
 
     @Test
-    void kickerReversesWithbButton() {
+    void kickerReversesWithBButton() {
         bButton.set(true);
         machine.poll();
 
@@ -105,7 +105,7 @@ public class KickerStateTest {
     }
 
     @Test
-    void kickerStopsWhenbButtonReleased() {
+    void kickerStopsWhenBButtonReleased() {
         bButton.set(true);
         machine.poll();
 
