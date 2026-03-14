@@ -8,6 +8,7 @@
 package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.TimeUnit.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -35,6 +36,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -380,12 +382,38 @@ public class Drive extends SubsystemBase {
       getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_RIGHT_FINISH.blueAlignmentPose));
   }
 
+  public Time findDistanceInTime(Distance distanceX, Distance distanceY) {
+    Time distanceInTime;
+
+    Distance totalDistance = Feet.of(
+            Math.sqrt((
+                    Math.pow(distanceX.in(Feet), 2) + Math.pow(distanceY.in(Feet), 2)))
+                    + Constants.RobotConstants.ballShootOffset.in(Feet));
+
+    distanceInTime = Seconds.of(
+            Math.sqrt((
+                    (totalDistance.in(Feet)
+                            * Math.tan(Constants.RobotConstants.shooterAngle.in(Degrees))
+                            + Constants.RobotConstants.shooterHeight.in(Feet)) - 6)
+                    / 16.087025));
+
+    return distanceInTime;
+  }
+
   public Rotation2d findAngleForShooting(Pose2d pose) {
     Distance positionX = pose.getMeasureX();
     Distance positionY = pose.getMeasureY();
 
+    Time distanceInTime;
+
     Distance deltaX;
     Distance deltaY;
+
+    Distance deltaXFromTimedVelocity;
+    Distance deltaYFromTimedVelocity;
+
+    Distance sumDeltaX;
+    Distance sumDeltaY;
 
     Rotation2d rotation;
 
@@ -398,13 +426,9 @@ public class Drive extends SubsystemBase {
                 deltaX = PointsOfInterest.cornerSW.getMeasureX().minus(positionX);
                 deltaY = PointsOfInterest.cornerSW.getMeasureY().minus(positionY);
             }
-
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
         } else { // If we are in our zone (able to shoot at hub)
             deltaX = PointsOfInterest.centerOfHubBlue.getMeasureX().minus(positionX);
             deltaY = PointsOfInterest.centerOfHubBlue.getMeasureY().minus(positionY);
-
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()));
         }
     } else {
         if (positionX.minus(PointsOfInterest.centerOfHubRed.getMeasureX()).in(Meters) < 0) { // If we are not in our zone
@@ -415,15 +439,24 @@ public class Drive extends SubsystemBase {
                 deltaX = PointsOfInterest.cornerSE.getMeasureX().minus(positionX);
                 deltaY = PointsOfInterest.cornerSE.getMeasureY().minus(positionY);
             }
-
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()));
         } else { // If we are in our zone (able to shoot at hub)
             deltaX = PointsOfInterest.centerOfHubRed.getMeasureX().minus(positionX);
             deltaY = PointsOfInterest.centerOfHubRed.getMeasureY().minus(positionY);
-            
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
         }
     }
+
+    distanceInTime = findDistanceInTime(deltaX, deltaY);
+
+    deltaXFromTimedVelocity = Meters.of(distanceInTime.in(Seconds) * getChassisSpeeds().vxMetersPerSecond); // Essentially how much farther the ball will go in the x direction
+    deltaYFromTimedVelocity = Meters.of(distanceInTime.in(Seconds) * getChassisSpeeds().vyMetersPerSecond); // Essentially how much farther the ball will go in the y direction
+
+    System.out.println("Distance in seconds: " + distanceInTime.in(Seconds) + "Distances in velocity: X: " + deltaXFromTimedVelocity + ", Y: " + deltaYFromTimedVelocity);
+
+    // Subtract the extra distances to account for where the ball will end up
+    sumDeltaX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
+    sumDeltaY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
+
+    rotation = new Rotation2d(Math.atan2(sumDeltaY.in(Meters), sumDeltaX.in(Meters)));
 
     Logger.recordOutput("Ideal Angle Found", rotation);
         

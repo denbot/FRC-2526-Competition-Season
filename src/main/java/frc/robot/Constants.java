@@ -11,12 +11,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotBase;
-
-import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.path.PathConstraints;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -36,6 +37,12 @@ public final class Constants {
 
     /** Replaying from a log file. */
     REPLAY
+  }
+
+  public static class RobotConstants {
+    public static final Angle shooterAngle = Degrees.of(70);
+    public static final Distance shooterHeight = Inches.of(20.8); // Height that the ball is at the moment it leaves the robot.
+    public static final Distance ballShootOffset = Inches.of(-9.95); // The distance that the ball exits the shooter relative to the center, assuming forward is positive
   }
 
   public static class OperatorConstants {
