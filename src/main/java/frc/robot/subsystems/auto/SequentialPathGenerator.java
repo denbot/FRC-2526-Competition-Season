@@ -1,25 +1,22 @@
 package frc.robot.subsystems.auto;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.OperatorConstants;
 
 public class SequentialPathGenerator {
-    public static Command getSequentialPath(onTheFlySetpoints[] setpoints, Double[] angles){
+    public static Command getSequentialPath(boolean isBlue, onTheFlySetpoints[] setpoints, Double[] angles){
         SequentialCommandGroup finalPath = new SequentialCommandGroup();
-        Optional<Alliance> alliance = DriverStation.getAlliance();
 
         for(int i = 0; i < setpoints.length; i++){
             Pose2d targetPose;
-            if(alliance.isPresent() && alliance.get() == Alliance.Red) targetPose = setpoints[i].redAlignmentPose;
+            if(!isBlue) targetPose = setpoints[i].redAlignmentPose;
             else targetPose = setpoints[i].blueAlignmentPose;
 
             finalPath.addCommands(
@@ -28,18 +25,32 @@ public class SequentialPathGenerator {
         }
         return finalPath;
     }
-    public static Command getSequentialPath(onTheFlySetpoints... setpoints){
+    public static Command getSequentialPath(boolean isBlue, onTheFlySetpoints... setpoints){
         SequentialCommandGroup finalPath = new SequentialCommandGroup();
-        Optional<Alliance> alliance = DriverStation.getAlliance();
 
         for(int i = 0; i < setpoints.length; i++){
             Pose2d targetPose;
-            if(alliance.isPresent() && alliance.get() == Alliance.Red) targetPose = setpoints[i].redAlignmentPose;
+            if(!isBlue) targetPose = setpoints[i].redAlignmentPose;
             else targetPose = setpoints[i].blueAlignmentPose;
 
             finalPath.addCommands(
                 AutoBuilder.pathfindToPose(targetPose,
                 OperatorConstants.pathfindingConstraints));
+        }
+        return finalPath;
+    }
+    
+    public static Command getSequentialPath(boolean isBlue, double[] maxSpeeds, onTheFlySetpoints... setpoints){
+        SequentialCommandGroup finalPath = new SequentialCommandGroup();
+
+        for(int i = 0; i < setpoints.length; i++){
+            Pose2d targetPose;
+            if(!isBlue) targetPose = setpoints[i].redAlignmentPose;
+            else targetPose = setpoints[i].blueAlignmentPose;
+
+            finalPath.addCommands(
+                AutoBuilder.pathfindToPose(targetPose,
+                new PathConstraints(maxSpeeds[i], maxSpeeds[i], Units.degreesToRadians(540), Units.degreesToRadians(720))));
         }
         return finalPath;
     }

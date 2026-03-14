@@ -11,8 +11,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class ShooterIOSim implements ShooterIO{
-    private static final DCMotor spinnerMotor = DCMotor.getKrakenX60Foc(2);
-    private static final DCMotor kickerMotor = DCMotor.getKrakenX60Foc(1);
+    private static final DCMotor spinnerMotor = DCMotor.getKrakenX60(2);
+    private static final DCMotor kickerMotor = DCMotor.getKrakenX60(1);
 
     private DCMotorSim spinnerMotorSim;
     private DCMotorSim kickerMotorSim;

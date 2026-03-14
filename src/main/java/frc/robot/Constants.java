@@ -43,7 +43,7 @@ public final class Constants {
     // Mr Ray canivore ID public static final String canivoreSerial = "D75CCE723353385320202034111303FF";
     public static final CANBus canivoreCANBus = new CANBus("33ED01F9463847532020204B451D0DFF");
     public static final PathConstraints pathfindingConstraints =
-      new PathConstraints(6.0, 6.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+      new PathConstraints(4.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
   }
 
   public static class FieldDimensions {

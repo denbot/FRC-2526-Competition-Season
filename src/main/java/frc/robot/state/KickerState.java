@@ -10,19 +10,24 @@ public enum KickerState {
     RUNNING,
     REVERSING;
 
-    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier xButton) {
+    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier leftTrigger, BooleanSupplier xButton) {
         // Kicker functions
         stateMachine
                 .state(KickerState.STOPPED)
                 .to(KickerState.REVERSING)
-                .transitionWhen(xButton);
+                .transitionWhen(() -> xButton.getAsBoolean() || leftTrigger.getAsBoolean());
         stateMachine
                 .state(KickerState.REVERSING)
                 .to(KickerState.STOPPED)
-                .transitionWhen(() -> !xButton.getAsBoolean());
+                .transitionWhen(() -> !xButton.getAsBoolean() && !leftTrigger.getAsBoolean());
 
         stateMachine
                 .state(ShooterState.AT_SPEED, KickerState.STOPPED)
+                .to(KickerState.RUNNING)
+                .transitionWhen(rightTrigger);
+
+         stateMachine
+                .state(ShooterState.AT_SPEED, KickerState.REVERSING)
                 .to(KickerState.RUNNING)
                 .transitionWhen(rightTrigger);
 

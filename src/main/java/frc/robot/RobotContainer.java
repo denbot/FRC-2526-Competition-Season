@@ -8,6 +8,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,6 +30,7 @@ import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.Leds.Leds;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.auto.ShuffleBoardInputs;
+import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -75,8 +78,12 @@ public class RobotContainer {
   private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
   private Leds leds;
+
+  private SlewRateLimiter xLim = new SlewRateLimiter(3);
+  private SlewRateLimiter yLim = new SlewRateLimiter(3);
+  private SlewRateLimiter oLim = new SlewRateLimiter(3);
   
-  private HubStatusAlert hubStatusAlert;
+  private HubStatusAlert hubStatusAlert = new HubStatusAlert();
 
   // Controller
   private OperatorController operatorController;
@@ -107,7 +114,6 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
         limelights = new Limelights(new LimelightIOReal(), drive);
-        CommandScheduler.getInstance().schedule(hubStatusAlert);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -155,7 +161,6 @@ public class RobotContainer {
         shooter = new Shooter(new ShooterIO() {}, stateMachine, drive);
         intake = new Intake(new IntakeIO() {}, stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
-        CommandScheduler.getInstance().schedule(hubStatusAlert);
         break;
     }
 
@@ -191,33 +196,35 @@ public class RobotContainer {
     IntakeState.setup(
             stateMachine,
             controller.leftTrigger(),
-            controller.x()
+            controller.b()
     );
 
     HopperState.setup(
             stateMachine,
             controller.leftTrigger(),
             controller.leftBumper(),
-            controller.x()
+            controller.b()
     );
 
     KickerState.setup(
             stateMachine,
             controller.rightTrigger(),
-            controller.x()
+            controller.leftTrigger(),
+            controller.b()
     );
 
     ShooterState.setup(
             stateMachine,
             controller.rightBumper(),
-            controller.y()
+            controller.y(),
+            controller.x()
     );
     IndexerState.setup(
             stateMachine, 
             controller.rightTrigger(), 
             controller.leftTrigger(), 
             controller.a(), 
-            controller.x()
+            controller.b()
     );
     MatchState.setup(stateMachine);
   }
@@ -233,9 +240,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -xLim.calculate(controller.getLeftY()),
+            () -> -yLim.calculate(controller.getLeftX()),
+            () -> -oLim.calculate(controller.getRightX())));
 
     // Lock to 0° when right stick button is held
     controller.rightStick()
@@ -259,6 +266,21 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> drive.findAngleForShooting(drive.getPose()))
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
+
+    // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
+    controller.x().whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> drive.findAngleForShooting(drive.getPose()))
+            .andThen(Commands.runOnce(() -> drive.stopWithX())));
+    
+    controller.povUp().onTrue(
+      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
+
+    controller.povDown().onTrue(
+      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
 }
 
 public Pose2d getRobotPosition(){
