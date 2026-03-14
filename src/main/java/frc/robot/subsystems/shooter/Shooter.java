@@ -105,7 +105,7 @@ public class Shooter extends SubsystemBase{
     }
     
     private Command setShooterCommandAdaptive() {
-        this.shooterCommand = runSpinnerAdaptive(drive.findShootingPose(drive.getPose()));
+        this.shooterCommand = runSpinnerAdaptive(drive);
         return this.shooterCommand;
     }
 
@@ -127,7 +127,6 @@ public class Shooter extends SubsystemBase{
             Math.pow(targetPose.getY(), 2)));
 
         SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
-        System.out.println("Distance from hub" + distance.in(Meters));
         double x = distance.in(Meters); 
 
         double targetVelocity = Math.min(80, Math.pow(x, 2) * 0.893293 + (1.75793 * x) + 40.677) + (spinnerVelocityOffset.magnitude());
@@ -144,8 +143,8 @@ public class Shooter extends SubsystemBase{
         spinnerVelocityOffset = spinnerVelocityOffset.plus(speed);
     }
 
-    public Command runSpinnerAdaptive(Pose2d targetPose){
-        return Commands.runEnd(() -> this.io.setSpinnerVelocity(this.getIdealSpeed(targetPose)), () -> this.io.stopSpinner());
+    public Command runSpinnerAdaptive(Drive drive){
+        return Commands.runEnd(() -> this.io.setSpinnerVelocity(this.getIdealSpeed(drive.findShootingPose(drive.getPose()))), () -> this.io.stopSpinner());
     }
 
     public Command runSpinner(){
