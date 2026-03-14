@@ -400,6 +400,31 @@ public class Drive extends SubsystemBase {
     return distanceInTime;
   }
 
+  private Rotation2d iterateRotation(Distance targetDistanceX, Distance targetDistanceY, Distance deltaX, Distance deltaY, ChassisSpeeds chassisSpeeds) {
+    Rotation2d rotation = new Rotation2d(0);
+
+    Distance targetX = targetDistanceX;
+    Distance targetY = targetDistanceY;
+    Distance oldDistance = Meters.of(Math.sqrt(Math.pow(targetDistanceX.in(Meters), 2) + Math.pow(targetDistanceY.in(Meters), 2)));
+    Distance newDistance;
+
+    for (int i = 0; i < 20; i++) { // 20 is the maximum amount of iterations
+      Time time = findDistanceInTime(targetX, targetY);
+      Distance deltaXFromTimedVelocity = Meters.of(time.in(Seconds) * chassisSpeeds.vxMetersPerSecond);
+      Distance deltaYFromTimedVelocity = Meters.of(time.in(Seconds) * chassisSpeeds.vyMetersPerSecond);
+      targetX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
+      targetY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
+      rotation = new Rotation2d(Math.atan2(targetY.in(Meters), targetX.in(Meters)));
+      newDistance = Meters.of(Math.sqrt(Math.pow(targetDistanceX.in(Meters), 2) + Math.pow(targetDistanceY.in(Meters), 2)));
+      double deltaDistance = Math.abs(newDistance.minus(oldDistance).in(Inches));
+      if (deltaDistance < 2) { // 2 inches is tolerance
+        return rotation;
+      }
+    }
+
+    return rotation;
+  }
+
   public Rotation2d findAngleForShooting(Pose2d pose) {
     Distance positionX = pose.getMeasureX();
     Distance positionY = pose.getMeasureY();
@@ -412,38 +437,44 @@ public class Drive extends SubsystemBase {
     Distance deltaXFromTimedVelocity;
     Distance deltaYFromTimedVelocity;
 
-    Distance sumDeltaX;
-    Distance sumDeltaY;
+    Distance aimForX;
+    Distance aimForY;
+
+    Distance targetDistanceX;
+    Distance targetDistanceY;
 
     Rotation2d rotation;
 
     if(isBlue()) {
         if (positionX.minus(PointsOfInterest.centerOfHubBlue.getMeasureX()).in(Meters) > 0) { // If we are not in our zone
             if (positionY.minus(PointsOfInterest.centerOfHubBlue.getMeasureY()).in(Meters) > 0) { // If we are in the north half of the field
-                deltaX = PointsOfInterest.cornerNW.getMeasureX().minus(positionX);
-                deltaY = PointsOfInterest.cornerNW.getMeasureY().minus(positionY);
+                aimForX = PointsOfInterest.cornerNW.getMeasureX();
+                aimForY = PointsOfInterest.cornerNW.getMeasureY();
             } else { // If we are in the south half of the field
-                deltaX = PointsOfInterest.cornerSW.getMeasureX().minus(positionX);
-                deltaY = PointsOfInterest.cornerSW.getMeasureY().minus(positionY);
+                aimForX = PointsOfInterest.cornerSW.getMeasureX();
+                aimForY = PointsOfInterest.cornerSW.getMeasureY();
             }
         } else { // If we are in our zone (able to shoot at hub)
-            deltaX = PointsOfInterest.centerOfHubBlue.getMeasureX().minus(positionX);
-            deltaY = PointsOfInterest.centerOfHubBlue.getMeasureY().minus(positionY);
+            aimForX = PointsOfInterest.centerOfHubBlue.getMeasureX();
+            aimForY = PointsOfInterest.centerOfHubBlue.getMeasureY();
         }
     } else {
         if (positionX.minus(PointsOfInterest.centerOfHubRed.getMeasureX()).in(Meters) < 0) { // If we are not in our zone
             if (positionY.minus(PointsOfInterest.centerOfHubRed.getMeasureY()).in(Meters) > 0) { // If we are in the north half of the field
-                deltaX = PointsOfInterest.cornerNE.getMeasureX().minus(positionX);
-                deltaY = PointsOfInterest.cornerNE.getMeasureY().minus(positionY);
+                aimForX = PointsOfInterest.cornerNE.getMeasureX();
+                aimForY = PointsOfInterest.cornerNE.getMeasureY();
             } else { // If we are in the south half of the field
-                deltaX = PointsOfInterest.cornerSE.getMeasureX().minus(positionX);
-                deltaY = PointsOfInterest.cornerSE.getMeasureY().minus(positionY);
+                aimForX = PointsOfInterest.cornerSE.getMeasureX();
+                aimForY = PointsOfInterest.cornerSE.getMeasureY();
             }
         } else { // If we are in our zone (able to shoot at hub)
-            deltaX = PointsOfInterest.centerOfHubRed.getMeasureX().minus(positionX);
-            deltaY = PointsOfInterest.centerOfHubRed.getMeasureY().minus(positionY);
+            aimForX = PointsOfInterest.centerOfHubRed.getMeasureX();
+            aimForY = PointsOfInterest.centerOfHubRed.getMeasureY();
         }
     }
+
+    deltaX = aimForX.minus(positionX);
+    deltaY = aimForY.minus(positionY);
 
     distanceInTime = findDistanceInTime(deltaX, deltaY);
 
@@ -453,10 +484,10 @@ public class Drive extends SubsystemBase {
     System.out.println("Distance in seconds: " + distanceInTime.in(Seconds) + "Distances in velocity: X: " + deltaXFromTimedVelocity + ", Y: " + deltaYFromTimedVelocity);
 
     // Subtract the extra distances to account for where the ball will end up
-    sumDeltaX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
-    sumDeltaY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
+    targetDistanceX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
+    targetDistanceY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
 
-    rotation = new Rotation2d(Math.atan2(sumDeltaY.in(Meters), sumDeltaX.in(Meters)));
+    rotation = iterateRotation(targetDistanceX, targetDistanceY, deltaX, deltaY, getChassisSpeeds());
 
     Logger.recordOutput("Ideal Angle Found", rotation);
         
