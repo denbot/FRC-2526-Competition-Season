@@ -127,6 +127,7 @@ public class Shooter extends SubsystemBase{
             Math.pow(targetPose.getY(), 2)));
 
         SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
+        System.out.println("Distance from hub" + distance.in(Meters));
         double x = distance.in(Meters); 
 
         double targetVelocity = Math.min(80, Math.pow(x, 2) * 0.893293 + (1.75793 * x) + 40.677) + (spinnerVelocityOffset.magnitude());
