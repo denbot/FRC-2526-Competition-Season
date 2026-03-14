@@ -400,8 +400,9 @@ public class Drive extends SubsystemBase {
     return distanceInTime;
   }
 
-  private Rotation2d iterateRotation(Distance targetDistanceX, Distance targetDistanceY, Distance deltaX, Distance deltaY, ChassisSpeeds chassisSpeeds) {
-    Rotation2d rotation = new Rotation2d(0);
+  private Pose2d iterateRotation(Distance targetDistanceX, Distance targetDistanceY, Distance deltaX, Distance deltaY, ChassisSpeeds chassisSpeeds) {
+    Pose2d pose;
+    Rotation2d rotation;
 
     Distance targetX = targetDistanceX;
     Distance targetY = targetDistanceY;
@@ -414,18 +415,19 @@ public class Drive extends SubsystemBase {
       Distance deltaYFromTimedVelocity = Meters.of(time.in(Seconds) * chassisSpeeds.vyMetersPerSecond);
       targetX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
       targetY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
-      rotation = new Rotation2d(Math.atan2(targetY.in(Meters), targetX.in(Meters)));
       newDistance = Meters.of(Math.sqrt(Math.pow(targetDistanceX.in(Meters), 2) + Math.pow(targetDistanceY.in(Meters), 2)));
       double deltaDistance = Math.abs(newDistance.minus(oldDistance).in(Inches));
       if (deltaDistance < 2) { // 2 inches is tolerance
-        return rotation;
+        break;
       }
     }
 
-    return rotation;
+    rotation = new Rotation2d(Math.atan2(targetY.in(Meters), targetX.in(Meters)));
+    pose = new Pose2d(targetX.in(Meters), targetY.in(Meters), rotation);
+    return pose;
   }
 
-  public Rotation2d findAngleForShooting(Pose2d pose) {
+  public Pose2d findShootingPose(Pose2d pose) {
     Distance positionX = pose.getMeasureX();
     Distance positionY = pose.getMeasureY();
 
@@ -443,7 +445,7 @@ public class Drive extends SubsystemBase {
     Distance targetDistanceX;
     Distance targetDistanceY;
 
-    Rotation2d rotation;
+    Pose2d shootingPose;
 
     if(isBlue()) {
         if (positionX.minus(PointsOfInterest.centerOfHubBlue.getMeasureX()).in(Meters) > 0) { // If we are not in our zone
@@ -487,11 +489,11 @@ public class Drive extends SubsystemBase {
     targetDistanceX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
     targetDistanceY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
 
-    rotation = iterateRotation(targetDistanceX, targetDistanceY, deltaX, deltaY, getChassisSpeeds());
+    shootingPose = iterateRotation(targetDistanceX, targetDistanceY, deltaX, deltaY, getChassisSpeeds());
 
-    Logger.recordOutput("Ideal Angle Found", rotation);
+    Logger.recordOutput("Ideal Shooting Pose Found", shootingPose);
         
-    return rotation;
+    return shootingPose;
   }
 
   public boolean isBlue() {

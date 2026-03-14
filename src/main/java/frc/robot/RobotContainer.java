@@ -264,7 +264,7 @@ public class RobotContainer {
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
-            () -> drive.findAngleForShooting(drive.getPose()))
+            () -> drive.findShootingPose(drive.getPose()).getRotation())
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
 
     // "Spin up" command, getting spinner to speed and auto aiming to a target position (Target position to be replaced by state machine later)
@@ -273,7 +273,7 @@ public class RobotContainer {
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
-            () -> drive.findAngleForShooting(drive.getPose()))
+            () -> drive.findShootingPose(drive.getPose()).getRotation())
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
     
     controller.povUp().onTrue(
