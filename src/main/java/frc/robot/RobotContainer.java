@@ -56,10 +56,9 @@ import frc.robot.subsystems.vision.LimelightIOReal;
 import frc.robot.subsystems.vision.LimelightIOSim;
 import frc.robot.subsystems.vision.Limelights;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

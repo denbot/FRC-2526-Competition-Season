@@ -126,10 +126,15 @@ public class DriveCommands {
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
+              double omega;
               // Calculate angular speed
-              double omega =
-                  angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+              if (Double.isNaN(rotationSupplier.get().getRadians())) {
+                  omega = angleController.calculate(drive.getRotation().getRadians(), drive.getRotation().getRadians());
+              } else {
+                  omega =
+                          angleController.calculate(
+                                  drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+              }
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
