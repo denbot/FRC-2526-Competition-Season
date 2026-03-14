@@ -33,6 +33,9 @@ public class Leds extends SubsystemBase{
 	private Drive drive;
 	private AddressableLEDBufferView leftHalf;
 	private AddressableLEDBufferView rightHalf;
+	private AddressableLEDBufferView leftLimelight;
+	private AddressableLEDBufferView frontLimelight;
+	private AddressableLEDBufferView rightLimelight;
 	private RebuiltStateMachine stateMachine;
 	private final Timer timeUntilTransition = new Timer();
 	private Time targetWaitTime = Seconds.zero();
@@ -42,8 +45,11 @@ public class Leds extends SubsystemBase{
 		this.led = new AddressableLED(0);
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
-		this.leftHalf = this.ledBuffer.createView(0, numLeds/2);
-		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds - 1);
+		this.leftHalf = this.ledBuffer.createView(4, numLeds/2);
+		this.rightHalf = this.ledBuffer.createView(numLeds/2+1, numLeds - 4);
+		this.rightLimelight = this.ledBuffer.createView(0, 4);
+		this.frontLimelight = this.ledBuffer.createView(numLeds/2-2, numLeds/2+1);
+		this.leftLimelight = this.ledBuffer.createView(numLeds - 4, numLeds - 1);
 
 		this.led.setLength(this.ledBuffer.getLength());
 		this.led.setData(ledBuffer);
@@ -102,10 +108,24 @@ public class Leds extends SubsystemBase{
 			
 			// Apply a mask to the graident from 0-1 for how close the drive base is to aiming fully
 			baseRight.mask(LEDPattern.progressMaskLayer(() -> (90 - degreesOff) / 90)).applyTo(this.rightHalf);
-		}
+		} else {LEDPattern.solid(Color.kOrangeRed).applyTo(this.ledBuffer);}
 		// Limelights
-		else if (limelights.getTotalTagCount() >= 3) LEDPattern.solid(Color.kGreen).applyTo(this.ledBuffer);
-		else LEDPattern.solid(Color.kRed).applyTo(this.ledBuffer);;
+		if (limelights.getBackLeftTags() > 0) {
+			LEDPattern.solid(Color.kGreen).applyTo(this.leftLimelight);
+		} else {
+			LEDPattern.solid(Color.kBlack).applyTo(this.leftLimelight);
+		}
+		if (limelights.getFrontTags() > 0) {
+			LEDPattern.solid(Color.kGreen).applyTo(this.frontLimelight);
+		} else {
+			LEDPattern.solid(Color.kBlack).applyTo(this.frontLimelight);
+		}
+		if (limelights.getBackRightTags() > 0) {
+			LEDPattern.solid(Color.kGreen).applyTo(this.rightLimelight);
+		} else {
+			LEDPattern.solid(Color.kBlack).applyTo(this.rightLimelight);
+		}
+		
 
 		this.led.setData(this.ledBuffer);
 	}

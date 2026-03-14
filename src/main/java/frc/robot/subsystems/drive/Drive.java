@@ -399,12 +399,12 @@ public class Drive extends SubsystemBase {
                 deltaY = PointsOfInterest.cornerSW.getMeasureY().minus(positionY);
             }
 
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
+            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()));
         } else { // If we are in our zone (able to shoot at hub)
             deltaX = PointsOfInterest.centerOfHubBlue.getMeasureX().minus(positionX);
             deltaY = PointsOfInterest.centerOfHubBlue.getMeasureY().minus(positionY);
 
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()));
+            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
         }
     } else {
         if (positionX.minus(PointsOfInterest.centerOfHubRed.getMeasureX()).in(Meters) < 0) { // If we are not in our zone
@@ -416,12 +416,12 @@ public class Drive extends SubsystemBase {
                 deltaY = PointsOfInterest.cornerSE.getMeasureY().minus(positionY);
             }
 
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()));
+            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
         } else { // If we are in our zone (able to shoot at hub)
             deltaX = PointsOfInterest.centerOfHubRed.getMeasureX().minus(positionX);
             deltaY = PointsOfInterest.centerOfHubRed.getMeasureY().minus(positionY);
             
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
+            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()));
         }
     }
 
