@@ -105,7 +105,7 @@ public class Shooter extends SubsystemBase{
     }
     
     private Command setShooterCommandAdaptive() {
-        this.shooterCommand = runSpinnerAdaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed);
+        this.shooterCommand = runSpinnerAdaptive(drive);
         return this.shooterCommand;
     }
 
@@ -118,13 +118,13 @@ public class Shooter extends SubsystemBase{
         return Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll());
     }
 
-    public AngularVelocity getIdealSpeed(Pose2d robotPose, Pose2d targetPose){
+    public AngularVelocity getIdealSpeed(Pose2d targetPose){ // Target pose is relevant to robot pose, x and y are delta x and delta y
         // TODO replace target pose withs state machine based identification and logic for aiming
         Distance distance;
 
         distance = Meters.of(Math.sqrt(
-            Math.pow(robotPose.getX() - targetPose.getX(), 2) +
-            Math.pow(robotPose.getY() - targetPose.getY(), 2)));
+            Math.pow(targetPose.getX(), 2) +
+            Math.pow(targetPose.getY(), 2)));
 
         SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
         double x = distance.in(Meters); 
@@ -143,8 +143,15 @@ public class Shooter extends SubsystemBase{
         spinnerVelocityOffset = spinnerVelocityOffset.plus(speed);
     }
 
-    public Command runSpinnerAdaptive(Drive drive, Pose2d targetPose){
-        return Commands.runEnd(() -> this.io.setSpinnerVelocity(this.getIdealSpeed(drive.getPose(), targetPose)), () -> this.io.stopSpinner());
+    public Command runSpinnerAdaptive(Drive drive){
+        return Commands.runEnd(() -> {
+                AngularVelocity idealSpeed = this.getIdealSpeed(drive.findShootingPose(drive.getPose()));
+                double idealSpeedInRPS = idealSpeed.in(RotationsPerSecond);
+                if (!Double.isNaN(idealSpeedInRPS)) {
+                    this.io.setSpinnerVelocity(idealSpeed);
+                }
+        }, this.io::stopSpinner);
+
     }
 
     public Command runSpinner(){
