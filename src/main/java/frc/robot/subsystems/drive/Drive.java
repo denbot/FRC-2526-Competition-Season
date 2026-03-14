@@ -400,7 +400,7 @@ public class Drive extends SubsystemBase {
     return distanceInTime;
   }
 
-  private Pose2d iterateRotation(Distance targetDistanceX, Distance targetDistanceY, Distance deltaX, Distance deltaY, ChassisSpeeds chassisSpeeds) {
+  private Pose2d iteratePose(Distance targetDistanceX, Distance targetDistanceY, Distance deltaX, Distance deltaY, ChassisSpeeds chassisSpeeds) {
     Pose2d pose;
     Rotation2d rotation;
 
@@ -489,7 +489,7 @@ public class Drive extends SubsystemBase {
     targetDistanceX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
     targetDistanceY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
 
-    shootingPose = iterateRotation(targetDistanceX, targetDistanceY, deltaX, deltaY, getChassisSpeeds());
+    shootingPose = iteratePose(targetDistanceX, targetDistanceY, deltaX, deltaY, getChassisSpeeds());
 
     Logger.recordOutput("Ideal Shooting Pose Found", shootingPose);
         

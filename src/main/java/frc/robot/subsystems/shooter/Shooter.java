@@ -144,7 +144,12 @@ public class Shooter extends SubsystemBase{
     }
 
     public Command runSpinnerAdaptive(Drive drive){
-        return Commands.runEnd(() -> this.io.setSpinnerVelocity(this.getIdealSpeed(drive.findShootingPose(drive.getPose()))), () -> this.io.stopSpinner());
+        AngularVelocity idealSpeed = this.getIdealSpeed(drive.findShootingPose(drive.getPose()));
+        double idealSpeedInRPS = idealSpeed.in(RotationsPerSecond);
+        if (!Double.isNaN(idealSpeedInRPS)) {
+            return Commands.runEnd(() -> this.io.setSpinnerVelocity(idealSpeed), this.io::stopSpinner);
+        }
+        return Commands.none();
     }
 
     public Command runSpinner(){
