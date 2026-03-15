@@ -49,7 +49,7 @@ public class Leds extends SubsystemBase{
 		this.rightHalf = this.ledBuffer.createView(numLeds/2+1, numLeds - 4);
 		this.rightLimelight = this.ledBuffer.createView(0, 4);
 		this.frontLimelight = this.ledBuffer.createView(numLeds/2-2, numLeds/2+1);
-		this.leftLimelight = this.ledBuffer.createView(numLeds - 4, numLeds - 1);
+		this.leftLimelight = this.ledBuffer.createView(numLeds - 5, numLeds - 1);
 
 		this.led.setLength(this.ledBuffer.getLength());
 		this.led.setData(ledBuffer);
@@ -66,10 +66,10 @@ public class Leds extends SubsystemBase{
 
 		this.stateMachine.state(RobotState.TELEOP, MatchState.NONE).to(MatchState.TRANSITION_SHIFT).run(getMatchStateTimerCommand(MatchState.TRANSITION_SHIFT.timeInState, 3.0));
 		this.stateMachine.state(MatchState.TRANSITION_SHIFT).to(MatchState.SHIFT_1).run(getMatchStateTimerCommand(MatchState.SHIFT_1.timeInState, 3.0));
-		this.stateMachine.state(MatchState.SHIFT_1).to(MatchState.SHIFT_2).run(getMatchStateTimerCommand(MatchState.SHIFT_2.timeInState, 3.0));
-		this.stateMachine.state(MatchState.SHIFT_2).to(MatchState.SHIFT_3).run(getMatchStateTimerCommand(MatchState.SHIFT_3.timeInState, 3.0));
-		this.stateMachine.state(MatchState.SHIFT_3).to(MatchState.SHIFT_4).run(getMatchStateTimerCommand(MatchState.SHIFT_4.timeInState, 3.0));
-		this.stateMachine.state(MatchState.SHIFT_4).to(MatchState.END_GAME).run(getMatchStateTimerCommand(MatchState.END_GAME.timeInState, 3.0));
+		this.stateMachine.state(MatchState.SHIFT_1).to(MatchState.SHIFT_2).run(getMatchStateTimerCommand(MatchState.SHIFT_2.timeInState, 5.0));
+		this.stateMachine.state(MatchState.SHIFT_2).to(MatchState.SHIFT_3).run(getMatchStateTimerCommand(MatchState.SHIFT_3.timeInState, 5.0));
+		this.stateMachine.state(MatchState.SHIFT_3).to(MatchState.SHIFT_4).run(getMatchStateTimerCommand(MatchState.SHIFT_4.timeInState, 5.0));
+		this.stateMachine.state(MatchState.SHIFT_4).to(MatchState.END_GAME).run(getMatchStateTimerCommand(MatchState.END_GAME.timeInState, 5.0));
 	}
 
 	public Command getMatchStateTimerCommand(Time timeInState, double offset){
@@ -86,13 +86,11 @@ public class Leds extends SubsystemBase{
 	@Override
 	public void periodic(){
 		if(this.timeUntilTransition.hasElapsed(targetWaitTime)){
-			CommandScheduler.getInstance().schedule(Commands.repeatingSequence(
-				Commands.runOnce(() ->LEDPattern.solid(this.isBlueActive ? Color.kBlue : Color.kRed).applyTo(this.ledBuffer)),
-				Commands.waitSeconds(0.5),
-				Commands.runOnce(() ->LEDPattern.solid(Color.kWhite).applyTo(this.ledBuffer)))
-				.withTimeout(Seconds.of(3)));
-			this.timeUntilTransition.reset();
-			this.timeUntilTransition.stop();			
+			LEDPattern.solid(
+				timeUntilTransition.get() % 0.5 > 0.25 ?
+				Color.kCyan :
+				Color.kOrange
+			).applyTo(this.ledBuffer);		
 		} 
 		else if (this.controller.rightBumper().getAsBoolean() == true){
 
