@@ -431,19 +431,11 @@ public class Drive extends SubsystemBase {
     Distance positionX = pose.getMeasureX();
     Distance positionY = pose.getMeasureY();
 
-    Time distanceInTime;
-
     Distance deltaX;
     Distance deltaY;
 
-    Distance velocityDeltaX;
-    Distance velocityDeltaY;
-
     Distance aimForX;
     Distance aimForY;
-
-    Distance targetDistanceX;
-    Distance targetDistanceY;
 
     Pose2d shootingPose;
 
