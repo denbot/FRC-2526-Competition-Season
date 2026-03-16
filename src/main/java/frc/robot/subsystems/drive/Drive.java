@@ -436,8 +436,8 @@ public class Drive extends SubsystemBase {
     Distance deltaX;
     Distance deltaY;
 
-    Distance deltaXFromTimedVelocity;
-    Distance deltaYFromTimedVelocity;
+    Distance velocityDeltaX;
+    Distance velocityDeltaY;
 
     Distance aimForX;
     Distance aimForY;
@@ -480,14 +480,12 @@ public class Drive extends SubsystemBase {
 
     distanceInTime = findDistanceInTime(deltaX, deltaY);
 
-    deltaXFromTimedVelocity = Meters.of(distanceInTime.in(Seconds) * getChassisSpeeds().vxMetersPerSecond); // Essentially how much farther the ball will go in the x direction
-    deltaYFromTimedVelocity = Meters.of(distanceInTime.in(Seconds) * getChassisSpeeds().vyMetersPerSecond); // Essentially how much farther the ball will go in the y direction
-
-    System.out.println("Distance in seconds: " + distanceInTime.in(Seconds) + "Distances in velocity: X: " + deltaXFromTimedVelocity + ", Y: " + deltaYFromTimedVelocity);
+    velocityDeltaX = Meters.of(distanceInTime.in(Seconds) * getChassisSpeeds().vxMetersPerSecond); // Essentially how much farther the ball will go in the x direction
+    velocityDeltaY = Meters.of(distanceInTime.in(Seconds) * getChassisSpeeds().vyMetersPerSecond); // Essentially how much farther the ball will go in the y direction
 
     // Subtract the extra distances to account for where the ball will end up
-    targetDistanceX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
-    targetDistanceY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
+    targetDistanceX = Meters.of(deltaX.in(Meters) - velocityDeltaX.in(Meters));
+    targetDistanceY = Meters.of(deltaY.in(Meters) - velocityDeltaY.in(Meters));
 
     shootingPose = iteratePose(targetDistanceX, targetDistanceY, deltaX, deltaY, getChassisSpeeds());
 
