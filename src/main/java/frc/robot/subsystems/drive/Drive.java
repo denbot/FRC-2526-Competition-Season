@@ -400,13 +400,13 @@ public class Drive extends SubsystemBase {
     return distanceInTime;
   }
 
-  private Pose2d iteratePose(Distance targetDistanceX, Distance targetDistanceY, Distance deltaX, Distance deltaY, ChassisSpeeds chassisSpeeds) {
+  private Pose2d iteratePose(Distance deltaX, Distance deltaY, ChassisSpeeds chassisSpeeds) {
     Pose2d pose;
     Rotation2d rotation;
 
-    Distance targetX = targetDistanceX;
-    Distance targetY = targetDistanceY;
-    Distance oldDistance = Meters.of(Math.sqrt(Math.pow(targetDistanceX.in(Meters), 2) + Math.pow(targetDistanceY.in(Meters), 2)));
+    Distance targetX = deltaX;
+    Distance targetY = deltaY;
+    Distance oldDistance = Meters.of(Math.sqrt(Math.pow(targetX.in(Meters), 2) + Math.pow(targetY.in(Meters), 2)));
     Distance newDistance;
 
     for (int i = 0; i < 20; i++) { // 20 is the maximum amount of iterations
@@ -415,11 +415,11 @@ public class Drive extends SubsystemBase {
       Distance deltaYFromTimedVelocity = Meters.of(time.in(Seconds) * chassisSpeeds.vyMetersPerSecond);
       targetX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
       targetY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
-      newDistance = Meters.of(Math.sqrt(Math.pow(targetDistanceX.in(Meters), 2) + Math.pow(targetDistanceY.in(Meters), 2)));
-      double deltaDistance = Math.abs(newDistance.minus(oldDistance).in(Inches));
-      if (deltaDistance < 2) { // 2 inches is tolerance
+      newDistance = Meters.of(Math.sqrt(Math.pow(targetX.in(Meters), 2) + Math.pow(targetY.in(Meters), 2)));
+      if (Math.abs(newDistance.minus(oldDistance).in(Inches)) < 2) { // 2 inches is tolerance
         break;
       }
+      oldDistance = newDistance;
     }
 
     rotation = new Rotation2d(Math.atan2(targetY.in(Meters), targetX.in(Meters)));
@@ -478,16 +478,7 @@ public class Drive extends SubsystemBase {
     deltaX = aimForX.minus(positionX);
     deltaY = aimForY.minus(positionY);
 
-    distanceInTime = findDistanceInTime(deltaX, deltaY);
-
-    velocityDeltaX = Meters.of(distanceInTime.in(Seconds) * getChassisSpeeds().vxMetersPerSecond); // Essentially how much farther the ball will go in the x direction
-    velocityDeltaY = Meters.of(distanceInTime.in(Seconds) * getChassisSpeeds().vyMetersPerSecond); // Essentially how much farther the ball will go in the y direction
-
-    // Subtract the extra distances to account for where the ball will end up
-    targetDistanceX = Meters.of(deltaX.in(Meters) - velocityDeltaX.in(Meters));
-    targetDistanceY = Meters.of(deltaY.in(Meters) - velocityDeltaY.in(Meters));
-
-    shootingPose = iteratePose(targetDistanceX, targetDistanceY, deltaX, deltaY, getChassisSpeeds());
+    shootingPose = iteratePose(deltaX, deltaY, getChassisSpeeds());
 
     Logger.recordOutput("Ideal Shooting Pose Found", shootingPose);
         
