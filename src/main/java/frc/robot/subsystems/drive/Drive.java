@@ -470,11 +470,9 @@ public class Drive extends SubsystemBase {
     deltaX = aimForX.minus(positionX);
     deltaY = aimForY.minus(positionY);
 
-    System.out.println(deltaX.in(Feet) + " | " + deltaY.in(Feet));
-
     shootingPose = iteratePose(deltaX, deltaY);
 
-    Logger.recordOutput("Ideal Shooting Pose Found", shootingPose);
+    Logger.recordOutput("Ideal Shooting Pose Found", new Pose2d(pose.getX() + shootingPose.getX(), pose.getY() + shootingPose.getY(), shootingPose.getRotation()));
         
     return shootingPose;
   }
