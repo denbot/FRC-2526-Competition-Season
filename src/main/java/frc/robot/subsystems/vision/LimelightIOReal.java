@@ -96,8 +96,9 @@ public class LimelightIOReal implements LimelightIO{
     }
 
     public void getSinglePoseEstimate(Drive drive, Limelight limelight){
+        LimelightHelpers.SetRobotOrientation(limelight.name, drive.getRotation().getDegrees(), 0, 0, 0, 0, 0);
         LimelightHelpers.PoseEstimate poseEstimate = 
-        LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.name);
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.name);
 
         if(poseEstimate == null || poseEstimate.tagCount == 0) return;
 
