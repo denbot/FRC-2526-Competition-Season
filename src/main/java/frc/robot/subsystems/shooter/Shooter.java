@@ -147,6 +147,10 @@ public class Shooter extends SubsystemBase{
         return Commands.runEnd(() -> this.io.setSpinnerVelocity(this.getIdealSpeed(drive.getPose(), targetPose)), () -> this.io.stopSpinner());
     }
 
+    public Command startSpinner(){
+        return Commands.runOnce(() -> this.io.setSpinnerVelocity(defaultSpinnerSpeed.plus(spinnerVelocityOffset)));
+    }
+
     public Command runSpinner(){
         return Commands.runEnd(() -> this.io.setSpinnerVelocity(defaultSpinnerSpeed.plus(spinnerVelocityOffset)), () -> this.io.stopSpinner());
     }

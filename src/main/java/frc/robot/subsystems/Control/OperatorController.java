@@ -6,10 +6,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.auto.AutoRoutineBuilder;
-import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
-import frc.robot.subsystems.auto.SequentialPathGenerator;
-import frc.robot.subsystems.auto.onTheFlySetpoints;
 
 public class OperatorController {
     private final CommandGenericHID operatorController1 = new CommandGenericHID(1);
@@ -30,6 +26,7 @@ public class OperatorController {
     public final Trigger redWonAutoToggle = operatorController2.button(3);
     private static boolean isBlue = true;
     
+    /*
     public OperatorController(AutoRoutineBuilder autoBuilder){
 
         blueWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(true); isBlue = true; SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
@@ -107,6 +104,7 @@ public class OperatorController {
             .onTrue(Commands.runOnce(() ->
                 autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
     }
+    */
     public static boolean getIsBlue(){
         return isBlue;
     }

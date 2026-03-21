@@ -28,9 +28,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.state.*;
 import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.Leds.Leds;
-import frc.robot.subsystems.auto.AutoRoutineBuilder;
-import frc.robot.subsystems.auto.ShuffleBoardInputs;
-import frc.robot.subsystems.auto.AutoRoutineBuilder.autoOptions;
+import frc.robot.subsystems.auto.AutoRoutineCreator;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -69,14 +67,13 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final ShuffleBoardInputs shuffleBoardInputs = new ShuffleBoardInputs();
 
   public final Drive drive;
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
   private Limelights limelights;
-  private AutoRoutineBuilder autoBuilder;
+  private AutoRoutineCreator autoBuilder;
   private Leds leds;
 
   private SlewRateLimiter xLim = new SlewRateLimiter(3);
@@ -167,8 +164,8 @@ public class RobotContainer {
     leds = new Leds(limelights, controller, shooter, drive, stateMachine);
 
     // Set up auto routines
-    autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
-    operatorController = new OperatorController(autoBuilder);
+    //autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
+    //operatorController = new OperatorController(autoBuilder);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Mute controller disconnected warnings
@@ -297,7 +294,7 @@ public void updateRobotPose(){
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoBuilder.getAutoRoutine();
+    return autoChooser.get();
   }
 
     public void startJingle(){
