@@ -291,10 +291,10 @@ public class RobotContainer {
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
     
     controller.povUp().onTrue(
-      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
+      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
 
     controller.povDown().onTrue(
-      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
+      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
 }
 
 public Pose2d getRobotPosition(){
