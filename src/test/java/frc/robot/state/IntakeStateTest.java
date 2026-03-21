@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class IntakeStateTest {
 
     final AtomicBoolean leftTrigger = new AtomicBoolean();
-    final AtomicBoolean xButton = new AtomicBoolean();
+    final AtomicBoolean bButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
     @BeforeEach
@@ -26,8 +26,8 @@ public class IntakeStateTest {
 
         machine = new RebuiltStateMachine();
         leftTrigger.set(false);
-        xButton.set(false);
-        IntakeState.setup(machine, leftTrigger::get, xButton::get);
+        bButton.set(false);
+        IntakeState.setup(machine, leftTrigger::get, bButton::get);
     }
 
     @AfterEach
@@ -62,7 +62,7 @@ public class IntakeStateTest {
 
     @Test
     void intakeReversesWhenXButtonIsPressed() {
-        xButton.set(true);
+        bButton.set(true);
         machine.poll();
 
         assertEquals(IntakeState.REVERSING, machine.currentState().intakeState());
@@ -70,14 +70,14 @@ public class IntakeStateTest {
 
     @Test
     void intakeStopsWhenXButtonIsReleased() {
-        xButton.set(true);
+        bButton.set(true);
         machine.poll();
 
         // Double check that it's reversing
         assertEquals(IntakeState.REVERSING, machine.currentState().intakeState());
 
         // Release the button
-        xButton.set(false);
+        bButton.set(false);
         machine.poll();
 
         assertEquals(IntakeState.STOPPED, machine.currentState().intakeState());

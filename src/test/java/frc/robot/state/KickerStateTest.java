@@ -19,7 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class KickerStateTest {
 
     final AtomicBoolean rightTrigger = new AtomicBoolean();
-    final AtomicBoolean xButton = new AtomicBoolean();
+    final AtomicBoolean leftTrigger = new AtomicBoolean();
+    final AtomicBoolean bButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
     @BeforeEach
@@ -29,8 +30,8 @@ public class KickerStateTest {
         setDriverStationState(RobotState.DISABLED);
 
         machine = new RebuiltStateMachine();
-        xButton.set(false);
-        KickerState.setup(machine, rightTrigger::get, xButton::get);
+        bButton.set(false);
+        KickerState.setup(machine, rightTrigger::get, leftTrigger::get, bButton::get);
     }
 
     @AfterEach
@@ -96,23 +97,23 @@ public class KickerStateTest {
     }
 
     @Test
-    void kickerReversesWithXButton() {
-        xButton.set(true);
+    void kickerReversesWithBButton() {
+        bButton.set(true);
         machine.poll();
 
         assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
     }
 
     @Test
-    void kickerStopsWhenXButtonReleased() {
-        xButton.set(true);
+    void kickerStopsWhenBButtonReleased() {
+        bButton.set(true);
         machine.poll();
 
         // Double check that it's reversing
         assertEquals(KickerState.REVERSING, machine.currentState().kickerState());
 
         // Release the button
-        xButton.set(false);
+        bButton.set(false);
         machine.poll();
 
         assertEquals(KickerState.STOPPED, machine.currentState().kickerState());

@@ -11,13 +11,11 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
@@ -68,11 +66,14 @@ public class IntakeIOTalonFX implements IntakeIO {
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
+                .withFeedback(
+                    new FeedbackConfigs()
+                        .withSensorToMechanismRatio(IntakeConstants.INTAKE_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(.5)
-                        .withKI(1)
-                        .withKV(0.1));
+                        .withKP(0.1)
+                        .withKS(0.02)
+                        .withKV(0.125));
 
         var extensionMotorLeftConfig =
             new TalonFXConfiguration()
@@ -85,14 +86,15 @@ public class IntakeIOTalonFX implements IntakeIO {
                         .withSensorToMechanismRatio(IntakeConstants.EXTENSION_GEAR_RATIO))
                 .withSlot0(
                     new Slot0Configs()
-                        .withKP(34))
+                    .withKP(34)
+                )
                 .withAudio(
                     new AudioConfigs().withAllowMusicDurDisable(true)
                 );
 
         var extensionMotorRightConfig =
             new TalonFXConfiguration()
-                .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+                .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
@@ -140,8 +142,6 @@ public class IntakeIOTalonFX implements IntakeIO {
         BaseStatusSignal.setUpdateFrequencyForAll(
             extensionMotorRight.getIsProLicensed().getValue() ? 200 : 50, extensionRightVelocity, extensionRightCurrentAmps, extensionRightStallCurrentAmps, extensionRightPositionRot);
 
-        extensionMotorRight.setControl(new Follower(extensionMotorLeft.getDeviceID(), MotorAlignmentValue.Opposed));
-    
         startupJingle.addInstrument(extensionMotorLeft);
         startupJingle.addInstrument(extensionMotorRight);
         intermission.addInstrument(extensionMotorLeft);
@@ -183,18 +183,22 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     public void setIntakeExtensionLength(Angle position) {
         extensionMotorLeft.setControl(new PositionVoltage(position).withEnableFOC(false));
+        extensionMotorRight.setControl(new PositionVoltage(position).withEnableFOC(false));
     }
 
     public void setIntakeMaxLength() {
         extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMaxExtensionPosition).withEnableFOC(false));
+        extensionMotorRight.setControl(new PositionVoltage(IntakeConstants.intakeMaxExtensionPosition).withEnableFOC(false));
     }
     
     public void setIntakeIdleLength() {
         extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeIdleExtensionPosition).withEnableFOC(false));
+        extensionMotorRight.setControl(new PositionVoltage(IntakeConstants.intakeIdleExtensionPosition).withEnableFOC(false));
     }
 
     public void setIntakeMinLength() {
         extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false));
+        extensionMotorRight.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false));
     }
 
     public void stopIntake() {

@@ -2,10 +2,7 @@ package frc.robot.state;
 
 import bot.den.foxflow.RobotState;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIOSim;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +16,7 @@ public class HopperStateTest{
 
     final AtomicBoolean leftTrigger = new AtomicBoolean();
     final AtomicBoolean leftBumper = new AtomicBoolean();
-    final AtomicBoolean xButton = new AtomicBoolean();
+    final AtomicBoolean bButton = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
     @BeforeEach
@@ -31,8 +28,8 @@ public class HopperStateTest{
         machine = new RebuiltStateMachine();
         leftTrigger.set(false);
         leftBumper.set(false);
-        xButton.set(false);
-        HopperState.setup(machine, leftTrigger::get, leftBumper::get, xButton::get);
+        bButton.set(false);
+        HopperState.setup(machine, leftTrigger::get, leftBumper::get, bButton::get);
     }
 
     @AfterEach
@@ -53,7 +50,7 @@ public class HopperStateTest{
 
     @Test
     public void hopperDeploysUsingX() {
-        xButton.set(true);
+        bButton.set(true);
         machine.poll();
 
         // Verify hopper begins to deploy
@@ -76,12 +73,12 @@ public class HopperStateTest{
 
     @Test
     public void hopperRetractsToIdleUsingX() {
-        xButton.set(true);
+        bButton.set(true);
         machine.poll();
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
 
-        xButton.set(false);
+        bButton.set(false);
         machine.poll();
 
         // Verify hopper begins to retract to idle
@@ -103,7 +100,7 @@ public class HopperStateTest{
     public void hopperCanDeployFromIdleUsingX() {
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.IDLE));
 
-        xButton.set(true);
+        bButton.set(true);
         machine.poll();
 
         // Verify hopper begins to deploy
@@ -113,7 +110,7 @@ public class HopperStateTest{
     @Test
     public void hopperCanFullyRetractFromDeployed() {
         leftTrigger.set(true);
-        xButton.set(true);
+        bButton.set(true);
 
         CommandScheduler.getInstance().schedule(machine.transitionTo(HopperState.DEPLOYED));
 
