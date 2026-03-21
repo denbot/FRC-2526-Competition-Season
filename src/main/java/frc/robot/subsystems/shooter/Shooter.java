@@ -105,13 +105,11 @@ public class Shooter extends SubsystemBase{
     }
     
     private Command setShooterCommandAdaptive() {
-        this.shooterCommand = runSpinnerAdaptive(drive, drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed);
-        return this.shooterCommand;
+        return runSpinnerAdaptive(drive);
     }
 
     private Command setShooterCommandFixed() {
-        this.shooterCommand = runSpinner();
-        return this.shooterCommand;
+        return runSpinner();
     }
 
     private Command cancelShooterCommand() {
@@ -127,9 +125,11 @@ public class Shooter extends SubsystemBase{
             Math.pow(robotPose.getY() - targetPose.getY(), 2)));
 
         SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
+
+
         double x = distance.in(Meters); 
 
-        double targetVelocity = Math.min(80, Math.pow(x, 2) * 0.893293 + (1.75793 * x) + 40.677) + (spinnerVelocityOffset.magnitude());
+        double targetVelocity = Math.min(65, Math.pow(x, 2) * 0.664 + (0.158 * x) + 33) + (spinnerVelocityOffset.magnitude());
         Logger.recordOutput("Spinner Velocity Setpoint", spinnerVelocitySetpoint);
         return RotationsPerSecond.of(targetVelocity); // TODO This function is guesswork and estimation
     }
@@ -143,8 +143,11 @@ public class Shooter extends SubsystemBase{
         spinnerVelocityOffset = spinnerVelocityOffset.plus(speed);
     }
 
-    public Command runSpinnerAdaptive(Drive drive, Pose2d targetPose){
-        return Commands.runEnd(() -> this.io.setSpinnerVelocity(this.getIdealSpeed(drive.getPose(), targetPose)), () -> this.io.stopSpinner());
+    public Command runSpinnerAdaptive(Drive drive){
+        return Commands.runEnd(() -> this.io.setSpinnerVelocity(
+            this.getIdealSpeed(drive.getPose(), 
+            drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed)
+        ), () -> this.io.stopSpinner());
     }
 
     public Command runSpinner(){
