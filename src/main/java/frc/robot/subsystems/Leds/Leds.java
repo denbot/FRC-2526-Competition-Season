@@ -107,8 +107,8 @@ public class Leds extends SubsystemBase{
 			baseRight.mask(LEDPattern.progressMaskLayer(() -> (90 - degreesOff) / 90)).applyTo(this.rightHalf);
 		} else {LEDPattern.solid(Color.kOrangeRed).applyTo(this.ledBuffer);}
 		// Limelights
-//		else if (limelights.getTotalTagCount() >= 3) LEDPattern.solid(Color.kGreen).applyTo(this.ledBuffer);
-		else LEDPattern.solid(Color.kRed).applyTo(this.ledBuffer);;
+		//else if (limelights.getTotalTagCount() >= 3) LEDPattern.solid(Color.kGreen).applyTo(this.ledBuffer);
+		//else LEDPattern.solid(Color.kRed).applyTo(this.ledBuffer);;
 
 		this.led.setData(this.ledBuffer);
 	}
