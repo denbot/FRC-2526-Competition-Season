@@ -1,6 +1,8 @@
 package frc.robot.subsystems.auto;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,7 +15,7 @@ public class AutoRoutineCreator {
     private static driverRelative startingSide = driverRelative.LEFT;
     private static boolean isBlue = true;
     private static Intake intake;
-    private static Shooter shooter;
+    public static Shooter shooter;
     private static Indexer indexer;
 
     public enum driverRelative{
@@ -35,7 +37,6 @@ public class AutoRoutineCreator {
     }
 
     public static void addSweep(driverRelative sweepDistance, boolean doFishtail){
-
         double approachingAngle = isBlue?90:270;
         double returningAngle = isBlue?270:90;
 
@@ -50,6 +51,9 @@ public class AutoRoutineCreator {
         AutoCommandHelper.addSubsystemAction(intake.setIntakeMaxLength());
         AutoCommandHelper.addSubsystemAction(intake.runIntake(RotationsPerSecond.of(80)));
                 
+        // ensure the sweep is run at a slower speed
+        AutoCommandHelper.setMaxLinearVelocity(MetersPerSecond.of(2));
+
         // sweep straight
         AutoCommandHelper.addSetpoint(
             setpointToPose(startingSide==driverRelative.LEFT
@@ -67,6 +71,7 @@ public class AutoRoutineCreator {
         }
         else{
             // Return straight back
+            AutoCommandHelper.setMaxLinearVelocity(MetersPerSecond.of(6));
             AutoCommandHelper.addSetpoint(
                 setpointToPose(startingSide==driverRelative.LEFT
                     ?sweepDistance==driverRelative.FAR?onTheFlySetpoints.NEUTRAL_CENTER_LEFT:onTheFlySetpoints.NEUTRAL_EDGE_LEFT
@@ -104,10 +109,35 @@ public class AutoRoutineCreator {
             setpointToPose(startingSide==driverRelative.LEFT
                 ?returnLocation==driverRelative.TRENCH?onTheFlySetpoints.TRENCH_LEFT_ALLIANCE:onTheFlySetpoints.RAMP_LEFT_ALLIANCE
                 :returnLocation==driverRelative.TRENCH?onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE:onTheFlySetpoints.RAMP_RIGHT_ALLIANCE));
-        
     }
 
     public static void addAlignScorePosition(driverRelative scoreLocation){
+        switch(scoreLocation){
+            case LEFT: 
+                AutoCommandHelper.addSetpoint(setpointToPose(onTheFlySetpoints.SCORE_LEFT));
+                break;
+            case RIGHT: 
+                AutoCommandHelper.addSetpoint(setpointToPose(onTheFlySetpoints.SCORE_RIGHT));
+                break;
+            case CENTER: 
+                AutoCommandHelper.addSetpoint(setpointToPose(onTheFlySetpoints.SCORE_CENTER));
+                break;
+            default: break;
+        }
+    }
+
+    public static void addHumanPlayerCommand(){
+        AutoCommandHelper.addSetpoint(setpointToPose(onTheFlySetpoints.HUMAN_PLAYER));
+        AutoCommandHelper.addPause(Seconds.of(5));
+        addAlignScorePosition(driverRelative.RIGHT);
+        addShootCommand();
+    }
+
+    public static void addClimbCommand(driverRelative climbSide){
+        AutoCommandHelper.addSetpoint(setpointToPose(climbSide==driverRelative.LEFT?onTheFlySetpoints.CLIMB_LEFT_SETUP:onTheFlySetpoints.CLIMB_RIGHT_SETUP));
+        AutoCommandHelper.addPause(Seconds.of(1));
+        AutoCommandHelper.setMaxLinearVelocity(MetersPerSecond.of(1));
+        AutoCommandHelper.addSetpoint(setpointToPose(climbSide==driverRelative.LEFT?onTheFlySetpoints.CLIMB_LEFT_SETUP:onTheFlySetpoints.CLIMB_RIGHT_SETUP));
     }
 
     public static void addShootCommand(){
@@ -122,6 +152,14 @@ public class AutoRoutineCreator {
         AutoCommandHelper.addSubsystemAction(shooter.stopSpinner());
         AutoCommandHelper.addSubsystemAction(shooter.stopKicker());
         AutoCommandHelper.addSubsystemAction(intake.stopIntake());
+    }
+
+    public static void clearAll(){
+        AutoCommandHelper.clearAll();
+    }
+
+    public static void removeLast(){
+        AutoCommandHelper.undo();
     }
 
     public static Pose2d setpointToPose(onTheFlySetpoints setpoint){

@@ -22,11 +22,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.drive.Drive;
 
 public class AutoCommandHelper {
-    private static SequentialCommandGroup autoRoutine = new SequentialCommandGroup();
+    private static List<Command> autoRoutine;
     private static List<Pose2d> currentPathSetpoints;
     private static PathConstraints currentConstraints = new PathConstraints(6, 6, 6, 6);
     private static List<Command> subsystemCommands;
     private static List<Integer> subsystemTargetPoseIndicies;
+    private static List<helperState> pastStates;
     
     public static void addSetpoint(Pose2d setpoint){
         currentPathSetpoints.add(setpoint);
@@ -63,7 +64,7 @@ public class AutoCommandHelper {
         subsystemCommands.clear();
         subsystemTargetPoseIndicies.clear();
 
-        autoRoutine.addCommands(pathCommand);
+        autoRoutine.add(pathCommand);
     }
 
     public static void addSubsystemAction(Command subsystemAction){
@@ -73,7 +74,7 @@ public class AutoCommandHelper {
 
     public static void addPause(Time duration){
         endPath(0);
-        autoRoutine.addCommands(Commands.waitTime(duration));
+        autoRoutine.add(Commands.waitTime(duration));
     }
 
     public static void setMaxLinearVelocity(LinearVelocity maxVelocity){
@@ -85,9 +86,55 @@ public class AutoCommandHelper {
         currentConstraints = new PathConstraints(currentConstraints.maxVelocityMPS(), 6, maxVelocity.baseUnitMagnitude(), 6);
         endPath(currentConstraints.maxVelocityMPS());
     }
-
+ 
     public static Command getRoutine(){
-        return autoRoutine;
+        SequentialCommandGroup returnCommandGroup = new SequentialCommandGroup();
+        for (Command command : autoRoutine) {
+            returnCommandGroup.addCommands(command);
+        }
+        return returnCommandGroup;
     }
 
+    public static void clearAll(){
+        autoRoutine.clear();
+        currentPathSetpoints.clear();
+        currentConstraints = new PathConstraints(6, 6, 6, 6);
+        subsystemCommands.clear();
+        subsystemTargetPoseIndicies.clear();
+    }
+
+    public static void undo(){
+        // revert to the second to last state and remove the last state
+        pastStates.get(pastStates.size()-2).revertTo();
+        pastStates = pastStates.subList(0, pastStates.size()-1);
+    }
+
+    public static void saveState(){
+        new helperState();
+    }
+
+    private static class helperState{
+        public List<Command> autoRoutine;
+        public List<Pose2d> currentPathSetpoints;
+        public PathConstraints currentConstraints;
+        public List<Command> subsystemCommands;
+        public List<Integer> subsystemTargetPoseIndicies;
+    
+        public helperState(){
+            this.autoRoutine = AutoCommandHelper.autoRoutine;
+            this.currentPathSetpoints = AutoCommandHelper.currentPathSetpoints;
+            this.currentConstraints = AutoCommandHelper.currentConstraints;
+            this.subsystemCommands = AutoCommandHelper.subsystemCommands;
+            this.subsystemTargetPoseIndicies = AutoCommandHelper.subsystemTargetPoseIndicies;
+            AutoCommandHelper.pastStates.add(this);
+        }
+
+        public void revertTo(){
+            AutoCommandHelper.autoRoutine = this.autoRoutine;
+            AutoCommandHelper.currentPathSetpoints = this.currentPathSetpoints;
+            AutoCommandHelper.currentConstraints = this.currentConstraints;
+            AutoCommandHelper.subsystemCommands = this.subsystemCommands;
+            AutoCommandHelper.subsystemTargetPoseIndicies = this.subsystemTargetPoseIndicies;
+        }
+    }
 }

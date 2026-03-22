@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Control;
+package frc.robot.subsystems.control;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.auto.AutoRoutineCreator;
+import frc.robot.subsystems.auto.AutoRoutineCreator.driverRelative;
+import frc.robot.subsystems.auto.AutoCommandHelper;
 
 public class OperatorController {
     private final CommandGenericHID operatorController1 = new CommandGenericHID(1);
@@ -26,85 +29,87 @@ public class OperatorController {
     public final Trigger redWonAutoToggle = operatorController2.button(3);
     private static boolean isBlue = true;
     
-    /*
-    public OperatorController(AutoRoutineBuilder autoBuilder){
+    public OperatorController(){
 
-        blueWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(true); isBlue = true; SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
-        redWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(false); isBlue = false;SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
+        AutoCommandHelper.saveState(); // ensure there is a basic empty state to load
+
+        blueWonAutoToggle.whileTrue(Commands.runOnce(() -> {AutoRoutineCreator.setIsBlue(true); isBlue = true; SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
+        redWonAutoToggle.whileTrue(Commands.runOnce(() -> {AutoRoutineCreator.setIsBlue(false); isBlue = false;SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
         // Add neutral sweep + score  
+
+        trenchBumpSwitch.onChange(Commands.runOnce(() -> AutoRoutineCreator.setStartingSide(leftRightSwitch.getAsBoolean() ? driverRelative.RIGHT : driverRelative.LEFT)));
+
         neutralZoneScoreButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added neutral score to auto routine");
-                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
-                autoBuilder.addExitAlliance(startSide);
-                autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
-                autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP);
-                autoBuilder.addAlignScorePosition(leftRightSwitch.getAsBoolean() ? autoOptions.SHOOT_RIGHT : autoOptions.SHOOT_LEFT);
-                autoBuilder.addShootCommand(); 
+                AutoRoutineCreator.addExitAlliance(trenchBumpSwitch.getAsBoolean() ? driverRelative.TRENCH : driverRelative.RAMP);
+                AutoRoutineCreator.addSweep(edgeCenterSwitch.getAsBoolean() ? driverRelative.FAR : driverRelative.CLOSE, true);
+                AutoRoutineCreator.addReturnAlliance(trenchBumpSwitch.getAsBoolean() ? driverRelative.TRENCH : driverRelative.RAMP);
+                AutoRoutineCreator.addAlignScorePosition(leftRightSwitch.getAsBoolean() ? driverRelative.RIGHT : driverRelative.LEFT);
+                AutoRoutineCreator.addShootCommand(); 
+                AutoCommandHelper.saveState();
             }).ignoringDisable(true));
 
         // Add neutral sweep + feed 
         neutralZoneFeedButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added neutral feed to auto routine");
-                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
-                autoBuilder.addExitAlliance(startSide);
-                autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
-                autoBuilder.addShootCommand(); 
+                driverRelative startSide = leftRightSwitch.getAsBoolean() ? driverRelative.RIGHT : driverRelative.LEFT;
+                AutoRoutineCreator.addExitAlliance(startSide);
+                AutoRoutineCreator.addSweep(edgeCenterSwitch.getAsBoolean() ? driverRelative.FAR : driverRelative.CLOSE, false);
+                AutoRoutineCreator.addShootCommand(); 
+                AutoCommandHelper.saveState();
             }).ignoringDisable(true));
 
         // add human player command
         humanPlayerButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added human player to auto routine");
-                autoBuilder.addHumanPlayerCommand(autoOptions.SHOOT_RIGHT);
+                AutoRoutineCreator.addHumanPlayerCommand();
+                AutoCommandHelper.saveState();
             }).ignoringDisable(true));
         
         // add climb command
         climbButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added climb to auto routine");
-                autoBuilder.addClimbCommand(
-                    leftRightSwitch.getAsBoolean() ? autoOptions.CLIMB_RIGHT : autoOptions.CLIMB_LEFT);
+                AutoRoutineCreator.addClimbCommand(
+                    leftRightSwitch.getAsBoolean() ? driverRelative.RIGHT : driverRelative.LEFT);
+                AutoCommandHelper.saveState();
             }).ignoringDisable(true));  
         
         // add aim and shoot command
         aimAndShootButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added aim & shoot to auto routine");
-                autoBuilder.addShootCommand();
+                AutoRoutineCreator.addShootCommand();
+                AutoCommandHelper.saveState();
             }).ignoringDisable(true));
     
         // clear routine 
         clearAllButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Cleared auto routine");
-                autoBuilder.clearRoutine();
+                AutoRoutineCreator.clearAll();
+                AutoCommandHelper.saveState();
             }).ignoringDisable(true));
 
         // remove last command from routine 
         clearLastButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Cleared auto routine");
-                autoBuilder.removeLast();
+                AutoRoutineCreator.removeLast();
             }).ignoringDisable(true));
-        
-        // in teleop, flipping this switch toggles an auto climb
-        teleopAutoClimbSwitch.onTrue(
-            leftRightSwitch.getAsBoolean()
-            ? SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH)
-            : SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
-        // TODO: .andThen(ClimbCommand);
         
         operatorController1.axisGreaterThan(1, 0.5)
             .onTrue(Commands.runOnce(() ->
-                autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
+                AutoRoutineCreator.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
                 
         operatorController1.axisLessThan(1, -0.5)
             .onTrue(Commands.runOnce(() ->
-                autoBuilder.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
+                AutoRoutineCreator.shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
     }
-    */
+
     public static boolean getIsBlue(){
         return isBlue;
     }
