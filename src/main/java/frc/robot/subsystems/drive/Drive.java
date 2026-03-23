@@ -382,6 +382,15 @@ public class Drive extends SubsystemBase {
       getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_RIGHT_FINISH.blueAlignmentPose));
   }
 
+  public ChassisSpeeds findFieldRelativeSpeed(Pose2d pose) {
+
+    ChassisSpeeds robotRelativeSpeeds = getChassisSpeeds();
+
+    ChassisSpeeds fieldRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, pose.getRotation());
+  
+    return fieldRelativeSpeeds;
+  }
+
   public Time findDistanceInTime(Distance distanceX, Distance distanceY) {
     Time distanceInTime;
 
@@ -393,14 +402,14 @@ public class Drive extends SubsystemBase {
     distanceInTime = Seconds.of(
             Math.sqrt((
                     (totalDistance.in(Feet)
-                            * Math.tan(Constants.RobotConstants.shooterAngle.in(Degrees))
+                            * Math.tan(Constants.RobotConstants.shooterAngle.in(Radians))
                             + Constants.RobotConstants.shooterHeight.in(Feet)) - 6)
                     / 16.087025));
 
     return distanceInTime;
   }
 
-  private Pose2d iteratePose(Distance deltaX, Distance deltaY, ChassisSpeeds chassisSpeeds) {
+  private Pose2d iteratePose(Distance deltaX, Distance deltaY, ChassisSpeeds fieldRelativeSpeeds) {
     Pose2d pose;
     Rotation2d rotation;
 
@@ -411,12 +420,12 @@ public class Drive extends SubsystemBase {
 
     for (int i = 0; i < 20; i++) { // 20 is the maximum amount of iterations
       Time time = findDistanceInTime(targetX, targetY);
-      Distance deltaXFromTimedVelocity = Meters.of(time.in(Seconds) * chassisSpeeds.vxMetersPerSecond);
-      Distance deltaYFromTimedVelocity = Meters.of(time.in(Seconds) * chassisSpeeds.vyMetersPerSecond);
+      Distance deltaXFromTimedVelocity = Meters.of(time.in(Seconds) * fieldRelativeSpeeds.vxMetersPerSecond);
+      Distance deltaYFromTimedVelocity = Meters.of(time.in(Seconds) * fieldRelativeSpeeds.vyMetersPerSecond);
       targetX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
       targetY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
       newDistance = Meters.of(Math.sqrt(Math.pow(targetX.in(Meters), 2) + Math.pow(targetY.in(Meters), 2)));
-      if (Math.abs(newDistance.minus(oldDistance).in(Inches)) < 2) { // 2 inches is tolerance
+      if (Math.abs(newDistance.minus(oldDistance).in(Inches)) < 0.5) { // 1 inch is tolerance
         break;
       }
       oldDistance = newDistance;
@@ -470,9 +479,9 @@ public class Drive extends SubsystemBase {
     deltaX = aimForX.minus(positionX);
     deltaY = aimForY.minus(positionY);
 
-    shootingPose = iteratePose(deltaX, deltaY, getChassisSpeeds());
+    shootingPose = iteratePose(deltaX, deltaY, findFieldRelativeSpeed(pose));
 
-    Logger.recordOutput("Ideal Shooting Pose Found", shootingPose);
+    Logger.recordOutput("Ideal Shooting Pose Found", new Pose2d(pose.getX() + shootingPose.getX(), pose.getY() + shootingPose.getY(), shootingPose.getRotation()));
         
     return shootingPose;
   }
