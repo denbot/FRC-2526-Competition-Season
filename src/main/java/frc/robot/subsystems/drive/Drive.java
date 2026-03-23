@@ -481,6 +481,8 @@ public class Drive extends SubsystemBase {
 
     shootingPose = iteratePose(deltaX, deltaY, findFieldRelativeSpeed(pose));
 
+    shootingPose.rotateBy(new Rotation2d(Math.PI));
+
     Logger.recordOutput("AutoAimShootingPose", new Pose2d(pose.getX() + shootingPose.getX(), pose.getY() + shootingPose.getY(), shootingPose.getRotation()));
         
     return shootingPose;
