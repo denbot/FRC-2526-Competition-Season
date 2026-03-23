@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.RobotBase;
 
 import com.ctre.phoenix6.CANBus;
@@ -39,6 +40,10 @@ public final class Constants {
     REPLAY
   }
 
+  public static class EnvironmentConstants {
+    public static final LinearAcceleration gravity = FeetPerSecondPerSecond.of(32.174);
+  }
+
   public static class RobotConstants {
     public static final Angle shooterAngle = Degrees.of(55);
     public static final Distance shooterHeight = Inches.of(20.8); // Height that the ball is at the moment it leaves the robot.
@@ -57,6 +62,7 @@ public final class Constants {
     public static final Distance fieldLength = Meters.of(16.54);
     public static final Distance fieldWidth = Meters.of(8.07);
     public static final Distance distanceFromCorner = Meters.of(0.665988);
+    public static final Distance hubHeight = Feet.of(6);
   }
 
   public static class PointsOfInterest {

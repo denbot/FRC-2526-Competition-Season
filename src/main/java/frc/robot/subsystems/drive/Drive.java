@@ -403,8 +403,8 @@ public class Drive extends SubsystemBase {
             Math.sqrt((
                     (totalDistance.in(Feet)
                             * Math.tan(Constants.RobotConstants.shooterAngle.in(Radians))
-                            + Constants.RobotConstants.shooterHeight.in(Feet)) - 6)
-                    / 16.087025));
+                            + Constants.RobotConstants.shooterHeight.in(Feet)) - Constants.FieldDimensions.hubHeight.in(Feet))
+                    / (Constants.EnvironmentConstants.gravity.in(FeetPerSecondPerSecond) / 2)));
 
     return distanceInTime;
   }
