@@ -178,7 +178,7 @@ public class RobotContainer {
         break;
     }
 
-    //leds = new Leds(controller, shooter, drive, stateMachine);
+    leds = new Leds(controller, vision, shooter, drive, stateMachine);
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
