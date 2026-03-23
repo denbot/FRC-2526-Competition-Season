@@ -28,6 +28,12 @@ public class AutoRoutineCreator {
         RAMP;
     }
 
+    public static void addSubsystems(Intake intake, Shooter shooter, Indexer indexer){
+        AutoRoutineCreator.intake = intake;
+        AutoRoutineCreator.shooter = shooter;
+        AutoRoutineCreator.indexer = indexer;
+    }
+
     public static void setStartingSide(driverRelative side){
         AutoRoutineCreator.startingSide = side;
     }
@@ -71,7 +77,7 @@ public class AutoRoutineCreator {
         }
         else{
             // Return straight back
-            AutoCommandHelper.setMaxLinearVelocity(MetersPerSecond.of(6));
+            AutoCommandHelper.setMaxLinearVelocity(MetersPerSecond.of(4));
             AutoCommandHelper.addSetpoint(
                 setpointToPose(startingSide==driverRelative.LEFT
                     ?sweepDistance==driverRelative.FAR?onTheFlySetpoints.NEUTRAL_CENTER_LEFT:onTheFlySetpoints.NEUTRAL_EDGE_LEFT
@@ -80,6 +86,7 @@ public class AutoRoutineCreator {
         }
 
         // stop running intake
+        AutoCommandHelper.setMaxLinearVelocity(MetersPerSecond.of(4));
         AutoCommandHelper.addSubsystemAction(intake.stopIntake());
     }
 
@@ -127,6 +134,7 @@ public class AutoRoutineCreator {
     }
 
     public static void addHumanPlayerCommand(){
+        AutoCommandHelper.addSubsystemAction(intake.setIntakeIdleLength());
         AutoCommandHelper.addSetpoint(setpointToPose(onTheFlySetpoints.HUMAN_PLAYER));
         AutoCommandHelper.addPause(Seconds.of(5));
         addAlignScorePosition(driverRelative.RIGHT);
@@ -138,6 +146,7 @@ public class AutoRoutineCreator {
         AutoCommandHelper.addPause(Seconds.of(1));
         AutoCommandHelper.setMaxLinearVelocity(MetersPerSecond.of(1));
         AutoCommandHelper.addSetpoint(setpointToPose(climbSide==driverRelative.LEFT?onTheFlySetpoints.CLIMB_LEFT_SETUP:onTheFlySetpoints.CLIMB_RIGHT_SETUP));
+        AutoCommandHelper.setMaxLinearVelocity(MetersPerSecond.of(4));
     }
 
     public static void addShootCommand(){
@@ -160,6 +169,63 @@ public class AutoRoutineCreator {
 
     public static void removeLast(){
         AutoCommandHelper.undo();
+    }
+
+    public static void testAllExit(){
+        addExitAlliance(driverRelative.TRENCH);
+        addExitAlliance(driverRelative.RAMP);
+    }
+    public static void testAllReturn(){
+        addReturnAlliance(driverRelative.TRENCH);
+        addReturnAlliance(driverRelative.RAMP);
+    }
+    public static void testAllSweep(){
+        addSweep(driverRelative.FAR, true);
+        addSweep(driverRelative.CLOSE, true);
+        addSweep(driverRelative.FAR, false);
+        addSweep(driverRelative.CLOSE, false);
+    }
+    public static void testAllScore(){
+        addAlignScorePosition(driverRelative.LEFT);
+        addAlignScorePosition(driverRelative.CENTER);
+        addAlignScorePosition(driverRelative.RIGHT);
+    }
+    public static void testAllClimb(){
+        addClimbCommand(driverRelative.LEFT);
+        addClimbCommand(driverRelative.RIGHT);
+    }
+
+    public static void testAllSequences(){
+        setIsBlue(true);
+        setStartingSide(driverRelative.LEFT);
+        testAllExit();
+        testAllSweep();
+        testAllReturn();
+        
+        setStartingSide(driverRelative.RIGHT);
+        testAllExit();
+        testAllSweep();
+        testAllReturn();
+
+        testAllClimb();
+        testAllScore();
+        addHumanPlayerCommand();
+
+        setIsBlue(false);
+        setStartingSide(driverRelative.LEFT);
+        testAllExit();
+        testAllSweep();
+        testAllReturn();
+
+        setStartingSide(driverRelative.RIGHT);
+        testAllExit();
+        testAllSweep();
+        testAllClimb();
+
+        testAllClimb();
+        testAllScore();
+        addHumanPlayerCommand();
+    
     }
 
     public static Pose2d setpointToPose(onTheFlySetpoints setpoint){

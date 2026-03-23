@@ -27,6 +27,7 @@ import frc.robot.commands.HubStatusAlert;
 import frc.robot.generated.TunerConstants;
 import frc.robot.state.*;
 import frc.robot.subsystems.Leds.Leds;
+import frc.robot.subsystems.auto.AutoCommandHelper;
 import frc.robot.subsystems.auto.AutoRoutineCreator;
 import frc.robot.subsystems.control.OperatorController;
 import frc.robot.subsystems.drive.Drive;
@@ -164,8 +165,9 @@ public class RobotContainer {
     leds = new Leds(limelights, controller, shooter, drive, stateMachine);
 
     // Set up auto routines
-    //autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
-    //operatorController = new OperatorController(autoBuilder);
+    AutoRoutineCreator.addSubsystems(intake, shooter, indexer);
+    operatorController = new OperatorController();
+    AutoRoutineCreator.testAllSequences();
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Mute controller disconnected warnings
@@ -294,7 +296,7 @@ public void updateRobotPose(){
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return AutoCommandHelper.getRoutine();
   }
 
     public void startJingle(){

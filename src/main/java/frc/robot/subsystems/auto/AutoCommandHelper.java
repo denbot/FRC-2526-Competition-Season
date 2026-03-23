@@ -1,5 +1,6 @@
 package frc.robot.subsystems.auto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -22,49 +23,72 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.drive.Drive;
 
 public class AutoCommandHelper {
-    private static List<Command> autoRoutine;
-    private static List<Pose2d> currentPathSetpoints;
-    private static PathConstraints currentConstraints = new PathConstraints(6, 6, 6, 6);
-    private static List<Command> subsystemCommands;
-    private static List<Integer> subsystemTargetPoseIndicies;
-    private static List<helperState> pastStates;
+    private static List<Command> autoRoutine = new ArrayList<>();
+    private static List<Pose2d> currentPathSetpoints = new ArrayList<>();
+    private static PathConstraints currentConstraints = new PathConstraints(4, 2, 4, 2);
+    private static List<Command> subsystemCommands = new ArrayList<>();
+    private static List<Integer> subsystemTargetPoseIndicies = new ArrayList<>();
+    private static List<helperState> pastStates = new ArrayList<>();
     
     public static void addSetpoint(Pose2d setpoint){
         currentPathSetpoints.add(setpoint);
     }
 
     public static void endPath(double endVelocityMPS){
-        PathPlannerPath path = new PathPlannerPath(
-            PathPlannerPath.waypointsFromPoses(currentPathSetpoints), // Convert Poses into pathplanner waypoints 
-            currentConstraints, // use the current constraints defined by the setMax___Velocity functions
-            null, 
-            new GoalEndState(endVelocityMPS, currentPathSetpoints.get(currentPathSetpoints.size()-1).getRotation())); 
+        if(currentPathSetpoints.size() <= 0) return;
+        else if(currentPathSetpoints.size() <= 1){ 
+            Command pathCommand = AutoBuilder.pathfindToPose(currentPathSetpoints.get(0), currentConstraints);
+            ParallelCommandGroup totalCommand = new ParallelCommandGroup(pathCommand);
+            
+            for(int i = 0; i < subsystemCommands.size(); i++){
+                totalCommand.addCommands(subsystemCommands.get(i));
+            }
 
-        Command pathCommand = AutoBuilder.pathfindThenFollowPath(path, currentConstraints);
-        ParallelCommandGroup totalCommand = new ParallelCommandGroup(pathCommand);
+            // clear temp lists
+            currentPathSetpoints.clear();
+            subsystemCommands.clear();
+            subsystemTargetPoseIndicies.clear();
 
-        // get a trajecoty object for the path so that we can refference the current target pose when the path is running
-        PathPlannerTrajectory trajectory = new PathPlannerTrajectory(path, new ChassisSpeeds(), new Rotation2d(), Drive.PP_CONFIG);
-        PathPlannerTrajectoryState targetState = trajectory.sample(2.0); // sample target pose
+            autoRoutine.add(totalCommand);
+        }
+        else{
+            PathPlannerPath path = new PathPlannerPath(
+                PathPlannerPath.waypointsFromPoses(currentPathSetpoints), // Convert Poses into pathplanner waypoints 
+                currentConstraints, // use the current constraints defined by the setMax___Velocity functions
+                null, 
+                new GoalEndState(endVelocityMPS, currentPathSetpoints.get(currentPathSetpoints.size()-1).getRotation())); 
 
-        // for all commands added throughout the definition of this path
-        for(int i = 0; i < subsystemCommands.size(); i++){
-            int index = subsystemTargetPoseIndicies.get(i); // get the pose at which the command was added
+            Command pathCommand = AutoBuilder.pathfindThenFollowPath(path, currentConstraints);
+            ParallelCommandGroup totalCommand = new ParallelCommandGroup(pathCommand);
 
-            // parallel the command with the motion path but only run the command if the current target pose is the pose after the command was added
-            // IE: added command after setpoint 2, it triggers once the path is trying to now go to sepoint 3 or the path just reached setpoint 2
-            totalCommand.addCommands(
+            // get a trajecoty object for the path so that we can refference the current target pose when the path is running
+            PathPlannerTrajectory trajectory = new PathPlannerTrajectory(path, new ChassisSpeeds(), new Rotation2d(), Drive.PP_CONFIG);
+            PathPlannerTrajectoryState targetState = trajectory.sample(2.0); // sample target pose
+
+            // for all commands added throughout the definition of this path
+            for(int i = 0; i < subsystemCommands.size(); i++){
+                int index = subsystemTargetPoseIndicies.get(i); // get the pose at which the command was added
+                
+                // parallel the command with the motion path but only run the command if the current target pose is the pose after the command was added
+                // IE: added command after setpoint 2, it triggers once the path is trying to now go to sepoint 3 or the path just reached setpoint 2
+
+                Pose2d refferncePose;
+                if(index >= currentPathSetpoints.size()-2) refferncePose = currentPathSetpoints.get(currentPathSetpoints.size()-1);
+                else refferncePose = currentPathSetpoints.get(index+1);
+
+                totalCommand.addCommands(
                     subsystemCommands.get(i)
                         .onlyIf(()->
-                            targetState.pose.equals(currentPathSetpoints.get(index+index==currentPathSetpoints.size()?0:1))));
+                            targetState.pose.equals(refferncePose)));
+            }
+
+            // clear temp lists
+            currentPathSetpoints.clear();
+            subsystemCommands.clear();
+            subsystemTargetPoseIndicies.clear();
+
+            autoRoutine.add(totalCommand);
         }
-
-        // clear temp lists
-        currentPathSetpoints.clear();
-        subsystemCommands.clear();
-        subsystemTargetPoseIndicies.clear();
-
-        autoRoutine.add(pathCommand);
     }
 
     public static void addSubsystemAction(Command subsystemAction){
@@ -78,12 +102,12 @@ public class AutoCommandHelper {
     }
 
     public static void setMaxLinearVelocity(LinearVelocity maxVelocity){
-        currentConstraints = new PathConstraints(maxVelocity.baseUnitMagnitude(), 6, currentConstraints.maxAngularVelocityRadPerSec(), 6);
+        currentConstraints = new PathConstraints(maxVelocity.baseUnitMagnitude(), 2, currentConstraints.maxAngularVelocityRadPerSec(), 2);
         endPath(maxVelocity.baseUnitMagnitude());
     }
 
     public static void setMaxAngularVelocity(AngularVelocity maxVelocity){
-        currentConstraints = new PathConstraints(currentConstraints.maxVelocityMPS(), 6, maxVelocity.baseUnitMagnitude(), 6);
+        currentConstraints = new PathConstraints(currentConstraints.maxVelocityMPS(), 2, maxVelocity.baseUnitMagnitude(), 2);
         endPath(currentConstraints.maxVelocityMPS());
     }
  
