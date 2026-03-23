@@ -431,7 +431,7 @@ public class Drive extends SubsystemBase {
       oldDistance = newDistance;
     }
 
-    rotation = new Rotation2d(Math.atan2(targetY.in(Meters), targetX.in(Meters)));
+    rotation = new Rotation2d(Math.atan2(targetY.in(Meters), targetX.in(Meters)) + Math.PI);
     pose = new Pose2d(targetX.in(Meters), targetY.in(Meters), rotation);
     return pose;
   }
@@ -480,8 +480,6 @@ public class Drive extends SubsystemBase {
     deltaY = aimForY.minus(positionY);
 
     shootingPose = iteratePose(deltaX, deltaY, findFieldRelativeSpeed(pose));
-
-    shootingPose.rotateBy(new Rotation2d(Math.PI));
 
     Logger.recordOutput("AutoAimShootingPose", new Pose2d(pose.getX() + shootingPose.getX(), pose.getY() + shootingPose.getY(), shootingPose.getRotation()));
         
