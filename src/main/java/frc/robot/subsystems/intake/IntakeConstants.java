@@ -17,5 +17,5 @@ public class IntakeConstants {
   public static double INTAKE_GEAR_RATIO = 12.0/30.0;
   public static int DEPLOYED_DIO_PORT = 0; // TODO: find port
   public static int RETRACTED_DIO_PORT = 1; // TODO: find port
-  public static final AngularVelocity intakeSpeed = RotationsPerSecond.of(60);
+  public static final AngularVelocity intakeSpeed = RotationsPerSecond.of(50);
 }

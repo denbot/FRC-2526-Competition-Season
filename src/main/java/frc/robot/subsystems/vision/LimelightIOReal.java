@@ -80,9 +80,9 @@ public class LimelightIOReal implements LimelightIO{
         PoseEstimate poseEstimate2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.BACK_RIGHT.name);
         PoseEstimate poseEstimate3 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.FRONT.name);
 
-        inputs.backLeftTagCount = poseEstimate1 == null ? 0 : poseEstimate1.tagCount;
-        inputs.backRightTagCount = poseEstimate2 == null ? 0 : poseEstimate2.tagCount;
-        inputs.frontTagCount = poseEstimate3 == null ? 0 : poseEstimate3.tagCount;
+        inputs.backLeftTagCount = LimelightHelpers.getTargetCount(Limelight.BACK_LEFT.name);
+        inputs.backRightTagCount = LimelightHelpers.getTargetCount(Limelight.BACK_RIGHT.name);
+        inputs.frontTagCount = LimelightHelpers.getTargetCount(Limelight.FRONT.name);
 
         inputs.totalTagCount = inputs.frontTagCount;
         //inputs.totalTagCount = inputs.backLeftTagCount + inputs.backRightTagCount + inputs.frontTagCount;
@@ -90,14 +90,15 @@ public class LimelightIOReal implements LimelightIO{
     }
 
     public void getAllPoseEstimate(Drive drive){
-        //getSinglePoseEstimate(drive, Limelight.BACK_LEFT);
-        //getSinglePoseEstimate(drive, Limelight.BACK_RIGHT);
+        getSinglePoseEstimate(drive, Limelight.BACK_LEFT);
+        getSinglePoseEstimate(drive, Limelight.BACK_RIGHT);
         getSinglePoseEstimate(drive, Limelight.FRONT);
     }
 
     public void getSinglePoseEstimate(Drive drive, Limelight limelight){
+        LimelightHelpers.SetRobotOrientation(limelight.name, drive.getRotation().getDegrees(), 0, 0, 0, 0, 0);
         LimelightHelpers.PoseEstimate poseEstimate = 
-        LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.name);
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.name);
 
         if(poseEstimate == null || poseEstimate.tagCount == 0) return;
 
