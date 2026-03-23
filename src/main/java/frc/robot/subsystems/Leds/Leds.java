@@ -33,6 +33,9 @@ public class Leds extends SubsystemBase{
 	private Drive drive;
 	private AddressableLEDBufferView leftHalf;
 	private AddressableLEDBufferView rightHalf;
+	private AddressableLEDBufferView leftLimelight;
+	private AddressableLEDBufferView frontLimelight;
+	private AddressableLEDBufferView rightLimelight;
 	private RebuiltStateMachine stateMachine;
 	private final Timer timeUntilTransition = new Timer();
 	private Time targetWaitTime = Seconds.zero();
@@ -42,8 +45,11 @@ public class Leds extends SubsystemBase{
 		this.led = new AddressableLED(0);
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
-		this.leftHalf = this.ledBuffer.createView(0, numLeds/2);
-		this.rightHalf = this.ledBuffer.createView(numLeds/2, numLeds - 1);
+		this.leftHalf = this.ledBuffer.createView(4, numLeds/2);
+		this.rightHalf = this.ledBuffer.createView(numLeds/2+1, numLeds - 4);
+		this.rightLimelight = this.ledBuffer.createView(0, 4);
+		this.frontLimelight = this.ledBuffer.createView(numLeds/2-2, numLeds/2+1);
+		this.leftLimelight = this.ledBuffer.createView(numLeds - 5, numLeds - 1);
 
 		this.led.setLength(this.ledBuffer.getLength());
 		this.led.setData(ledBuffer);
@@ -60,10 +66,10 @@ public class Leds extends SubsystemBase{
 
 		this.stateMachine.state(RobotState.TELEOP, MatchState.NONE).to(MatchState.TRANSITION_SHIFT).run(getMatchStateTimerCommand(MatchState.TRANSITION_SHIFT.timeInState, 3.0));
 		this.stateMachine.state(MatchState.TRANSITION_SHIFT).to(MatchState.SHIFT_1).run(getMatchStateTimerCommand(MatchState.SHIFT_1.timeInState, 3.0));
-		this.stateMachine.state(MatchState.SHIFT_1).to(MatchState.SHIFT_2).run(getMatchStateTimerCommand(MatchState.SHIFT_2.timeInState, 3.0));
-		this.stateMachine.state(MatchState.SHIFT_2).to(MatchState.SHIFT_3).run(getMatchStateTimerCommand(MatchState.SHIFT_3.timeInState, 3.0));
-		this.stateMachine.state(MatchState.SHIFT_3).to(MatchState.SHIFT_4).run(getMatchStateTimerCommand(MatchState.SHIFT_4.timeInState, 3.0));
-		this.stateMachine.state(MatchState.SHIFT_4).to(MatchState.END_GAME).run(getMatchStateTimerCommand(MatchState.END_GAME.timeInState, 3.0));
+		this.stateMachine.state(MatchState.SHIFT_1).to(MatchState.SHIFT_2).run(getMatchStateTimerCommand(MatchState.SHIFT_2.timeInState, 5.0));
+		this.stateMachine.state(MatchState.SHIFT_2).to(MatchState.SHIFT_3).run(getMatchStateTimerCommand(MatchState.SHIFT_3.timeInState, 5.0));
+		this.stateMachine.state(MatchState.SHIFT_3).to(MatchState.SHIFT_4).run(getMatchStateTimerCommand(MatchState.SHIFT_4.timeInState, 5.0));
+		this.stateMachine.state(MatchState.SHIFT_4).to(MatchState.END_GAME).run(getMatchStateTimerCommand(MatchState.END_GAME.timeInState, 5.0));
 	}
 
 	public Command getMatchStateTimerCommand(Time timeInState, double offset){
@@ -80,13 +86,11 @@ public class Leds extends SubsystemBase{
 	@Override
 	public void periodic(){
 		if(this.timeUntilTransition.hasElapsed(targetWaitTime)){
-			CommandScheduler.getInstance().schedule(Commands.repeatingSequence(
-				Commands.runOnce(() ->LEDPattern.solid(this.isBlueActive ? Color.kBlue : Color.kRed).applyTo(this.ledBuffer)),
-				Commands.waitSeconds(0.5),
-				Commands.runOnce(() ->LEDPattern.solid(Color.kWhite).applyTo(this.ledBuffer)))
-				.withTimeout(Seconds.of(3)));
-			this.timeUntilTransition.reset();
-			this.timeUntilTransition.stop();			
+			LEDPattern.solid(
+				timeUntilTransition.get() % 0.5 > 0.25 ?
+				Color.kCyan :
+				Color.kOrange
+			).applyTo(this.ledBuffer);		
 		} 
 		else if (this.controller.rightBumper().getAsBoolean() == true){
 
@@ -102,10 +106,24 @@ public class Leds extends SubsystemBase{
 			
 			// Apply a mask to the graident from 0-1 for how close the drive base is to aiming fully
 			baseRight.mask(LEDPattern.progressMaskLayer(() -> (90 - degreesOff) / 90)).applyTo(this.rightHalf);
-		}
+		} else {LEDPattern.solid(Color.kOrangeRed).applyTo(this.ledBuffer);}
 		// Limelights
-		else if (limelights.getTotalTagCount() >= 3) LEDPattern.solid(Color.kGreen).applyTo(this.ledBuffer);
-		else LEDPattern.solid(Color.kRed).applyTo(this.ledBuffer);;
+		if (limelights.getBackLeftTags() > 0) {
+			LEDPattern.solid(Color.kGreen).applyTo(this.leftLimelight);
+		} else {
+			LEDPattern.solid(Color.kBlack).applyTo(this.leftLimelight);
+		}
+		if (limelights.getFrontTags() > 0) {
+			LEDPattern.solid(Color.kGreen).applyTo(this.frontLimelight);
+		} else {
+			LEDPattern.solid(Color.kBlack).applyTo(this.frontLimelight);
+		}
+		if (limelights.getBackRightTags() > 0) {
+			LEDPattern.solid(Color.kGreen).applyTo(this.rightLimelight);
+		} else {
+			LEDPattern.solid(Color.kBlack).applyTo(this.rightLimelight);
+		}
+		
 
 		this.led.setData(this.ledBuffer);
 	}

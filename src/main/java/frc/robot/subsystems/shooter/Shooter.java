@@ -110,8 +110,7 @@ public class Shooter extends SubsystemBase{
     }
 
     private Command setShooterCommandFixed() {
-        this.shooterCommand = runSpinner();
-        return this.shooterCommand;
+        return runSpinner();
     }
 
     private Command cancelShooterCommand() {
@@ -127,9 +126,11 @@ public class Shooter extends SubsystemBase{
             Math.pow(targetPose.getY(), 2)));
 
         SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
+
+
         double x = distance.in(Meters); 
 
-        double targetVelocity = Math.min(80, Math.pow(x, 2) * 0.893293 + (1.75793 * x) + 40.677) + (spinnerVelocityOffset.magnitude());
+        double targetVelocity = Math.min(65, Math.pow(x, 2) * 0.664 + (0.158 * x) + 33) + (spinnerVelocityOffset.magnitude());
         Logger.recordOutput("Spinner Velocity Setpoint", spinnerVelocitySetpoint);
         return RotationsPerSecond.of(targetVelocity); // TODO This function is guesswork and estimation
     }
