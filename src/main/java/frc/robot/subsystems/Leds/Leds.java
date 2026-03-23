@@ -20,17 +20,17 @@ import frc.robot.state.MatchState;
 import frc.robot.state.RebuiltStateMachine;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.vision.Limelights;
+import frc.robot.subsystems.vision.Vision;
 
 
 public class Leds extends SubsystemBase{
 	private int numLeds = 46;
 	private AddressableLED led;
 	private AddressableLEDBuffer ledBuffer;
-	private Limelights limelights;
 	private CommandXboxController controller;
 	private Shooter shooter;
 	private Drive drive;
+	private Vision vision;
 	private AddressableLEDBufferView leftHalf;
 	private AddressableLEDBufferView rightHalf;
 	private AddressableLEDBufferView leftLimelight;
@@ -39,9 +39,9 @@ public class Leds extends SubsystemBase{
 	private RebuiltStateMachine stateMachine;
 	private final Timer timeUntilTransition = new Timer();
 	private Time targetWaitTime = Seconds.zero();
-	private Boolean isBlueActive = false;
+	private Boolean isBlueActive;
 
-	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
+	public Leds(CommandXboxController controller, Vision vision, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
 		this.led = new AddressableLED(0);
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
@@ -56,7 +56,7 @@ public class Leds extends SubsystemBase{
 		this.led.start();
 
 		this.controller = controller;
-		this.limelights = limelights;
+		this.vision = vision;
 		this.shooter = shooter;
 		this.drive = drive;
 		this.stateMachine = stateMachine;
@@ -108,17 +108,17 @@ public class Leds extends SubsystemBase{
 			baseRight.mask(LEDPattern.progressMaskLayer(() -> (90 - degreesOff) / 90)).applyTo(this.rightHalf);
 		} else {LEDPattern.solid(Color.kOrangeRed).applyTo(this.ledBuffer);}
 		// Limelights
-		if (limelights.getBackLeftTags() > 0) {
+		if (vision.getTagIDAvailable(1)) {
 			LEDPattern.solid(Color.kGreen).applyTo(this.leftLimelight);
 		} else {
 			LEDPattern.solid(Color.kBlack).applyTo(this.leftLimelight);
 		}
-		if (limelights.getFrontTags() > 0) {
+		if (vision.getTagIDAvailable(2)) {
 			LEDPattern.solid(Color.kGreen).applyTo(this.frontLimelight);
 		} else {
 			LEDPattern.solid(Color.kBlack).applyTo(this.frontLimelight);
 		}
-		if (limelights.getBackRightTags() > 0) {
+		if (vision.getTagIDAvailable(0)) {
 			LEDPattern.solid(Color.kGreen).applyTo(this.rightLimelight);
 		} else {
 			LEDPattern.solid(Color.kBlack).applyTo(this.rightLimelight);

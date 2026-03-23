@@ -14,9 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,7 +23,13 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HubStatusAlert;
 import frc.robot.generated.TunerConstants;
-import frc.robot.state.*;
+import frc.robot.state.HopperState;
+import frc.robot.state.IndexerState;
+import frc.robot.state.IntakeState;
+import frc.robot.state.KickerState;
+import frc.robot.state.MatchState;
+import frc.robot.state.RebuiltStateMachine;
+import frc.robot.state.ShooterState;
 import frc.robot.subsystems.Control.OperatorController;
 import frc.robot.subsystems.Leds.Leds;
 import frc.robot.subsystems.auto.AutoRoutineBuilder;
@@ -42,7 +46,6 @@ import frc.robot.subsystems.indexer.IndexerIOSim;
 import frc.robot.subsystems.indexer.IndexerIOTalonFX;
 
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
@@ -51,15 +54,12 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
-import frc.robot.subsystems.vision.LimelightIO;
-import frc.robot.subsystems.vision.LimelightIOReal;
-import frc.robot.subsystems.vision.LimelightIOSim;
-import frc.robot.subsystems.vision.Limelights;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
+import frc.robot.subsystems.vision.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.subsystems.vision.VisionConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -75,7 +75,6 @@ public class RobotContainer {
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
-  private Limelights limelights;
   private AutoRoutineBuilder autoBuilder;
   private Leds leds;
 
@@ -83,7 +82,9 @@ public class RobotContainer {
   private SlewRateLimiter yLim = new SlewRateLimiter(3);
   private SlewRateLimiter oLim = new SlewRateLimiter(3);
   
-  private HubStatusAlert hubStatusAlert = new HubStatusAlert();
+  private final Vision vision;
+
+  private HubStatusAlert hubStatusAlert;
 
   // Controller
   private OperatorController operatorController;
@@ -109,11 +110,17 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+        vision =
+                new Vision(
+                        drive::addVisionMeasurement,
+                        new VisionIOLimelight(cameraLeftName, drive::getRotation),
+                        new VisionIOLimelight(cameraRightName, drive::getRotation),
+                        new VisionIOLimelight(cameraFrontName, drive::getRotation));
 
         indexer = new Indexer(new IndexerIOTalonFX(), stateMachine);
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
-        limelights = new Limelights(new LimelightIOReal(), drive);
+        CommandScheduler.getInstance().schedule(hubStatusAlert);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -143,10 +150,16 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        vision =
+                new Vision(
+                        drive::addVisionMeasurement,
+                        new VisionIOPhotonVisionSim(cameraLeftName, robotToCameraLeft, drive::getPose),
+                        new VisionIOPhotonVisionSim(cameraRightName, robotToCameraRight, drive::getPose),
+                        new VisionIOPhotonVisionSim(cameraFrontName, robotToCameraFront, drive::getPose));
+
         shooter = new Shooter(new ShooterIOSim(), stateMachine, drive);
         indexer = new Indexer(new IndexerIOSim(), stateMachine);
         intake = new Intake(new IntakeIOSim(), stateMachine);
-        limelights = new Limelights(new LimelightIOSim(), drive);
         break;
 
       default:
@@ -158,13 +171,14 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
         shooter = new Shooter(new ShooterIO() {}, stateMachine, drive);
         intake = new Intake(new IntakeIO() {}, stateMachine);
-        limelights = new Limelights(new LimelightIOSim(), drive);
+        CommandScheduler.getInstance().schedule(hubStatusAlert);
         break;
     }
 
-    leds = new Leds(limelights, controller, shooter, drive, stateMachine);
+    leds = new Leds(controller, vision, shooter, drive, stateMachine);
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
@@ -285,10 +299,6 @@ public class RobotContainer {
 
 public Pose2d getRobotPosition(){
     return drive.getPose();
-}
-
-public void updateRobotPose(){
-    limelights.getAllPoseEstimate();
 }
 
   /**
