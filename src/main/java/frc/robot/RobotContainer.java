@@ -14,11 +14,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -26,10 +23,9 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HubStatusAlert;
 import frc.robot.generated.TunerConstants;
 import frc.robot.state.*;
-import frc.robot.subsystems.Leds.Leds;
-import frc.robot.subsystems.auto.AutoCommandHelper;
-import frc.robot.subsystems.auto.AutoRoutineCreator;
 import frc.robot.subsystems.control.OperatorController;
+import frc.robot.subsystems.Leds.Leds;
+import frc.robot.subsystems.auto.AutoRoutineBuilder;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -41,7 +37,6 @@ import frc.robot.subsystems.indexer.IndexerIOSim;
 import frc.robot.subsystems.indexer.IndexerIOTalonFX;
 
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
@@ -50,12 +45,10 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
-import frc.robot.subsystems.vision.LimelightIO;
 import frc.robot.subsystems.vision.LimelightIOReal;
 import frc.robot.subsystems.vision.LimelightIOSim;
 import frc.robot.subsystems.vision.Limelights;
 
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -68,13 +61,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-
   public final Drive drive;
   private Intake intake;
   private Indexer indexer;
   private Shooter shooter;
   private Limelights limelights;
-  private AutoRoutineCreator autoBuilder;
+  private AutoRoutineBuilder autoBuilder;
   private Leds leds;
 
   private SlewRateLimiter xLim = new SlewRateLimiter(3);
@@ -165,9 +157,9 @@ public class RobotContainer {
     leds = new Leds(limelights, controller, shooter, drive, stateMachine);
 
     // Set up auto routines
-    AutoRoutineCreator.addSubsystems(intake, shooter, indexer);
-    operatorController = new OperatorController();
-    AutoRoutineCreator.testAllSequences();
+    autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
+    operatorController = new OperatorController(autoBuilder);
+    autoBuilder.testAll();
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Mute controller disconnected warnings
@@ -276,10 +268,10 @@ public class RobotContainer {
             .andThen(Commands.runOnce(() -> drive.stopWithX())));
     
     controller.povUp().onTrue(
-      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(2))));
+      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(1))));
 
     controller.povDown().onTrue(
-      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-2))));
+      Commands.runOnce(() -> shooter.stepSpinnerVelocitySetpoint(RotationsPerSecond.of(-1))));
 }
 
 public Pose2d getRobotPosition(){
@@ -296,7 +288,7 @@ public void updateRobotPose(){
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoCommandHelper.getRoutine();
+    return autoBuilder.getAutoRoutine();
   }
 
     public void startJingle(){
