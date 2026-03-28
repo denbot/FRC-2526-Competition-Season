@@ -61,7 +61,7 @@ public final class Constants {
   public static class FieldDimensions {
     public static final Distance fieldLength = Meters.of(16.54);
     public static final Distance fieldWidth = Meters.of(8.07);
-    public static final Distance distanceFromCorner = Meters.of(0.665988);
+    public static final Distance distanceFromCorner = Meters.of(1);
     public static final Distance hubHeight = Feet.of(6);
   }
 

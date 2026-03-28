@@ -130,7 +130,7 @@ public class Shooter extends SubsystemBase{
 
         double x = distance.in(Meters); 
 
-        double targetVelocity = Math.min(65, Math.pow(x, 2) * 0.664 + (0.158 * x) + 33) + (spinnerVelocityOffset.magnitude());
+        double targetVelocity = Math.min(100, Math.pow(x, 2) * 0.664 + (0.158 * x) + 35) + (spinnerVelocityOffset.magnitude());
         Logger.recordOutput("Spinner Velocity Setpoint", spinnerVelocitySetpoint);
         return RotationsPerSecond.of(targetVelocity); // TODO This function is guesswork and estimation
     }

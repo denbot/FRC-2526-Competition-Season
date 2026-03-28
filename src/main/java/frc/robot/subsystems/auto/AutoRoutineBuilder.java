@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
@@ -107,50 +108,28 @@ public class AutoRoutineBuilder {
     }
 
     public void addShootCommand(){
-        /*addAction(
-            intake.setIntakeMaxLength() // extend intake for maximum storage space
-            // Run the spinner up to speed until it is at speed
-            .alongWith(shooter.runSpinnerAdaptive(
-                drive, drive.isBlue() 
-                ? PointsOfInterest.centerOfHubBlue 
-                : PointsOfInterest.centerOfHubRed))
-            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)) // Auto aim at the hub
-            .until(() -> Math.abs(shooter.getSpinnerClosedLoopError()) < 1 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
-            .andThen(
-                // Continue running spinner at speed
-                shooter.runSpinnerAdaptive(
-                    drive, drive.isBlue() 
-                    ? PointsOfInterest.centerOfHubBlue 
-                    : PointsOfInterest.centerOfHubRed)
-                // Run indexer and kicker to feed shooter with fuel
-                .alongWith(indexer.runIndexer()).withTimeout(6)
-                .alongWith(shooter.runKicker()).withTimeout(6)
-                // wait 4 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
-                .alongWith(
-                    Commands.waitSeconds(4)
-                    .andThen(intake.setIntakeMinLength())).withTimeout(6)), "Shoot");
-        }*/
         addAction(
             intake.setIntakeMaxLength() // extend intake for maximum storage space
             // Run the spinner up to speed until it is at speed
-            .alongWith(shooter.runSpinner()) // Auto aim at the hub
-            .until(() -> Math.abs(shooter.getSpinnerClosedLoopError()) < 12 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
+            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)) // Auto aim at the hub
+            .andThen(shooter.runSpinnerAdaptive(drive))
+            .until(() -> Math.abs(shooter.getSpinnerClosedLoopError()) < 1 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
             .andThen(
                 // Continue running spinner at speed
-                shooter.runSpinner() // Auto aim at the hub
+                shooter.runSpinnerAdaptive(drive)
+                .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)).withTimeout(4) // Auto aim at the hub
                 // Run indexer and kicker to feed shooter with fuel
-
-                .alongWith(indexer.runIndexer()).withTimeout(6)
-                .alongWith(shooter.runKicker()).withTimeout(6)
-                // wait 4 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
+                .alongWith(indexer.runIndexer()).withTimeout(4)
+                .alongWith(shooter.runKicker()).withTimeout(4)
+                // wait 2 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
                 .alongWith(
-                    Commands.waitSeconds(4)
-                    .andThen(intake.setIntakeMinLength())).withTimeout(6))
-                .andThen(
-                    shooter.stopKicker()
-                    .alongWith(intake.stopIntake())
-                ), "Shoot");
-        }
+                    Commands.waitSeconds(2)
+                    .andThen(intake.setIntakeMinLength())).withTimeout(4))
+            .andThen(
+                indexer.stopIndexer()
+                .alongWith(shooter.stopKicker())
+            ), "Shoot");
+    }
 
     public void addAlignScorePosition(autoOptions scoreLocation){
         switch (scoreLocation) {

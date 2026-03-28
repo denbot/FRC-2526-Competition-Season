@@ -159,8 +159,8 @@ public class DriveCommands {
   }
 
   public static Command autoJoystickDriveAtAngle(Drive drive) {
-    Supplier<Double> currentPosition = () -> 180 + drive.getPose().getRotation().getDegrees();
-    Supplier<Double> targetPosition = () -> 180 + drive.findShootingPose(drive.getPose()).getRotation().getDegrees();
+    Supplier<Double> currentPosition = () -> drive.getPose().getRotation().getDegrees();
+    Supplier<Double> targetPosition = () -> drive.findShootingPose(drive.getPose()).getRotation().getDegrees();
     System.out.println(currentPosition + "   " + targetPosition);
 
     return joystickDriveAtAngle(drive,
