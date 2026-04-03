@@ -105,7 +105,8 @@ public class Shooter extends SubsystemBase{
     }
     
     private Command setShooterCommandAdaptive() {
-        return runSpinnerAdaptive(drive);
+        this.shooterCommand = runSpinnerAdaptive(drive);
+        return this.shooterCommand;
     }
 
     private Command setShooterCommandFixed() {
@@ -116,20 +117,20 @@ public class Shooter extends SubsystemBase{
         return Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll());
     }
 
-    public AngularVelocity getIdealSpeed(Pose2d robotPose, Pose2d targetPose){
+    public AngularVelocity getIdealSpeed(Pose2d targetPose){ // Target pose is relevant to robot pose, x and y are delta x and delta y
         // TODO replace target pose withs state machine based identification and logic for aiming
         Distance distance;
 
         distance = Meters.of(Math.sqrt(
-            Math.pow(robotPose.getX() - targetPose.getX(), 2) +
-            Math.pow(robotPose.getY() - targetPose.getY(), 2)));
+            Math.pow(targetPose.getX(), 2) +
+            Math.pow(targetPose.getY(), 2)));
 
         SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
 
 
         double x = distance.in(Meters); 
 
-        double targetVelocity = Math.min(65, Math.pow(x, 2) * 0.664 + (0.158 * x) + 33) + (spinnerVelocityOffset.magnitude());
+        double targetVelocity = Math.min(100, Math.pow(x, 2) * 0.664 + (0.158 * x) + 35) + (spinnerVelocityOffset.magnitude());
         Logger.recordOutput("Spinner Velocity Setpoint", spinnerVelocitySetpoint);
         return RotationsPerSecond.of(targetVelocity); // TODO This function is guesswork and estimation
     }
@@ -144,10 +145,14 @@ public class Shooter extends SubsystemBase{
     }
 
     public Command runSpinnerAdaptive(Drive drive){
-        return Commands.runEnd(() -> this.io.setSpinnerVelocity(
-            this.getIdealSpeed(drive.getPose(), 
-            drive.isBlue() ? Constants.PointsOfInterest.centerOfHubBlue: Constants.PointsOfInterest.centerOfHubRed)
-        ), () -> this.io.stopSpinner());
+        return Commands.runEnd(() -> {
+                AngularVelocity idealSpeed = this.getIdealSpeed(drive.findShootingPose(drive.getPose()));
+                double idealSpeedInRPS = idealSpeed.in(RotationsPerSecond);
+                if (!Double.isNaN(idealSpeedInRPS)) {
+                    this.io.setSpinnerVelocity(idealSpeed);
+                }
+        }, this.io::stopSpinner);
+
     }
 
     public Command runSpinner(){

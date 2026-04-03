@@ -8,6 +8,7 @@
 package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.TimeUnit.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -35,6 +36,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -380,54 +382,108 @@ public class Drive extends SubsystemBase {
       getAutoAlignmentCommand(onTheFlySetpoints.CLIMB_RIGHT_FINISH.blueAlignmentPose));
   }
 
-  public Rotation2d findAngleForShooting(Pose2d pose) {
+  public ChassisSpeeds findFieldRelativeSpeed(Pose2d pose) {
+
+    ChassisSpeeds robotRelativeSpeeds = getChassisSpeeds();
+
+    ChassisSpeeds fieldRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, pose.getRotation());
+  
+    return fieldRelativeSpeeds;
+  }
+
+  public Time findDistanceInTime(Distance distanceX, Distance distanceY) {
+    Time distanceInTime;
+
+    Distance totalDistance = Feet.of(
+            Math.sqrt((
+                    Math.pow(distanceX.in(Feet), 2) + Math.pow(distanceY.in(Feet), 2)))
+                    + Constants.RobotConstants.ballShootOffset.in(Feet));
+
+    distanceInTime = Seconds.of(
+            Math.sqrt((
+                    (totalDistance.in(Feet)
+                            * Math.tan(Constants.RobotConstants.shooterAngle.in(Radians))
+                            + Constants.RobotConstants.shooterHeight.in(Feet)) - Constants.FieldDimensions.hubHeight.in(Feet))
+                    / (Constants.EnvironmentConstants.gravity.in(FeetPerSecondPerSecond) / 2)));
+
+    return distanceInTime;
+  }
+
+  private Pose2d iteratePose(Distance deltaX, Distance deltaY, ChassisSpeeds fieldRelativeSpeeds) {
+    Pose2d pose;
+    Rotation2d rotation;
+
+    Distance targetX = deltaX;
+    Distance targetY = deltaY;
+    Distance oldDistance = Meters.of(Math.sqrt(Math.pow(targetX.in(Meters), 2) + Math.pow(targetY.in(Meters), 2)));
+    Distance newDistance;
+
+    for (int i = 0; i < 20; i++) { // 20 is the maximum amount of iterations
+      Time time = findDistanceInTime(targetX, targetY);
+      Distance deltaXFromTimedVelocity = Meters.of(time.in(Seconds) * fieldRelativeSpeeds.vxMetersPerSecond);
+      Distance deltaYFromTimedVelocity = Meters.of(time.in(Seconds) * fieldRelativeSpeeds.vyMetersPerSecond);
+      targetX = Meters.of(deltaX.in(Meters) - deltaXFromTimedVelocity.in(Meters));
+      targetY = Meters.of(deltaY.in(Meters) - deltaYFromTimedVelocity.in(Meters));
+      newDistance = Meters.of(Math.sqrt(Math.pow(targetX.in(Meters), 2) + Math.pow(targetY.in(Meters), 2)));
+      if (Math.abs(newDistance.minus(oldDistance).in(Inches)) < 0.5) { // 1 inch is tolerance
+        break;
+      }
+      oldDistance = newDistance;
+    }
+
+    rotation = new Rotation2d(Math.atan2(targetY.in(Meters), targetX.in(Meters)) + Math.PI);
+    pose = new Pose2d(targetX.in(Meters), targetY.in(Meters), rotation);
+    return pose;
+  }
+
+  public Pose2d findShootingPose(Pose2d pose) {
     Distance positionX = pose.getMeasureX();
     Distance positionY = pose.getMeasureY();
 
     Distance deltaX;
     Distance deltaY;
 
-    Rotation2d rotation;
+    Distance aimForX;
+    Distance aimForY;
+
+    Pose2d shootingPose;
 
     if(isBlue()) {
         if (positionX.minus(PointsOfInterest.centerOfHubBlue.getMeasureX()).in(Meters) > 0) { // If we are not in our zone
             if (positionY.minus(PointsOfInterest.centerOfHubBlue.getMeasureY()).in(Meters) > 0) { // If we are in the north half of the field
-                deltaX = PointsOfInterest.cornerNW.getMeasureX().minus(positionX);
-                deltaY = PointsOfInterest.cornerNW.getMeasureY().minus(positionY);
+                aimForX = PointsOfInterest.cornerNW.getMeasureX();
+                aimForY = PointsOfInterest.cornerNW.getMeasureY();
             } else { // If we are in the south half of the field
-                deltaX = PointsOfInterest.cornerSW.getMeasureX().minus(positionX);
-                deltaY = PointsOfInterest.cornerSW.getMeasureY().minus(positionY);
+                aimForX = PointsOfInterest.cornerSW.getMeasureX();
+                aimForY = PointsOfInterest.cornerSW.getMeasureY();
             }
-
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()));
         } else { // If we are in our zone (able to shoot at hub)
-            deltaX = PointsOfInterest.centerOfHubBlue.getMeasureX().minus(positionX);
-            deltaY = PointsOfInterest.centerOfHubBlue.getMeasureY().minus(positionY);
-
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
+            aimForX = PointsOfInterest.centerOfHubBlue.getMeasureX();
+            aimForY = PointsOfInterest.centerOfHubBlue.getMeasureY();
         }
     } else {
         if (positionX.minus(PointsOfInterest.centerOfHubRed.getMeasureX()).in(Meters) < 0) { // If we are not in our zone
             if (positionY.minus(PointsOfInterest.centerOfHubRed.getMeasureY()).in(Meters) > 0) { // If we are in the north half of the field
-                deltaX = PointsOfInterest.cornerNE.getMeasureX().minus(positionX);
-                deltaY = PointsOfInterest.cornerNE.getMeasureY().minus(positionY);
+                aimForX = PointsOfInterest.cornerNE.getMeasureX();
+                aimForY = PointsOfInterest.cornerNE.getMeasureY();
             } else { // If we are in the south half of the field
-                deltaX = PointsOfInterest.cornerSE.getMeasureX().minus(positionX);
-                deltaY = PointsOfInterest.cornerSE.getMeasureY().minus(positionY);
+                aimForX = PointsOfInterest.cornerSE.getMeasureX();
+                aimForY = PointsOfInterest.cornerSE.getMeasureY();
             }
-
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()) - Math.PI);
         } else { // If we are in our zone (able to shoot at hub)
-            deltaX = PointsOfInterest.centerOfHubRed.getMeasureX().minus(positionX);
-            deltaY = PointsOfInterest.centerOfHubRed.getMeasureY().minus(positionY);
-            
-            rotation = new Rotation2d(Math.atan(deltaY.baseUnitMagnitude() / deltaX.baseUnitMagnitude()));
+            aimForX = PointsOfInterest.centerOfHubRed.getMeasureX();
+            aimForY = PointsOfInterest.centerOfHubRed.getMeasureY();
         }
     }
 
-    Logger.recordOutput("Ideal Angle Found", rotation);
+    deltaX = aimForX.minus(positionX);
+    deltaY = aimForY.minus(positionY);
+
+    shootingPose = iteratePose(deltaX, deltaY, findFieldRelativeSpeed(pose));
+
+    Logger.recordOutput("AutoAimShootingPose", new Pose2d(pose.getX() + shootingPose.getX(), pose.getY() + shootingPose.getY(), shootingPose.getRotation()));
         
-    return rotation;
+    return shootingPose;
   }
 
   public boolean isBlue() {

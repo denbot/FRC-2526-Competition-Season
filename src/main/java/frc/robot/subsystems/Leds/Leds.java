@@ -102,7 +102,7 @@ public class Leds extends SubsystemBase{
 			baseLeft.blink(Seconds.of(0.5)).applyTo(leftHalf);
 			
 			// Get a value between 0-90 degrees (clamped by min.max) for how far off the dirve base is from aiming at the hub 
-			double degreesOff = Math.min(Math.abs(drive.findAngleForShooting(drive.getPose()).getDegrees() - drive.getPose().getRotation().getDegrees()), 90);
+			double degreesOff = Math.min(Math.abs(drive.findShootingPose(drive.getPose()).getRotation().getDegrees() - drive.getPose().getRotation().getDegrees()), 90);
 			
 			// Apply a mask to the graident from 0-1 for how close the drive base is to aiming fully
 			baseRight.mask(LEDPattern.progressMaskLayer(() -> (90 - degreesOff) / 90)).applyTo(this.rightHalf);
