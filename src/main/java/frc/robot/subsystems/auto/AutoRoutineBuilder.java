@@ -110,7 +110,10 @@ public class AutoRoutineBuilder {
             
             }
             else{
-                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.RAMP_RIGHT_NEUTRAL, onTheFlySetpoints.RAMP_RIGHT_ALLIANCE), "Return Right Through Ramp");
+                addAction(
+                    SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.RAMP_RIGHT_NEUTRAL, onTheFlySetpoints.RAMP_RIGHT_ALLIANCE)
+                    .alongWith(this.intake.stopIntake())
+                    , "Return Right Through Ramp");
             }
         }
         
