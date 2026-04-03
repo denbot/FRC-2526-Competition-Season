@@ -88,16 +88,25 @@ public class AutoRoutineBuilder {
     public void addReturnAlliance(autoOptions returnSide, autoOptions returnLocation){
         if(returnSide == autoOptions.BORDER_LEFT){
             if(returnLocation == autoOptions.TRENCH){
-                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL, onTheFlySetpoints.TRENCH_LEFT_ALLIANCE), "Return Left Through Trench");
+                addAction(
+                    SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL, onTheFlySetpoints.TRENCH_LEFT_ALLIANCE)
+                    .alongWith(this.intake.stopIntake())
+                    , "Return Left Through Trench");
             
             }
             else{
-                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.RAMP_LEFT_NEUTRAL, onTheFlySetpoints.RAMP_LEFT_ALLIANCE), "Return Left Through Ramp");
+                addAction(
+                    SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.RAMP_LEFT_NEUTRAL, onTheFlySetpoints.RAMP_LEFT_ALLIANCE)
+                    .alongWith(this.intake.stopIntake())
+                    , "Return Left Through Ramp");
             }
         }
         else{
             if(returnLocation == autoOptions.TRENCH){
-                addAction(SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL, onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE), "Return Right Through Trench");
+                addAction(
+                    SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL, onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE)
+                    .alongWith(this.intake.stopIntake())
+                    , "Return Right Through Trench");
             
             }
             else{
@@ -150,8 +159,11 @@ public class AutoRoutineBuilder {
     }
     
     public void addHumanPlayerCommand(autoOptions endScorePosition){
-        addAction(Commands.runOnce(() -> intake.setIntakeIdleLength()), "Set Intake to Idle");
-        addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.HUMAN_PLAYER), "Align To Human Player");
+      
+        addAction(
+            getAutoAlignmentCommand(isBlue, onTheFlySetpoints.HUMAN_PLAYER)
+            .alongWith(intake.setIntakeMaxLength())
+            , "Align To Human Player");
         addAction(Commands.waitSeconds(2), "Wait For HP");
         addAlignScorePosition(endScorePosition);
         addShootCommand();
