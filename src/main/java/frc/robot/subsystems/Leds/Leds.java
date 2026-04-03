@@ -2,13 +2,17 @@ package frc.robot.subsystems.Leds;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+
 import bot.den.foxflow.RobotState;
+import bot.den.foxflow.StateMachine;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.AddressableLEDBufferView;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.state.HubState;
 import frc.robot.state.MatchState;
 import frc.robot.state.RebuiltStateMachine;
+import frc.robot.state.ShooterState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.vision.Limelights;
@@ -85,28 +90,39 @@ public class Leds extends SubsystemBase{
 	
 	@Override
 	public void periodic(){
-		if(this.timeUntilTransition.hasElapsed(targetWaitTime)){
+		if (stateMachine.currentState().robotState() == RobotState.AUTO) {
+			LEDPattern baseColor = LEDPattern.solid(Color.kWhite);
+			baseColor.applyTo(this.ledBuffer);
+		} else if(
+			this.timeUntilTransition.hasElapsed(targetWaitTime) && 
+			stateMachine.currentState().robotState() == RobotState.TELEOP) {
 			LEDPattern.solid(
 				timeUntilTransition.get() % 0.5 > 0.25 ?
 				Color.kCyan :
 				Color.kOrange
-			).applyTo(this.ledBuffer);		
-		} 
-		else if (this.controller.rightBumper().getAsBoolean() == true){
+			).applyTo(this.ledBuffer);	
+		} else {
+			if (DriverStation.getAlliance().isPresent()) {
+				if(DriverStation.getAlliance().get() == Alliance.Red) {
+					LEDPattern.solid(Color.kRed).breathe(Seconds.of(1)).applyTo(this.ledBuffer);
+				} else {
+					LEDPattern.solid(Color.kBlue).breathe(Seconds.of(1)).applyTo(this.ledBuffer);
+				}
+			} else {
+				LEDPattern.solid(Color.kOrangeRed).breathe(Seconds.of(0.5)).applyTo(this.ledBuffer);
+			} 
+		}
 
-			LEDPattern baseLeft = LEDPattern.solid(Color.kGreen); // Base color for shooter speed
-			LEDPattern baseRight = LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kYellow, Color.kPurple); // Base color for auto aim
-
+		if (stateMachine.currentState().shooterState() != ShooterState.STOPPED){
+			LEDPattern baseColor = LEDPattern.solid(Color.kRed); // Base color for shooter speed
 			// Blink green if spinner is at speed, blink red if not
-			if (shooter.getSpinnerClosedLoopError() > 1) baseLeft = LEDPattern.solid(Color.kRed);
-			baseLeft.blink(Seconds.of(0.5)).applyTo(leftHalf);
+			if (stateMachine.currentState().shooterState() == ShooterState.AT_SPEED) 
+			{
+				baseColor = LEDPattern.solid(Color.kGreen);
+			}
+			baseColor.blink(Seconds.of(0.5)).applyTo(this.ledBuffer);
 			
-			// Get a value between 0-90 degrees (clamped by min.max) for how far off the dirve base is from aiming at the hub 
-			double degreesOff = Math.min(Math.abs(drive.findShootingPose(drive.getPose()).getRotation().getDegrees() - drive.getPose().getRotation().getDegrees()), 90);
-			
-			// Apply a mask to the graident from 0-1 for how close the drive base is to aiming fully
-			baseRight.mask(LEDPattern.progressMaskLayer(() -> (90 - degreesOff) / 90)).applyTo(this.rightHalf);
-		} else {LEDPattern.solid(Color.kOrangeRed).applyTo(this.ledBuffer);}
+		}
 		// Limelights
 		if (limelights.getBackLeftTags() > 0) {
 			LEDPattern.solid(Color.kGreen).applyTo(this.leftLimelight);
