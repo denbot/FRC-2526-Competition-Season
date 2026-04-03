@@ -9,7 +9,6 @@ import java.util.Map;
 
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.vision.Limelights.Limelight;
 
 public class LimelightIOReal implements LimelightIO{
@@ -71,42 +70,43 @@ public class LimelightIOReal implements LimelightIO{
         inputs.backLeftConnected = isLimelightConnected(Limelight.BACK_LEFT);
         inputs.backRightConnected = isLimelightConnected(Limelight.BACK_RIGHT);
         inputs.frontConnected = isLimelightConnected(Limelight.FRONT);
-        inputs.allConnected = inputs.frontConnected;
-        //inputs.allConnected = inputs.backLeftConnected&&inputs.backRightConnected&&inputs.frontConnected;
+        inputs.allConnected = inputs.backLeftConnected&&inputs.backRightConnected&&inputs.frontConnected;
 
         // Tag count
         // pre-define to check for null cases
-        PoseEstimate poseEstimate1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.BACK_LEFT.name);
-        PoseEstimate poseEstimate2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.BACK_RIGHT.name);
-        PoseEstimate poseEstimate3 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Limelight.FRONT.name);
 
         inputs.backLeftTagCount = LimelightHelpers.getTargetCount(Limelight.BACK_LEFT.name);
         inputs.backRightTagCount = LimelightHelpers.getTargetCount(Limelight.BACK_RIGHT.name);
         inputs.frontTagCount = LimelightHelpers.getTargetCount(Limelight.FRONT.name);
 
-        inputs.totalTagCount = inputs.frontTagCount;
-        //inputs.totalTagCount = inputs.backLeftTagCount + inputs.backRightTagCount + inputs.frontTagCount;
+        
+        inputs.totalTagCount = inputs.backLeftTagCount + inputs.backRightTagCount + inputs.frontTagCount;
 
     }
 
     public void getAllPoseEstimate(Drive drive){
-        getSinglePoseEstimate(drive, Limelight.BACK_LEFT);
-        getSinglePoseEstimate(drive, Limelight.BACK_RIGHT);
-        getSinglePoseEstimate(drive, Limelight.FRONT);
+        getSinglePoseEstimate(drive, Limelight.BACK_LEFT, false);
+        getSinglePoseEstimate(drive, Limelight.BACK_RIGHT, false);
+        getSinglePoseEstimate(drive, Limelight.FRONT, true);
     }
 
-    public void getSinglePoseEstimate(Drive drive, Limelight limelight){
-        LimelightHelpers.SetRobotOrientation(limelight.name, drive.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    public void getSinglePoseEstimate(Drive drive, Limelight limelight, boolean acceptsRotation){
+        LimelightHelpers.SetRobotOrientation(limelight.name, drive.getPose().getRotation().getDegrees(), 0, 0, 0, 0, 0);
         LimelightHelpers.PoseEstimate poseEstimate = 
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.name);
-
-        if(poseEstimate == null || poseEstimate.tagCount == 0) return;
+        boolean rejectUpdate = false;
+        if(poseEstimate == null || poseEstimate.tagCount == 0) rejectUpdate = true;
+        if (Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) > 2*Math.PI) rejectUpdate = true;
 
         if (poseEstimate.tagCount == 1 && 
         poseEstimate.rawFiducials.length == 1 &&
         (poseEstimate.rawFiducials[0].ambiguity > .7 || 
-        poseEstimate.rawFiducials[0].distToCamera > 3)) return;
+        poseEstimate.rawFiducials[0].distToCamera > 3)) rejectUpdate = true;
         
-        drive.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds, limelight.visionMatrix);
+        if(rejectUpdate == false){
+            drive.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds, acceptsRotation ? limelight.visionMatrixAcceptsRotation : limelight.visionMatrixRejectsRotation);
+            
+
+        }
     }
 }
