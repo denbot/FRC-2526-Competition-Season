@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Control;
+package frc.robot.subsystems.control;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 

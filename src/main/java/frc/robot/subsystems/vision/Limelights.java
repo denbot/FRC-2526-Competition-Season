@@ -20,13 +20,15 @@ public class Limelights extends SubsystemBase{
 
         public final String name;
         public final String ip;
-        public final Matrix<N3, N1> visionMatrix = new Matrix<>(Nat.N3(), Nat.N1());
+        public final Matrix<N3, N1> visionMatrixRejectsRotation = new Matrix<>(Nat.N3(), Nat.N1());
+        public final Matrix<N3, N1> visionMatrixAcceptsRotation = new Matrix<>(Nat.N3(), Nat.N1());
 
         Limelight(String name, String ip) {
             this.name = name;
             this.ip = ip;
-            this.visionMatrix.fill(0.5);
-            this.visionMatrix.set(2, 0, 1);
+            this.visionMatrixRejectsRotation.fill(0.5);
+            this.visionMatrixRejectsRotation.set(2, 0, 10000000);
+            this.visionMatrixAcceptsRotation.fill(0.5);
         }
     }
 
