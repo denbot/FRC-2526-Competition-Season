@@ -7,6 +7,7 @@ import frc.robot.state.ShooterState;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -24,6 +25,7 @@ public class Shooter extends SubsystemBase{
     private final ShooterIO io;
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
+    private InterpolatingDoubleTreeMap shooterTable = new InterpolatingDoubleTreeMap();
     private AngularVelocity spinnerVelocitySetpoint = RotationsPerSecond.of(60);
     private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(50);
     private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
@@ -36,6 +38,13 @@ public class Shooter extends SubsystemBase{
     public Shooter(ShooterIO io, RebuiltStateMachine stateMachine, Drive drive){
         this.io = io;
         this.drive = drive;
+
+    this.shooterTable.put(2.5, 41.0);
+    this.shooterTable.put(3.15, 44.0);
+    this.shooterTable.put(3.5, 46.6);
+    this.shooterTable.put(4.0, 49.6);
+    this.shooterTable.put(4.3, 56.0);
+    this.shooterTable.put(2.12, 39.3);
 
         stateMachine
                 .state(ShooterState.STOPPED)
@@ -130,7 +139,7 @@ public class Shooter extends SubsystemBase{
 
         double x = distance.in(Meters); 
 
-        double targetVelocity = Math.min(100, Math.pow(x, 2) * 0.664 + (0.158 * x) + 35) + (spinnerVelocityOffset.magnitude());
+        double targetVelocity = Math.min(100, shooterTable.get(x)) + (spinnerVelocityOffset.magnitude());
         Logger.recordOutput("Spinner Velocity Setpoint", spinnerVelocitySetpoint);
         return RotationsPerSecond.of(targetVelocity); // TODO This function is guesswork and estimation
     }
