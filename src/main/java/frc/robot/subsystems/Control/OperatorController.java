@@ -44,6 +44,7 @@ public class OperatorController {
                 autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP);
                 // autoBuilder.addAlignScorePosition(leftRightSwitch.getAsBoolean() ? autoOptions.SHOOT_RIGHT : autoOptions.SHOOT_LEFT);
                 autoBuilder.addShootCommand(); 
+                autoBuilder.addAction(autoBuilder.getAutoAlignmentCommand(isBlue, leftRightSwitch.getAsBoolean() ? onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE : onTheFlySetpoints.TRENCH_LEFT_ALLIANCE), null);
             }).ignoringDisable(true));
 
         // Add neutral sweep + feed 

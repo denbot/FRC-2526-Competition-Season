@@ -233,7 +233,7 @@ public class AutoRoutineBuilder {
         SmartDashboard.putStringArray("Auto Routine", commandNamesAsStringArray());
     }
 
-    private Command getAutoAlignmentCommand(boolean isBlue, onTheFlySetpoints setpoint){
+    public Command getAutoAlignmentCommand(boolean isBlue, onTheFlySetpoints setpoint){
         Pose2d targetPose;
         if(isBlue) targetPose = setpoint.blueAlignmentPose;
         else targetPose = setpoint.redAlignmentPose;
@@ -243,7 +243,7 @@ public class AutoRoutineBuilder {
             OperatorConstants.pathfindingConstraints);
     }
 
-    private void addAction(Command command, String commandName){
+    public void addAction(Command command, String commandName){
         this.commands.add(command);
         this.commandNames.add(commandName);
         SmartDashboard.putStringArray("Auto Routine", commandNamesAsStringArray());
