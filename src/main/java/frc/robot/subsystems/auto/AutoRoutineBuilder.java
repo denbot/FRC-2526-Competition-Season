@@ -58,7 +58,7 @@ public class AutoRoutineBuilder {
 
     public void addExitAlliance(autoOptions exitSide){
         if(exitSide == autoOptions.BORDER_LEFT) addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL), "Exit Aliance Left");
-        else addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL), "Exit Aliance Right");
+        else addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL).raceWith(this.intake.setIntakeMinLength()), "Exit Aliance Right");
     }
     
     public void addSweep(autoOptions startSide, autoOptions sweepAlignment){
