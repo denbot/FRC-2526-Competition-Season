@@ -43,6 +43,10 @@ public class HubStatusAlert extends Command {
         }
     }
 
+    public Boolean getBadData() {
+        return emptyStatusAlert.get() || badDataAlert.get();
+    }
+
     @Override
     public boolean isFinished() {
         return goodData;
