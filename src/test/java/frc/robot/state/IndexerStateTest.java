@@ -22,6 +22,7 @@ public class IndexerStateTest {
     final AtomicBoolean leftTrigger = new AtomicBoolean();
     final AtomicBoolean aButton = new AtomicBoolean();
     final AtomicBoolean bButton = new AtomicBoolean();
+    final AtomicBoolean churnTrigger = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
     @BeforeEach
@@ -35,7 +36,8 @@ public class IndexerStateTest {
         leftTrigger.set(false);
         aButton.set(false);
         bButton.set(false);
-        IndexerState.setup(machine, rightTrigger::get, leftTrigger::get, aButton::get, bButton::get);
+        churnTrigger.set(false);
+        IndexerState.setup(machine, rightTrigger::get, leftTrigger::get, aButton::get, bButton::get, churnTrigger::get);
     }
 
     @AfterEach

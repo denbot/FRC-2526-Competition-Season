@@ -24,7 +24,7 @@ public class OperatorController {
     private final Trigger aimAndShootButton = operatorController1.button(5);
     private final Trigger clearAllButton = operatorController1.button(6);
     private final Trigger clearLastButton = operatorController1.button(7);
-    private final Trigger teleopAutoClimbSwitch = operatorController2.button(12);
+    public final Trigger churnTrigger = operatorController2.button(12);
     // 3-way rotary switch, toggles A when left, neither when center, B when right
     public final Trigger blueWonAutoToggle = operatorController2.button(2);
     public final Trigger redWonAutoToggle = operatorController2.button(3);
@@ -91,13 +91,6 @@ public class OperatorController {
                 System.out.println("Cleared auto routine");
                 autoBuilder.removeLast();
             }).ignoringDisable(true));
-        
-        // in teleop, flipping this switch toggles an auto climb
-        teleopAutoClimbSwitch.onTrue(
-            leftRightSwitch.getAsBoolean()
-            ? SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.CLIMB_RIGHT_SETUP, onTheFlySetpoints.CLIMB_RIGHT_FINISH)
-            : SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.CLIMB_LEFT_SETUP, onTheFlySetpoints.CLIMB_LEFT_FINISH));
-        // TODO: .andThen(ClimbCommand);
         
         operatorController1.axisGreaterThan(1, 0.5)
             .onTrue(Commands.runOnce(() ->
