@@ -210,6 +210,7 @@ public class RobotContainer {
             controller.rightTrigger(),
             controller.leftTrigger(),
             controller.b(),
+            controller.a(),
             operatorController.churnTrigger
     );
 

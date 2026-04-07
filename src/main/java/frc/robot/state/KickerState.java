@@ -10,12 +10,12 @@ public enum KickerState {
     RUNNING,
     REVERSING;
 
-    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier leftTrigger, BooleanSupplier xButton, BooleanSupplier churnSwitch) {
+    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier leftTrigger, BooleanSupplier xButton, BooleanSupplier aButton, BooleanSupplier churnSwitch) {
         // Kicker functions
         stateMachine
                 .state(KickerState.STOPPED)
                 .to(KickerState.REVERSING)
-                .transitionWhen(() -> xButton.getAsBoolean() || leftTrigger.getAsBoolean() || churnSwitch.getAsBoolean());
+                .transitionWhen(() -> xButton.getAsBoolean() || leftTrigger.getAsBoolean() || aButton.getAsBoolean() || churnSwitch.getAsBoolean());
         stateMachine
                 .state(KickerState.REVERSING)
                 .to(KickerState.STOPPED)

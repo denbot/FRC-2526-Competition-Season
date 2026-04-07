@@ -21,6 +21,7 @@ public class KickerStateTest {
     final AtomicBoolean rightTrigger = new AtomicBoolean();
     final AtomicBoolean leftTrigger = new AtomicBoolean();
     final AtomicBoolean bButton = new AtomicBoolean();
+    final AtomicBoolean aButton = new AtomicBoolean();
     final AtomicBoolean churnTrigger = new AtomicBoolean();
     private RebuiltStateMachine machine;
 
@@ -32,7 +33,7 @@ public class KickerStateTest {
 
         machine = new RebuiltStateMachine();
         bButton.set(false);
-        KickerState.setup(machine, rightTrigger::get, leftTrigger::get, bButton::get, churnTrigger::get);
+        KickerState.setup(machine, rightTrigger::get, leftTrigger::get, bButton::get, aButton::get, churnTrigger::get);
     }
 
     @AfterEach
