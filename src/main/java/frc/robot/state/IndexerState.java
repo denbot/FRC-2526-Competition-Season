@@ -11,7 +11,7 @@ public enum IndexerState {
     RUNNING,
     REVERSING;
 
-    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier leftTrigger, BooleanSupplier aButton, BooleanSupplier xButton) {
+    public static void setup(RebuiltStateMachine stateMachine, BooleanSupplier rightTrigger, BooleanSupplier leftTrigger, BooleanSupplier aButton, BooleanSupplier xButton, BooleanSupplier churnSwitch) {
         stateMachine
                 .state(IndexerState.STOPPED)
                 .to(IndexerState.RUNNING)
@@ -40,10 +40,10 @@ public enum IndexerState {
         stateMachine
                 .state(IndexerState.STOPPED)
                 .to(IndexerState.REVERSING)
-                .transitionWhen(() -> aButton.getAsBoolean() || xButton.getAsBoolean()); // Goes from inactive to reverse if x button is pressed
+                .transitionWhen(() -> aButton.getAsBoolean() || xButton.getAsBoolean() || churnSwitch.getAsBoolean()); // Goes from inactive to reverse if x button is pressed
         stateMachine
                 .state(IndexerState.REVERSING)
                 .to(IndexerState.STOPPED)
-                .transitionWhen(() -> !aButton.getAsBoolean() && !xButton.getAsBoolean()); // Go from reverse to inactive if x button let go
+                .transitionWhen(() -> !aButton.getAsBoolean() && !xButton.getAsBoolean() && !churnSwitch.getAsBoolean()); // Go from reverse to inactive if x button let go
     }
 }

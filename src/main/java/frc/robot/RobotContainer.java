@@ -209,7 +209,9 @@ public class RobotContainer {
             stateMachine,
             controller.rightTrigger(),
             controller.leftTrigger(),
-            controller.b()
+            controller.b(),
+            controller.a(),
+            operatorController.churnTrigger
     );
 
     ShooterState.setup(
@@ -223,7 +225,8 @@ public class RobotContainer {
             controller.rightTrigger(), 
             controller.leftTrigger(), 
             controller.a(), 
-            controller.b()
+            controller.b(),
+            operatorController.churnTrigger
     );
     MatchState.setup(stateMachine);
   }
