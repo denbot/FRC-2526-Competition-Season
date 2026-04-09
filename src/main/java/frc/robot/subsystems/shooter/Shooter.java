@@ -27,7 +27,7 @@ public class Shooter extends SubsystemBase{
 
     private InterpolatingDoubleTreeMap shooterTable = new InterpolatingDoubleTreeMap();
     private AngularVelocity spinnerVelocitySetpoint = RotationsPerSecond.of(60);
-    private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(50);
+    private AngularVelocity defaultSpinnerSpeed = RotationsPerSecond.of(100);
     private AngularVelocity kickerVelocitySetpoint = RotationsPerSecond.of(60);
     private AngularVelocity spinnerVelocityOffset = RotationsPerSecond.of(0);
     
@@ -39,12 +39,12 @@ public class Shooter extends SubsystemBase{
         this.io = io;
         this.drive = drive;
 
-    this.shooterTable.put(2.5, 41.0);
-    this.shooterTable.put(3.15, 44.0);
-    this.shooterTable.put(3.5, 46.6);
-    this.shooterTable.put(4.0, 49.6);
-    this.shooterTable.put(4.3, 56.0);
-    this.shooterTable.put(2.12, 39.3);
+    this.shooterTable.put(2.5, 42.0);
+    this.shooterTable.put(3.15, 45.0);
+    this.shooterTable.put(3.5, 47.6);
+    this.shooterTable.put(4.0, 50.6);
+    this.shooterTable.put(4.3, 57.0);
+    this.shooterTable.put(2.12, 40.3);
 
         stateMachine
                 .state(ShooterState.STOPPED)

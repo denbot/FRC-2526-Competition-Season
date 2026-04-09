@@ -60,7 +60,7 @@ public class OperatorController {
         humanPlayerButton.onTrue(Commands.runOnce(
             () -> {
                 System.out.println("Added human player to auto routine");
-                autoBuilder.addHumanPlayerCommand(autoOptions.SHOOT_RIGHT);
+                autoBuilder.addHumanPlayerCommand(autoOptions.SHOOT_CENTER);
             }).ignoringDisable(true));
         
         // add climb command

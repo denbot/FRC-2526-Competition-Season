@@ -31,7 +31,7 @@ public enum onTheFlyOffsets {
     // Default Score Location Offsets
     SCORE_LEFT(1, -1.3, -30),
     SCORE_RIGHT(1, 1.3, 30),
-    SCORE_CENTER(1, 0, 180);
+    SCORE_CENTER(1.6, 0, 0);
 
     public final Transform2d transform;
 
