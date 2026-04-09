@@ -22,7 +22,7 @@ public class AutoRoutineBuilder {
 
     private ArrayList<Command> commands;
     private ArrayList<String> commandNames;
-    private Intake intake;
+    public Intake intake;
     public Shooter shooter;
     private Indexer indexer;
     private Drive drive;
@@ -56,9 +56,13 @@ public class AutoRoutineBuilder {
         this.isBlue = isBlue;
     }
 
-    public void addExitAlliance(autoOptions exitSide){
-        if(exitSide == autoOptions.BORDER_LEFT) addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL), "Exit Aliance Left");
-        else addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL), "Exit Aliance Right");
+    public void addExitAllianceTrench(autoOptions exitSide){
+        if(exitSide == autoOptions.BORDER_LEFT) addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL).alongWith(this.intake.setIntakeMinLength()), "Exit Aliance Left");
+        else addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL).alongWith(this.intake.setIntakeMinLength()), "Exit Aliance Right");
+    }
+    public void addExitAllianceRamp(autoOptions exitSide){
+        if(exitSide == autoOptions.BORDER_LEFT) addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.RAMP_LEFT_NEUTRAL).alongWith(this.intake.setIntakeMinLength()), "Exit Aliance Left");
+        else addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.RAMP_RIGHT_NEUTRAL).alongWith(this.intake.setIntakeMinLength()), "Exit Aliance Right");
     }
     
     public void addSweep(autoOptions startSide, autoOptions sweepAlignment){
@@ -90,14 +94,14 @@ public class AutoRoutineBuilder {
             if(returnLocation == autoOptions.TRENCH){
                 addAction(
                     SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.TRENCH_LEFT_NEUTRAL, onTheFlySetpoints.TRENCH_LEFT_ALLIANCE)
-                    .alongWith(this.intake.stopIntake())
+                    .alongWith(this.intake.stopIntake()).alongWith(this.indexer.reverseIndexer()).alongWith(this.shooter.reverseKicker())
                     , "Return Left Through Trench");
             
             }
             else{
                 addAction(
                     SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.RAMP_LEFT_NEUTRAL, onTheFlySetpoints.RAMP_LEFT_ALLIANCE)
-                    .alongWith(this.intake.stopIntake())
+                    .alongWith(this.intake.stopIntake()).alongWith(this.indexer.reverseIndexer()).alongWith(this.shooter.reverseKicker())
                     , "Return Left Through Ramp");
             }
         }
@@ -105,14 +109,14 @@ public class AutoRoutineBuilder {
             if(returnLocation == autoOptions.TRENCH){
                 addAction(
                     SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.TRENCH_RIGHT_NEUTRAL, onTheFlySetpoints.TRENCH_RIGHT_ALLIANCE)
-                    .alongWith(this.intake.stopIntake())
+                    .alongWith(this.intake.stopIntake()).alongWith(this.indexer.reverseIndexer()).alongWith(this.shooter.reverseKicker())
                     , "Return Right Through Trench");
             
             }
             else{
                 addAction(
                     SequentialPathGenerator.getSequentialPath(isBlue, onTheFlySetpoints.RAMP_RIGHT_NEUTRAL, onTheFlySetpoints.RAMP_RIGHT_ALLIANCE)
-                    .alongWith(this.intake.stopIntake())
+                    .alongWith(this.intake.stopIntake()).alongWith(this.indexer.reverseIndexer()).alongWith(this.shooter.reverseKicker())
                     , "Return Right Through Ramp");
             }
         }
@@ -146,15 +150,21 @@ public class AutoRoutineBuilder {
     public void addAlignScorePosition(autoOptions scoreLocation){
         switch (scoreLocation) {
             case SHOOT_LEFT:
-                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_LEFT), "Align Shoot Left");
+                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_LEFT)
+                    .alongWith(this.intake.stopIntake()).alongWith(this.indexer.reverseIndexer()).alongWith(this.shooter.reverseKicker())
+                    , "Align Shoot Left");
                 break;
 
             case SHOOT_RIGHT:
-                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_RIGHT), "Align Shoot Right");
+                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_RIGHT)
+                    .alongWith(this.intake.stopIntake()).alongWith(this.indexer.reverseIndexer()).alongWith(this.shooter.reverseKicker())
+                    , "Align Shoot Right");
                 break;
             
             case SHOOT_CENTER:
-                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_CENTER), "Align Shoot Center");
+                addAction(getAutoAlignmentCommand(isBlue, onTheFlySetpoints.SCORE_CENTER)
+                    .alongWith(this.intake.stopIntake()).alongWith(this.indexer.reverseIndexer()).alongWith(this.shooter.reverseKicker())
+                    , "Align Shoot Center");
                 break;
             default:
                 break;
@@ -185,8 +195,8 @@ public class AutoRoutineBuilder {
     }
 
     public void testAll(){
-        this.addExitAlliance(autoOptions.BORDER_LEFT);
-        //this.addExitAlliance(autoOptions.BORDER_RIGHT);
+        this.addExitAllianceTrench(autoOptions.BORDER_LEFT);
+        //this.addExitAllianceTrench(autoOptions.BORDER_RIGHT);
 
         //this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_CENTER);
         //this.addSweep(autoOptions.BORDER_LEFT, autoOptions.SWEEP_EDGE);
@@ -233,7 +243,7 @@ public class AutoRoutineBuilder {
         SmartDashboard.putStringArray("Auto Routine", commandNamesAsStringArray());
     }
 
-    private Command getAutoAlignmentCommand(boolean isBlue, onTheFlySetpoints setpoint){
+    public Command getAutoAlignmentCommand(boolean isBlue, onTheFlySetpoints setpoint){
         Pose2d targetPose;
         if(isBlue) targetPose = setpoint.blueAlignmentPose;
         else targetPose = setpoint.redAlignmentPose;
@@ -243,7 +253,7 @@ public class AutoRoutineBuilder {
             OperatorConstants.pathfindingConstraints);
     }
 
-    private void addAction(Command command, String commandName){
+    public void addAction(Command command, String commandName){
         this.commands.add(command);
         this.commandNames.add(commandName);
         SmartDashboard.putStringArray("Auto Routine", commandNamesAsStringArray());
