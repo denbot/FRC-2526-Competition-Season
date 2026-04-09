@@ -113,6 +113,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX(), stateMachine);
         shooter = new Shooter(new ShooterIOTalonFX(), stateMachine, drive);
         limelights = new Limelights(new LimelightIOReal(), drive);
+        CommandScheduler.getInstance().schedule(hubStatusAlert);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -160,10 +161,11 @@ public class RobotContainer {
         shooter = new Shooter(new ShooterIO() {}, stateMachine, drive);
         intake = new Intake(new IntakeIO() {}, stateMachine);
         limelights = new Limelights(new LimelightIOSim(), drive);
+        CommandScheduler.getInstance().schedule(hubStatusAlert);
         break;
     }
 
-    leds = new Leds(limelights, controller, shooter, drive, stateMachine);
+    leds = new Leds(limelights, controller, shooter, drive, stateMachine, () -> hubStatusAlert.getBadData());
 
     // Set up auto routines
     autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);

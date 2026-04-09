@@ -2,6 +2,7 @@ package frc.robot.subsystems.Leds;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.function.BooleanSupplier;
 
 import bot.den.foxflow.RobotState;
 import bot.den.foxflow.StateMachine;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.HubStatusAlert;
 import frc.robot.state.HubState;
 import frc.robot.state.MatchState;
 import frc.robot.state.RebuiltStateMachine;
@@ -45,8 +47,9 @@ public class Leds extends SubsystemBase{
 	private final Timer timeUntilTransition = new Timer();
 	private Time targetWaitTime = Seconds.zero();
 	private Boolean isBlueActive = false;
+	private BooleanSupplier badData;
 
-	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
+	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine, BooleanSupplier badData){
 		this.led = new AddressableLED(0);
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
@@ -65,6 +68,7 @@ public class Leds extends SubsystemBase{
 		this.shooter = shooter;
 		this.drive = drive;
 		this.stateMachine = stateMachine;
+		this.badData = badData;
 
 		this.stateMachine.state(HubState.ACTIVE).to(HubState.INACTIVE).run(Commands.runOnce(() -> this.isBlueActive = drive.isBlue() ? false : true));
 		this.stateMachine.state(HubState.INACTIVE).to(HubState.ACTIVE).run(Commands.runOnce(() -> this.isBlueActive = drive.isBlue() ? true : false));
@@ -140,7 +144,10 @@ public class Leds extends SubsystemBase{
 		} else {
 			LEDPattern.solid(Color.kBlack).applyTo(this.rightLimelight);
 		}
-		
+
+		if (badData.getAsBoolean()) {
+			LEDPattern.solid(Color.kPurple).applyTo(this.ledBuffer);
+		}
 
 		this.led.setData(this.ledBuffer);
 	}

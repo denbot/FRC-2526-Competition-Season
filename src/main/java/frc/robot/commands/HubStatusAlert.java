@@ -38,9 +38,13 @@ public class HubStatusAlert extends Command {
             } else {
                 badDataAlert.set(true);
             }
-        } else if (timer.hasElapsed(Seconds.of(2))) {
+        } else if (timer.hasElapsed(Seconds.of(10))) {
             emptyStatusAlert.set(true);
         }
+    }
+
+    public Boolean getBadData() {
+        return emptyStatusAlert.get() || badDataAlert.get();
     }
 
     @Override

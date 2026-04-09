@@ -53,7 +53,7 @@ public class HubStatusAlertTest {
 
         command.initialize();
 
-        SimHooks.stepTiming(1.8);
+        SimHooks.stepTiming(9.8);
         command.execute();
 
         assertFalse(command.emptyStatusAlert.get());
@@ -101,7 +101,7 @@ public class HubStatusAlertTest {
 
         command.initialize();
 
-        SimHooks.stepTiming(2.1);
+        SimHooks.stepTiming(10.1);
 
         command.execute();
 
@@ -125,7 +125,7 @@ public class HubStatusAlertTest {
 
         command.initialize();
 
-        SimHooks.stepTiming(2.1);
+        SimHooks.stepTiming(10.1);
 
         command.execute();
 
