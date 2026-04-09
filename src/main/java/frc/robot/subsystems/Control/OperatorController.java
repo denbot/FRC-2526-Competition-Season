@@ -18,9 +18,9 @@ public class OperatorController {
     private final Trigger edgeCenterSwitch = operatorController1.button(11);
     private final Trigger trenchBumpSwitch = operatorController1.button(12);
     private final Trigger neutralZoneFeedButton = operatorController1.button(1);
-    private final Trigger neutralZoneScoreButton = operatorController1.button(2);
+    private final Trigger neutralZoneScoreTrenchButton = operatorController1.button(2);
     private final Trigger humanPlayerButton = operatorController1.button(3);
-    private final Trigger climbButton = operatorController1.button(4);
+    private final Trigger neutralZoneScoreRampButton = operatorController1.button(4);
     private final Trigger aimAndShootButton = operatorController1.button(5);
     private final Trigger clearAllButton = operatorController1.button(6);
     private final Trigger clearLastButton = operatorController1.button(7);
@@ -35,11 +35,11 @@ public class OperatorController {
         blueWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(true); isBlue = true; SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
         redWonAutoToggle.whileTrue(Commands.runOnce(() -> {autoBuilder.setIsBlue(false); isBlue = false;SmartDashboard.putString("Current Team", isBlue?"blue":"red");}).ignoringDisable(true));
         // Add neutral sweep + score  
-        neutralZoneScoreButton.onTrue(Commands.runOnce(
+        neutralZoneScoreTrenchButton.onTrue(Commands.runOnce(
             () -> {
-                System.out.println("Added neutral score to auto routine");
+                System.out.println("Added neutral score to auto routine, exit trench");
                 autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
-                autoBuilder.addExitAlliance(startSide);
+                autoBuilder.addExitAllianceTrench(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
                 autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP);
                 // autoBuilder.addAlignScorePosition(leftRightSwitch.getAsBoolean() ? autoOptions.SHOOT_RIGHT : autoOptions.SHOOT_LEFT);
@@ -51,7 +51,7 @@ public class OperatorController {
             () -> {
                 System.out.println("Added neutral feed to auto routine");
                 autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
-                autoBuilder.addExitAlliance(startSide);
+                autoBuilder.addExitAllianceTrench(startSide);
                 autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
                 autoBuilder.addShootCommand(); 
             }).ignoringDisable(true));
@@ -64,11 +64,15 @@ public class OperatorController {
             }).ignoringDisable(true));
         
         // add climb command
-        climbButton.onTrue(Commands.runOnce(
+        neutralZoneScoreRampButton.onTrue(Commands.runOnce(
             () -> {
-                System.out.println("Added climb to auto routine");
-                autoBuilder.addClimbCommand(
-                    leftRightSwitch.getAsBoolean() ? autoOptions.CLIMB_RIGHT : autoOptions.CLIMB_LEFT);
+                System.out.println("Added neutral score to auto routine, exit ramp");
+                autoOptions startSide = leftRightSwitch.getAsBoolean() ? autoOptions.BORDER_RIGHT : autoOptions.BORDER_LEFT;
+                autoBuilder.addExitAllianceRamp(startSide);
+                autoBuilder.addSweep(startSide, edgeCenterSwitch.getAsBoolean() ? autoOptions.SWEEP_CENTER : autoOptions.SWEEP_EDGE);
+                autoBuilder.addReturnAlliance(startSide, trenchBumpSwitch.getAsBoolean() ? autoOptions.TRENCH : autoOptions.RAMP);
+                // autoBuilder.addAlignScorePosition(leftRightSwitch.getAsBoolean() ? autoOptions.SHOOT_RIGHT : autoOptions.SHOOT_LEFT);
+                autoBuilder.addShootCommand(); 
             }).ignoringDisable(true));  
         
         // add aim and shoot command
