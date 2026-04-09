@@ -134,13 +134,12 @@ public class Shooter extends SubsystemBase{
             Math.pow(targetPose.getX(), 2) +
             Math.pow(targetPose.getY(), 2)));
 
-        SmartDashboard.putNumber("Distance From Hub (Meters)", distance.magnitude());
-
+        Logger.recordOutput("Shooter/Hub Distance", distance.magnitude());
 
         double x = distance.in(Meters); 
 
         double targetVelocity = Math.min(100, shooterTable.get(x)) + (spinnerVelocityOffset.magnitude());
-        Logger.recordOutput("Spinner Velocity Setpoint", spinnerVelocitySetpoint);
+        Logger.recordOutput("Shooter/Velocity Setpoint", targetVelocity);
         return RotationsPerSecond.of(targetVelocity); // TODO This function is guesswork and estimation
     }
 
