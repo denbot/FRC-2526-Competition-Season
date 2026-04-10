@@ -46,7 +46,6 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     private final StatusSignal<AngularVelocity> intakeVelocity = intakeMotor.getVelocity();
     private final StatusSignal<Current> intakeCurrentAmps = intakeMotor.getSupplyCurrent();
-    private final StatusSignal<Current> intakeStallCurrentAmps = intakeMotor.getMotorStallCurrent();
     private final StatusSignal<Angle> intakePositionRot = intakeMotor.getPosition();
     private final StatusSignal<Double> intakeVelocityClosedLoopError = intakeMotor.getClosedLoopError();
 
@@ -54,8 +53,6 @@ public class IntakeIOTalonFX implements IntakeIO {
     private final StatusSignal<AngularVelocity> extensionRightVelocity = extensionMotorRight.getVelocity();
     private final StatusSignal<Current> extensionLeftCurrentAmps = extensionMotorLeft.getSupplyCurrent();
     private final StatusSignal<Current> extensionRightCurrentAmps = extensionMotorRight.getSupplyCurrent();
-    private final StatusSignal<Current> extensionLeftStallCurrentAmps = extensionMotorLeft.getMotorStallCurrent();
-    private final StatusSignal<Current> extensionRightStallCurrentAmps = extensionMotorRight.getMotorStallCurrent();
     private final StatusSignal<Angle> extensionLeftPositionRot = extensionMotorLeft.getPosition();
     private final StatusSignal<Angle> extensionRightPositionRot = extensionMotorRight.getPosition();
     private final StatusSignal<Double> extensionClosedLoopError = extensionMotorLeft.getClosedLoopError();
@@ -134,13 +131,13 @@ public class IntakeIOTalonFX implements IntakeIO {
 
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-            intakeMotor.getIsProLicensed().getValue() ? 200 : 50, intakeVelocity, intakeCurrentAmps, intakeStallCurrentAmps, intakePositionRot);
+            intakeMotor.getIsProLicensed().getValue() ? 200 : 50, intakeVelocity, intakeCurrentAmps, intakeCurrentAmps, intakePositionRot);
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-            extensionMotorLeft.getIsProLicensed().getValue() ? 200 : 50, extensionLeftVelocity, extensionLeftCurrentAmps, extensionLeftStallCurrentAmps, extensionLeftPositionRot);
+            extensionMotorLeft.getIsProLicensed().getValue() ? 200 : 50, extensionLeftVelocity, extensionLeftCurrentAmps, extensionLeftCurrentAmps, extensionLeftPositionRot);
         
         BaseStatusSignal.setUpdateFrequencyForAll(
-            extensionMotorRight.getIsProLicensed().getValue() ? 200 : 50, extensionRightVelocity, extensionRightCurrentAmps, extensionRightStallCurrentAmps, extensionRightPositionRot);
+            extensionMotorRight.getIsProLicensed().getValue() ? 200 : 50, extensionRightVelocity, extensionRightCurrentAmps, extensionRightCurrentAmps, extensionRightPositionRot);
 
         startupJingle.addInstrument(extensionMotorLeft);
         startupJingle.addInstrument(extensionMotorRight);
@@ -150,9 +147,9 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        var intakeMotorStatus = BaseStatusSignal.refreshAll(intakeVelocity, intakeCurrentAmps, intakeStallCurrentAmps, intakePositionRot);
-        var intakeLeftMotorStatus = BaseStatusSignal.refreshAll(extensionLeftVelocity, extensionLeftCurrentAmps, extensionLeftStallCurrentAmps, extensionLeftPositionRot);
-        var intakeRightMotorStatus = BaseStatusSignal.refreshAll(extensionRightVelocity, extensionRightCurrentAmps, extensionRightStallCurrentAmps, extensionRightPositionRot);
+        var intakeMotorStatus = BaseStatusSignal.refreshAll(intakeVelocity, intakeCurrentAmps, intakeCurrentAmps, intakePositionRot);
+        var intakeLeftMotorStatus = BaseStatusSignal.refreshAll(extensionLeftVelocity, extensionLeftCurrentAmps, extensionLeftCurrentAmps, extensionLeftPositionRot);
+        var intakeRightMotorStatus = BaseStatusSignal.refreshAll(extensionRightVelocity, extensionRightCurrentAmps, extensionRightCurrentAmps, extensionRightPositionRot);
 
         inputs.intakeMotorConnected = intakeMotorDebounce.calculate(intakeMotorStatus.isOK());
         inputs.extensionMotorLeftConnected = extensionMotorLeftDebounce.calculate(intakeLeftMotorStatus.isOK());
@@ -169,9 +166,9 @@ public class IntakeIOTalonFX implements IntakeIO {
         inputs.extensionRightPositionRots = extensionRightPositionRot.getValue();
         inputs.extensionClosedLoopError = extensionClosedLoopError.getValue();
 
-        inputs.stallCurrentIntake = intakeStallCurrentAmps.getValue();
-        inputs.stallCurrentExtensionLeft = extensionLeftStallCurrentAmps.getValue();
-        inputs.stallCurrentExtensionRight = extensionRightStallCurrentAmps.getValue();
+        inputs.currentIntake = intakeCurrentAmps.getValue();
+        inputs.currentExtensionLeft = extensionLeftCurrentAmps.getValue();
+        inputs.currentExtensionRight = extensionRightCurrentAmps.getValue();
 
         inputs.intakeDeployedSwitch = !intakeDeployedSensor.get();
         inputs.intakeRetractedSwitch = !intakeRetractedSensor.get();

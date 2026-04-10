@@ -17,9 +17,9 @@ public interface IntakeIO {
     public boolean intakeMotorConnected = false;
     public boolean extensionMotorLeftConnected = false;
     public boolean extensionMotorRightConnected = false;
-    public Current stallCurrentExtensionLeft = Amp.zero();
-    public Current stallCurrentExtensionRight = Amp.zero();
-    public Current stallCurrentIntake = Amp.zero();
+    public Current currentExtensionLeft = Amp.zero();
+    public Current currentExtensionRight = Amp.zero();
+    public Current currentIntake = Amp.zero();
     public double intakeVelocityClosedLoopError = 0.0;
     public AngularVelocity intakeVelocityRotPerSec = RevolutionsPerSecond.zero();
     public AngularVelocity extensionVelocityLeft = RevolutionsPerSecond.zero();

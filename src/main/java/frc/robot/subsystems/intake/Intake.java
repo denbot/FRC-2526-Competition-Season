@@ -179,16 +179,16 @@ public class Intake extends SubsystemBase {
     return inputs.intakeRetractedSwitch;
   }
 
-  public Current getStallCurrentIntake() {
-    return inputs.stallCurrentIntake;
+  public Current getCurrentIntake() {
+    return inputs.currentIntake;
   }
 
-  public Current getStallCurrentExtensionLeft() {
-    return inputs.stallCurrentExtensionLeft;
+  public Current getCurrentExtensionLeft() {
+    return inputs.currentExtensionLeft;
   }
   
-  public Current getStallCurrentExtensionRight() {
-    return inputs.stallCurrentExtensionRight;
+  public Current getCurrentExtensionRight() {
+    return inputs.currentExtensionRight;
   }
 
   public AngularVelocity getIntakeVelocityRotPerSec() {
