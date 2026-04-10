@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.control.OperatorController;
 import frc.robot.subsystems.vision.LimelightHelpers;
 import frc.robot.subsystems.vision.Limelights.Limelight;
 
@@ -114,9 +115,9 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.BACK_LEFT.name, Limelight.idsToUse);
-    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.FRONT.name, Limelight.idsToUse);
-    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.BACK_RIGHT.name, Limelight.idsToUse);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.BACK_LEFT.name, OperatorController.getIsBlue()?Limelight.blueIdsToUse:Limelight.redIdsToUse);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.FRONT.name, OperatorController.getIsBlue()?Limelight.blueIdsToUse:Limelight.redIdsToUse);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.BACK_RIGHT.name, OperatorController.getIsBlue()?Limelight.blueIdsToUse:Limelight.redIdsToUse);
     robotContainer.stopIntermission();
     robotContainer.stopJingle();
     autonomousCommand = robotContainer.getAutonomousCommand();
@@ -142,6 +143,11 @@ public class Robot extends LoggedRobot {
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
+    
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.BACK_LEFT.name, OperatorController.getIsBlue()?Limelight.blueIdsToUse:Limelight.redIdsToUse);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.FRONT.name, OperatorController.getIsBlue()?Limelight.blueIdsToUse:Limelight.redIdsToUse);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.BACK_RIGHT.name, OperatorController.getIsBlue()?Limelight.blueIdsToUse:Limelight.redIdsToUse);
+    
     CommandScheduler.getInstance().cancelAll();
     // this line or comment it out.
     if (autonomousCommand != null) {
