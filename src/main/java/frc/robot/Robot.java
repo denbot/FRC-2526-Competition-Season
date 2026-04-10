@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.vision.LimelightHelpers;
+import frc.robot.subsystems.vision.Limelights.Limelight;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -112,6 +114,9 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.BACK_LEFT.name, Limelight.idsToUse);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.FRONT.name, Limelight.idsToUse);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Limelight.BACK_RIGHT.name, Limelight.idsToUse);
     robotContainer.stopIntermission();
     robotContainer.stopJingle();
     autonomousCommand = robotContainer.getAutonomousCommand();
