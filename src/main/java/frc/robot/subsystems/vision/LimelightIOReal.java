@@ -95,7 +95,7 @@ public class LimelightIOReal implements LimelightIO{
         LimelightHelpers.PoseEstimate poseEstimate = 
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.name);
         boolean rejectUpdate = false;
-        if(poseEstimate == null || poseEstimate.tagCount == 0) rejectUpdate = true;
+        if(poseEstimate == null || poseEstimate.tagCount == 0) return;
         if (Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) > 2*Math.PI) rejectUpdate = true;
 
         if (poseEstimate.tagCount == 1 && 
@@ -105,8 +105,6 @@ public class LimelightIOReal implements LimelightIO{
         
         if(rejectUpdate == false){
             drive.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds, acceptsRotation ? limelight.visionMatrixAcceptsRotation : limelight.visionMatrixRejectsRotation);
-            
-
         }
     }
 }
