@@ -1,0 +1,126 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.407449584816133,
+        "y": 7.429525504151838
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.161198102016609,
+        "y": 7.429525504151838
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.848923841059602,
+        "y": 6.844594370860928
+      },
+      "prevControl": {
+        "x": 7.795188055191748,
+        "y": 7.80324929300972
+      },
+      "nextControl": {
+        "x": 7.904187425860025,
+        "y": 5.858683274021352
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.1295255041518395,
+        "y": 4.32011862396204
+      },
+      "prevControl": {
+        "x": 7.7781491894850365,
+        "y": 4.30258825408817
+      },
+      "nextControl": {
+        "x": 5.537164887307236,
+        "y": 4.363155397390273
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.008754448398578,
+        "y": 5.794128113879003
+      },
+      "prevControl": {
+        "x": 7.119927087508014,
+        "y": 5.627805289768697
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "shooting point left"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -175.95356971598
+    },
+    {
+      "waypointRelativePos": 0.9518963922294168,
+      "rotationDegrees": -91.21849677762306
+    },
+    {
+      "waypointRelativePos": 1.7076923076923083,
+      "rotationDegrees": -104.04000702811672
+    },
+    {
+      "waypointRelativePos": 2.3728029602220158,
+      "rotationDegrees": 91.80767320415772
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake"
+        }
+      }
+    },
+    {
+      "name": "Churn",
+      "waypointRelativePos": 2.4436363636363843,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Churn"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 129.55966796899452
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 177.13759477388825
+  },
+  "useDefaultConstraints": true
+}

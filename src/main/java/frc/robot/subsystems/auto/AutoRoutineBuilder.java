@@ -88,9 +88,7 @@ public class AutoRoutineBuilder {
                         new double[]{4.0, 4.0}, 
                         TargetPoses.NEUTRAL_EDGE_LEFT, 
                         TargetPoses.NEUTRAL_EDGE_MID_FROM_LEFT)
-                    .raceWith(this.intake.setIntakeMaxLength()
-                    .alongWith(this.intake.runIntake(RotationsPerSecond.of(80)))
-                    .alongWith(this.indexer.runIndexer())),
+                    .raceWith(getIntakeCommand()),
                     "Sweep Edge Left");
             }
             else{
@@ -100,9 +98,7 @@ public class AutoRoutineBuilder {
                         new double[]{4.0, 4.0}, 
                         TargetPoses.NEUTRAL_CENTER_LEFT, 
                         TargetPoses.NEUTRAL_CENTER_MID_FROM_LEFT)
-                    .raceWith(this.intake.setIntakeMaxLength()
-                    .alongWith(this.intake.runIntake(RotationsPerSecond.of(80)))
-                    .alongWith(this.indexer.runIndexer())),
+                    .raceWith(getIntakeCommand()),
                     "Sweep Center Left");
             }
         }
@@ -114,9 +110,7 @@ public class AutoRoutineBuilder {
                         new double[]{4.0, 4.0}, 
                         TargetPoses.NEUTRAL_EDGE_RIGHT, 
                         TargetPoses.NEUTRAL_EDGE_MID_FROM_RIGHT)
-                    .raceWith(this.intake.setIntakeMaxLength()
-                    .alongWith(this.intake.runIntake(RotationsPerSecond.of(80)))
-                    .alongWith(this.indexer.runIndexer())),
+                    .raceWith(getIntakeCommand()),
                     "Sweep Edge Right");
             }
             else{
@@ -126,9 +120,7 @@ public class AutoRoutineBuilder {
                         new double[]{4.0, 4.0}, 
                         TargetPoses.NEUTRAL_CENTER_RIGHT, 
                         TargetPoses.NEUTRAL_CENTER_MID_FROM_RIGHT)
-                    .raceWith(this.intake.setIntakeMaxLength()
-                    .alongWith(this.intake.runIntake(RotationsPerSecond.of(80)))
-                    .alongWith(this.indexer.runIndexer())),
+                    .raceWith(getIntakeCommand()),
                     "Sweep Center Right");
             }
         }
@@ -142,9 +134,7 @@ public class AutoRoutineBuilder {
                         new double[]{2.0, 0.0}, 
                         TargetPoses.TRENCH_LEFT_NEUTRAL, 
                         TargetPoses.TRENCH_LEFT_ALLIANCE)
-                    .alongWith(this.intake.stopIntake())
-                    .alongWith(this.indexer.reverseIndexer())
-                    .alongWith(this.shooter.reverseKicker())
+                    .alongWith()
                     , "Return Left Through Trench");
             
             }
@@ -154,9 +144,7 @@ public class AutoRoutineBuilder {
                         new double[]{2.0, 0.0}, 
                         TargetPoses.RAMP_LEFT_NEUTRAL, 
                         TargetPoses.RAMP_LEFT_ALLIANCE)
-                    .alongWith(this.intake.stopIntake())
-                    .alongWith(this.indexer.reverseIndexer())
-                    .alongWith(this.shooter.reverseKicker())
+                    .alongWith(getChurnCommand())
                     , "Return Left Through Ramp");
             }
         }
@@ -167,9 +155,7 @@ public class AutoRoutineBuilder {
                         new double[]{4.0, 0.0}, 
                         TargetPoses.TRENCH_RIGHT_NEUTRAL, 
                         TargetPoses.TRENCH_RIGHT_ALLIANCE)
-                    .alongWith(this.intake.stopIntake())
-                    .alongWith(this.indexer.reverseIndexer())
-                    .alongWith(this.shooter.reverseKicker())
+                    .alongWith(getChurnCommand())
                     , "Return Right Through Trench");
             
             }
@@ -179,9 +165,7 @@ public class AutoRoutineBuilder {
                         new double[]{4.0, 0.0}, 
                         TargetPoses.RAMP_RIGHT_NEUTRAL, 
                         TargetPoses.RAMP_RIGHT_ALLIANCE)
-                    .alongWith(this.intake.stopIntake())
-                    .alongWith(this.indexer.reverseIndexer())
-                    .alongWith(this.shooter.reverseKicker())
+                    .alongWith(getChurnCommand())
                     , "Return Right Through Ramp");
             }
         }
@@ -189,52 +173,26 @@ public class AutoRoutineBuilder {
     }
 
     public void addShootCommand(){
-        addAction(
-            intake.setIntakeMaxLength() // extend intake for maximum storage space
-            // Run the spinner up to speed until it is at speed
-            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)) // Auto aim at the hub
-            .andThen(shooter.runSpinnerAdaptive(drive))
-            .until(() -> Math.abs(shooter.getSpinnerClosedLoopError()) < 1 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
-            .andThen(
-                // Continue running spinner at speed
-                shooter.runSpinnerAdaptive(drive)
-                .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)).withTimeout(4) // Auto aim at the hub
-                // Run indexer and kicker to feed shooter with fuel
-                .alongWith(indexer.runIndexer()).withTimeout(4)
-                .alongWith(shooter.runKicker()).withTimeout(4)
-                // wait 2 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
-                .alongWith(
-                    Commands.waitSeconds(2)
-                    .andThen(intake.setIntakeMinLength())).withTimeout(4))
-            .andThen(
-                indexer.stopIndexer()
-                .alongWith(shooter.stopKicker())
-            ), "Shoot");
+        addAction(getShootCommand(), "Shoot");
     }
 
     public void addAlignScorePosition(autoOptions scoreLocation){
         switch (scoreLocation) {
             case SHOOT_LEFT:
                 addAction(getAutoAlignmentCommand(TargetPoses.SCORE_LEFT,1.0)
-                    .alongWith(this.intake.stopIntake())
-                    .alongWith(this.indexer.reverseIndexer())
-                    .alongWith(this.shooter.reverseKicker())
+                    .alongWith(getChurnCommand())
                     , "Align Shoot Left");
                 break;
 
             case SHOOT_RIGHT:
                 addAction(getAutoAlignmentCommand(TargetPoses.SCORE_RIGHT,1.0)
-                    .alongWith(this.intake.stopIntake())
-                    .alongWith(this.indexer.reverseIndexer())
-                    .alongWith(this.shooter.reverseKicker())
+                    .alongWith(getChurnCommand())
                     , "Align Shoot Right");
                 break;
             
             case SHOOT_CENTER:
                 addAction(getAutoAlignmentCommand(TargetPoses.SCORE_CENTER,1.0)
-                    .alongWith(this.intake.stopIntake())
-                    .alongWith(this.indexer.reverseIndexer())
-                    .alongWith(this.shooter.reverseKicker())
+                    .alongWith(getChurnCommand())
                     , "Align Shoot Center");
                 break;
             default:
@@ -281,6 +239,41 @@ public class AutoRoutineBuilder {
             targetPose,
             OperatorConstants.pathfindingConstraints,
             endSpeed);
+    }
+
+    public Command getIntakeCommand() {
+        return this.intake.setIntakeMaxLength()
+                    .alongWith(this.intake.runIntake(RotationsPerSecond.of(80)))
+                    .alongWith(this.indexer.runIndexer());
+    }
+
+    public Command getChurnCommand() {
+        return this.intake.stopIntake()
+                    .alongWith(this.indexer.reverseIndexer())
+                    .alongWith(this.shooter.reverseKicker());
+    }
+
+    public Command getShootCommand() {
+        return intake.setIntakeMaxLength() // extend intake for maximum storage space
+            // Run the spinner up to speed until it is at speed
+            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)) // Auto aim at the hub
+            .andThen(shooter.runSpinnerAdaptive(drive))
+            .until(() -> Math.abs(shooter.getSpinnerClosedLoopError()) < 1 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
+            .andThen(
+                // Continue running spinner at speed
+                shooter.runSpinnerAdaptive(drive)
+                .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)).withTimeout(4) // Auto aim at the hub
+                // Run indexer and kicker to feed shooter with fuel
+                .alongWith(indexer.runIndexer()).withTimeout(4)
+                .alongWith(shooter.runKicker()).withTimeout(4)
+                // wait 2 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
+                .alongWith(
+                    Commands.waitSeconds(2)
+                    .andThen(intake.setIntakeMinLength())).withTimeout(4))
+            .andThen(
+                indexer.stopIndexer()
+                .alongWith(shooter.stopKicker())
+                .alongWith(intake.setIntakeMaxLength()));
     }
 
     public void addAction(Command command, String commandName){
