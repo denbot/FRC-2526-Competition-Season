@@ -101,9 +101,9 @@ public class ShooterIOTalonFX implements ShooterIO {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(60)
+                    .withStatorCurrentLimit(40)
                     .withSupplyCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(60))
+                    .withSupplyCurrentLimit(40))
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
