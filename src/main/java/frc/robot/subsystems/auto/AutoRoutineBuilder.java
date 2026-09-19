@@ -272,7 +272,8 @@ public class AutoRoutineBuilder {
                     .andThen(intake.setIntakeMinLength())).withTimeout(4))
             .andThen(
                 indexer.stopIndexer()
-                .alongWith(shooter.stopKicker()));
+                .alongWith(shooter.stopKicker())
+                .alongWith(intake.setIntakeMaxLength()));
     }
 
     public void addAction(Command command, String commandName){

@@ -6,6 +6,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.AudioConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -60,6 +61,12 @@ public class IntakeIOTalonFX implements IntakeIO {
     public IntakeIOTalonFX() {
         var intakeMotorConfig =
             new TalonFXConfiguration()
+                .withCurrentLimits(
+                    new CurrentLimitsConfigs()
+                        .withStatorCurrentLimitEnable(true)
+                        .withStatorCurrentLimit(40)
+                        .withSupplyCurrentLimitEnable(true)
+                        .withSupplyCurrentLimit(40))
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
@@ -75,6 +82,12 @@ public class IntakeIOTalonFX implements IntakeIO {
         var extensionMotorLeftConfig =
             new TalonFXConfiguration()
                 .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+                .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimitEnable(true)
+                    .withStatorCurrentLimit(40)
+                    .withSupplyCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(40))
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
@@ -92,6 +105,12 @@ public class IntakeIOTalonFX implements IntakeIO {
         var extensionMotorRightConfig =
             new TalonFXConfiguration()
                 .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
+                .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimitEnable(true)
+                    .withStatorCurrentLimit(40)
+                    .withSupplyCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(40))
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
@@ -194,8 +213,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     public void setIntakeMinLength() {
-        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false));
-        extensionMotorRight.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false));
+        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false).withVelocity(-0.0625));
+        extensionMotorRight.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false).withVelocity(-0.0625));
     }
 
     public void stopIntake() {

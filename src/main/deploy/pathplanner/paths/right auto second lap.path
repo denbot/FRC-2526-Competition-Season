@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.977508278145695,
+        "x": 3.1701423487544496,
         "y": 2.1691970198675508
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4402731788079475,
-        "y": 0.18723509933774807
+        "x": 3.482158956109135,
+        "y": 0.34997627520759145
       },
       "isLocked": false,
       "linkedName": "shooting point right"
@@ -32,32 +32,32 @@
     },
     {
       "anchor": {
-        "x": 6.890612582781456,
-        "y": 3.584884105960265
+        "x": 6.5276158940397355,
+        "y": 3.082811387900356
       },
       "prevControl": {
-        "x": 7.098313874419096,
-        "y": 4.046442531821689
+        "x": 7.9832577638053825,
+        "y": 3.7097524683014007
       },
       "nextControl": {
-        "x": 6.171879139072847,
-        "y": 1.9876986754966877
+        "x": 5.2036298932384355,
+        "y": 2.5125741399762744
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.977508278145695,
+        "x": 3.1701423487544496,
         "y": 2.1691970198675508
       },
       "prevControl": {
-        "x": 2.926688741721854,
-        "y": 2.8806705298013244
+        "x": 4.2568208778173195,
+        "y": 2.512574139976275
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "shooting point right"
     }
   ],
   "rotationTargets": [
@@ -66,7 +66,11 @@
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 1.126734505087886,
+      "waypointRelativePos": 0.8676923076923129,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1.4538461538461473,
       "rotationDegrees": 89.98780595109795
     },
     {
@@ -75,11 +79,7 @@
     },
     {
       "waypointRelativePos": 2.2839962997224776,
-      "rotationDegrees": -91.06823321742657
-    },
-    {
-      "waypointRelativePos": 2.678075855689202,
-      "rotationDegrees": -88.58442362880825
+      "rotationDegrees": -93.4666401999052
     }
   ],
   "constraintZones": [],
@@ -98,7 +98,7 @@
     },
     {
       "name": "Churn",
-      "waypointRelativePos": 2.2628571428571447,
+      "waypointRelativePos": 1.907808090310434,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -109,7 +109,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 2.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -118,7 +118,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -144.7132510249402
+    "rotation": -143.97262661489628
   },
   "reversed": false,
   "folder": null,

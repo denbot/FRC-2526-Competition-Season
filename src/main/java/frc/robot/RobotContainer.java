@@ -248,16 +248,16 @@ public class RobotContainer {
       drive.setDefaultCommand(
           DriveCommands.joystickDrive(
               drive,
-              () -> -xLim.calculate(controller.getLeftY()),
-              () -> -yLim.calculate(controller.getLeftX()),
+              () -> -xLim.calculate(controller.getLeftY()*0.7),
+              () -> -yLim.calculate(controller.getLeftX()*0.7),
               () -> -oLim.calculate(controller.getRightX())));
   
       // Lock to 0° when right stick button is held
       controller.rightStick()
           .whileTrue(DriveCommands.joystickDriveAtAngle(
                   drive,
-                  () -> -controller.getLeftY(),
-                  () -> -controller.getLeftX(),
+                  () -> -xLim.calculate(controller.getLeftY()),
+                  () -> -yLim.calculate(controller.getLeftX()),
                   () -> Rotation2d.kZero));
       
       // Reset gyro to 0° when start button is pressed
@@ -270,8 +270,8 @@ public class RobotContainer {
       controller.rightBumper().whileTrue(
               DriveCommands.joystickDriveAtAngle(
               drive,
-              () -> -controller.getLeftY(),
-              () -> -controller.getLeftX(),
+              () -> -xLim.calculate(controller.getLeftY() * 0.4),
+              () -> -yLim.calculate(controller.getLeftX() * 0.4),
               () -> drive.findShootingPose(drive.getPose()).getRotation())
               .andThen(Commands.runOnce(() -> drive.stopWithX())));
   
@@ -279,8 +279,8 @@ public class RobotContainer {
       controller.x().whileTrue(
               DriveCommands.joystickDriveAtAngle(
               drive,
-              () -> -controller.getLeftY(),
-              () -> -controller.getLeftX(),
+              () -> -xLim.calculate(controller.getLeftY() * 0.4),
+              () -> -yLim.calculate(controller.getLeftX() * 0.4),
               () -> drive.findShootingPose(drive.getPose()).getRotation())
               .andThen(Commands.runOnce(() -> drive.stopWithX())));
       
@@ -305,7 +305,8 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-      return autoChooser.get().andThen(autoBuilder.getAutoRoutine());
+      return autoChooser.get();
+      //.andThen(autoBuilder.getAutoRoutine());
     }
   
     public void checkColor(){
