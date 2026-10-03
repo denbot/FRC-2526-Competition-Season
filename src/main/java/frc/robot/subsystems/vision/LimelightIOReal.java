@@ -75,13 +75,11 @@ public class LimelightIOReal implements LimelightIO{
         // Tag count
         // pre-define to check for null cases
 
-        inputs.backLeftTagCount = LimelightHelpers.getTargetCount(Limelight.BACK_LEFT.name);
-        inputs.backRightTagCount = LimelightHelpers.getTargetCount(Limelight.BACK_RIGHT.name);
-        inputs.frontTagCount = LimelightHelpers.getTargetCount(Limelight.FRONT.name);
-
+        inputs.backLeftTagCount = getTagCount(Limelight.BACK_LEFT.name);
+        inputs.backRightTagCount = getTagCount(Limelight.BACK_RIGHT.name);
+        inputs.frontTagCount = getTagCount(Limelight.FRONT.name);
         
         inputs.totalTagCount = inputs.backLeftTagCount + inputs.backRightTagCount + inputs.frontTagCount;
-
     }
 
     public void getAllPoseEstimate(Drive drive){
@@ -90,10 +88,23 @@ public class LimelightIOReal implements LimelightIO{
         getSinglePoseEstimate(drive, Limelight.FRONT, true);
     }
 
+    public int getTagCount(String limelight){
+        LimelightHelpers.PoseEstimate poseEstimate = 
+        LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight);
+        if(poseEstimate == null || 
+        (poseEstimate.tagCount == 1 && poseEstimate.rawFiducials.length == 1 &&
+        (poseEstimate.rawFiducials[0].ambiguity > .7 || 
+        poseEstimate.rawFiducials[0].distToCamera > 3))){
+            return 0;
+        } else{
+            return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight).tagCount;
+        }
+    }
+
     public void getSinglePoseEstimate(Drive drive, Limelight limelight, boolean acceptsRotation){
         LimelightHelpers.SetRobotOrientation(limelight.name, drive.getPose().getRotation().getDegrees(), 0, 0, 0, 0, 0);
         LimelightHelpers.PoseEstimate poseEstimate = 
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.name);
+        LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.name);
         boolean rejectUpdate = false;
         if(poseEstimate == null || poseEstimate.tagCount == 0) return;
         if (Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) > 2*Math.PI) rejectUpdate = true;
@@ -104,7 +115,7 @@ public class LimelightIOReal implements LimelightIO{
         poseEstimate.rawFiducials[0].distToCamera > 3)) rejectUpdate = true;
         
         if(rejectUpdate == false){
-            drive.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds, acceptsRotation ? limelight.visionMatrixAcceptsRotation : limelight.visionMatrixRejectsRotation);
+            drive.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds, limelight.visionMatrix);
         }
     }
 }

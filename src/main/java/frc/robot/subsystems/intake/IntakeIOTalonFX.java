@@ -66,9 +66,9 @@ public class IntakeIOTalonFX implements IntakeIO {
                 .withCurrentLimits(
                     new CurrentLimitsConfigs()
                         .withStatorCurrentLimitEnable(true)
-                        .withStatorCurrentLimit(40)
+                        .withStatorCurrentLimit(60)
                         .withSupplyCurrentLimitEnable(true)
-                        .withSupplyCurrentLimit(40))
+                        .withSupplyCurrentLimit(60))
                 .withFeedback(
                     new FeedbackConfigs()
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))

@@ -39,6 +39,10 @@ public enum HopperState {
                 .state(HopperState.IDLE)
                 .to(HopperState.RETRACTING_TO_RETRACTED)
                 .transitionWhen(leftBumper);
+        stateMachine
+                .state(HopperState.DEPLOYED, KickerState.RUNNING)
+                .to(HopperState.RETRACTING_TO_RETRACTED)
+                .transitionAfter(1);
     }
-}
+}  
 

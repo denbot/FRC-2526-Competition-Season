@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 3.482158956109135,
-        "y": 0.34997627520759145
+        "y": 0.3499762752075919
       },
       "isLocked": false,
       "linkedName": "shooting point right"
@@ -82,7 +82,21 @@
       "rotationDegrees": -93.4666401999052
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.1232361241768578,
+      "maxWaypointRelativePos": 2.026340545625587,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
@@ -110,7 +124,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 2.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

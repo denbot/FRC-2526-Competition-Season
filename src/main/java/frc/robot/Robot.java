@@ -156,6 +156,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
     robotContainer.stopIntermission();
+
     robotContainer.stopJingle();
   }
 

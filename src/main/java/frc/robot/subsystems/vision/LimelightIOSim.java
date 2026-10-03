@@ -15,6 +15,10 @@ public class LimelightIOSim implements LimelightIO{
         inputs.backRightTagCount = 0;
         inputs.frontTagCount = 0;
         inputs.totalTagCount = 0;
+
+        inputs.backLeftPoseUpdate = false;
+        inputs.backRightPoseUpdate = false;
+        inputs.frontPoseUpdate = true;
     }
 
     public void getAllPoseEstimate(Drive drive) {}

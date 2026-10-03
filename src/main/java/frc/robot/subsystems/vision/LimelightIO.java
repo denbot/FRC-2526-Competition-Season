@@ -16,6 +16,10 @@ public interface LimelightIO {
         public int backRightTagCount = 0;
         public int frontTagCount = 0;
         public int totalTagCount = 0;
+
+        public boolean backLeftPoseUpdate = false;
+        public boolean backRightPoseUpdate = false;
+        public boolean frontPoseUpdate = false;
     }
 
     public default void updateInputs(LimelightIOInputs inputs) {}

@@ -93,6 +93,21 @@ public class Intake extends SubsystemBase {
             .run(stopIntake());
 
     stateMachine
+            .state(HopperState.RETRACTING_TO_RETRACTED)
+            .to(HopperState.RETRACTED)
+            .run(runIntake(RotationsPerSecond.of(-2)));
+
+    stateMachine
+            .state(HopperState.RETRACTED)
+            .to(HopperState.DEPLOYING)
+            .run(stopIntake());
+    
+    stateMachine
+            .state(HopperState.RETRACTED)
+            .to(HopperState.RETRACTING_TO_IDLE)
+            .run(stopIntake());
+
+    stateMachine
             .state(HopperState.DEPLOYING)
             .to(HopperState.DEPLOYED)
             .transitionWhen(() -> Math.abs(inputs.extensionClosedLoopError) < 0.05);

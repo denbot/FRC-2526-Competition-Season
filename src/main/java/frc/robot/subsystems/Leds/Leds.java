@@ -1,10 +1,15 @@
 package frc.robot.subsystems.Leds;
 
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 
 import bot.den.foxflow.RobotState;
 import bot.den.foxflow.StateMachine;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -13,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -93,8 +99,8 @@ public class Leds extends SubsystemBase{
 	@Override
 	public void periodic(){
 		if (stateMachine.currentState().robotState() == RobotState.AUTO) {
-			LEDPattern baseColor = LEDPattern.solid(Color.kWhite);
-			baseColor.applyTo(this.ledBuffer);
+			LEDPattern baseColor = LEDPattern.rainbow(255, 255);
+			baseColor.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), Meters.of(0.02)).applyTo(this.ledBuffer);
 		} else if(
 			this.timeUntilTransition.hasElapsed(targetWaitTime) && 
 			stateMachine.currentState().robotState() == RobotState.TELEOP) {
@@ -106,9 +112,15 @@ public class Leds extends SubsystemBase{
 		} else {
 			if (DriverStation.getAlliance().isPresent()) {
 				if(RobotContainer.isBlue()) {
-					LEDPattern.solid(Color.kBlue).breathe(Seconds.of(1)).applyTo(this.ledBuffer);
+					LEDPattern
+						.gradient(GradientType.kContinuous, Color.kBlue, Color.kOrangeRed)
+						.scrollAtAbsoluteSpeed(MetersPerSecond.of(0.5), Meters.of(0.02))
+						.applyTo(this.ledBuffer);
 				} else {
-					LEDPattern.solid(Color.kRed).breathe(Seconds.of(1)).applyTo(this.ledBuffer);
+					LEDPattern
+					.gradient(GradientType.kContinuous, Color.kRed, Color.kOrangeRed)
+					.scrollAtAbsoluteSpeed(MetersPerSecond.of(0.5), Meters.of(0.02))
+					.applyTo(this.ledBuffer);
 				}
 			} else {
 				LEDPattern.solid(Color.kOrangeRed).applyTo(this.ledBuffer);
@@ -116,13 +128,12 @@ public class Leds extends SubsystemBase{
 		}
 
 		if (stateMachine.currentState().shooterState() != ShooterState.STOPPED){
-			LEDPattern baseColor = LEDPattern.solid(Color.kRed); // Base color for shooter speed
-			// Blink green if spinner is at speed, blink red if not
+			LEDPattern baseColor = LEDPattern.gradient(GradientType.kContinuous, Color.kRed, Color.kViolet);
 			if (stateMachine.currentState().shooterState() == ShooterState.AT_SPEED) 
 			{
-				baseColor = LEDPattern.solid(Color.kGreen);
+				baseColor = LEDPattern.gradient(GradientType.kContinuous, Color.kRed, Color.kOrangeRed, Color.kOrange);
 			}
-			baseColor.blink(Seconds.of(0.5)).applyTo(this.ledBuffer);
+			baseColor.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), Meters.of(0.02)).applyTo(this.ledBuffer);
 			
 		}
 		// Limelights
