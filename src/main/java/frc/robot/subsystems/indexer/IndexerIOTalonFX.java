@@ -42,7 +42,9 @@ public class IndexerIOTalonFX implements IndexerIO{
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(40))
+                    .withStatorCurrentLimit(40)
+                    .withSupplyCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(40))
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))

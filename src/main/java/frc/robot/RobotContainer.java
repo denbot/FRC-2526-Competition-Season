@@ -250,7 +250,7 @@ public class RobotContainer {
               drive,
               () -> -xLim.calculate(controller.getLeftY()*0.7),
               () -> -yLim.calculate(controller.getLeftX()*0.7),
-              () -> -oLim.calculate(controller.getRightX())));
+              () -> -oLim.calculate(controller.getRightX()*0.7)));
   
       // Lock to 0° when right stick button is held
       controller.rightStick()

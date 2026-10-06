@@ -8,10 +8,12 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -98,6 +100,13 @@ public class IntakeIOTalonFX implements IntakeIO {
                     new Slot0Configs()
                     .withKP(34)
                 )
+                .withMotionMagic(
+                    new MotionMagicConfigs()
+                    .withMotionMagicAcceleration(0.25)
+                    .withMotionMagicCruiseVelocity(0.6)
+                    .withMotionMagicExpo_kA(0.1)
+                    .withMotionMagicExpo_kV(0.12)
+                )
                 .withAudio(
                     new AudioConfigs().withAllowMusicDurDisable(true)
                 );
@@ -120,6 +129,13 @@ public class IntakeIOTalonFX implements IntakeIO {
                 .withSlot0(
                     new Slot0Configs()
                         .withKP(34))
+                .withMotionMagic(
+                    new MotionMagicConfigs()
+                    .withMotionMagicAcceleration(0.25)
+                    .withMotionMagicCruiseVelocity(0.6)
+                    .withMotionMagicExpo_kA(0.1)
+                    .withMotionMagicExpo_kV(0.12)
+                )
                 .withAudio(
                     new AudioConfigs().withAllowMusicDurDisable(true)
                 );
@@ -213,8 +229,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     public void setIntakeMinLength() {
-        extensionMotorLeft.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false).withVelocity(-0.0625));
-        extensionMotorRight.setControl(new PositionVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false).withVelocity(-0.0625));
+        extensionMotorLeft.setControl(new MotionMagicVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false));
+        extensionMotorRight.setControl(new MotionMagicVoltage(IntakeConstants.intakeMinExtensionPosition).withEnableFOC(false));
     }
 
     public void stopIntake() {
