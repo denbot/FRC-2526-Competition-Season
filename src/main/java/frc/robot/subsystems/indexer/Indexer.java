@@ -17,11 +17,13 @@ import frc.robot.state.RebuiltStateMachine;
 public class Indexer extends SubsystemBase{
     private final IndexerIO io;
     private final IndexerIOInputsAutoLogged inputs = new IndexerIOInputsAutoLogged();
+    private RebuiltStateMachine stateMachine;
 
     private AngularVelocity indexMotorSpeedSetpoint = RotationsPerSecond.of(30);
 
     public Indexer(IndexerIO io, RebuiltStateMachine stateMachine){
         this.io = io;
+        this.stateMachine = stateMachine;
 
         stateMachine
             .state(IndexerState.STOPPED)
@@ -60,7 +62,8 @@ public class Indexer extends SubsystemBase{
         // Log key variables
         io.updateInputs(inputs);
         Logger.processInputs("Indexer", inputs);
-        Logger.recordOutput("Indexer Speed Setpoint", indexMotorSpeedSetpoint);
+        Logger.recordOutput("State Machine/Indexer Speed Setpoint", indexMotorSpeedSetpoint);
+        Logger.recordOutput("State Machine/Indexer State", this.stateMachine.currentState().indexerState());
     }
 
     public Command runIndexer(){

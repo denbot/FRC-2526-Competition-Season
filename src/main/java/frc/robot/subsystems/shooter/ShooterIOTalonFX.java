@@ -101,9 +101,9 @@ public class ShooterIOTalonFX implements ShooterIO {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
-                    .withStatorCurrentLimit(40)
+                    .withStatorCurrentLimit(60)
                     .withSupplyCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(40))
+                    .withSupplyCurrentLimit(60))
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
@@ -123,12 +123,14 @@ public class ShooterIOTalonFX implements ShooterIO {
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             leftSpinnerMotor.getIsProLicensed().getValue() ? 200 : 50, 
-            leftSpinnerVelocity, 
+            leftSpinnerVelocity,
+            leftSpinnerClosedLoopError, 
             leftSpinnerCurrentAmps);
         
         BaseStatusSignal.setUpdateFrequencyForAll(
             rightSpinnerMotor.getIsProLicensed().getValue() ? 200 : 50, 
             rightSpinnerVelocity, 
+            rightSpinnerClosedLoopError,
             rightSpinnerCurrentAmps);
             
         BaseStatusSignal.setUpdateFrequencyForAll(

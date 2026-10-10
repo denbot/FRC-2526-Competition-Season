@@ -45,6 +45,7 @@ public class AutoRoutineBuilder {
         RAMP,
         SWEEP_EDGE,
         SWEEP_CENTER,
+        SWEEP_FAR,
         CLIMB_LEFT,
         CLIMB_RIGHT,
         SHOOT_LEFT,
@@ -56,12 +57,12 @@ public class AutoRoutineBuilder {
         if(exitSide == autoOptions.BORDER_LEFT){
             addAction(
                 getAutoAlignmentCommand(TargetPoses.TRENCH_LEFT_NEUTRAL, 1.0)
-            .alongWith(this.intake.setIntakeMinLength()),
+                .raceWith(getIntakeCommand()),
             "Exit Aliance Left");
         } else {
             addAction(
                 getAutoAlignmentCommand(TargetPoses.TRENCH_RIGHT_NEUTRAL, 1.0)
-                .alongWith(this.intake.setIntakeMinLength()),
+                .raceWith(getIntakeCommand()),
                 "Exit Aliance Right");
         }
     }
@@ -69,12 +70,12 @@ public class AutoRoutineBuilder {
         if(exitSide == autoOptions.BORDER_LEFT){
             addAction(
                 getAutoAlignmentCommand(TargetPoses.RAMP_LEFT_NEUTRAL, 1.0)
-                .alongWith(this.intake.setIntakeMinLength()),
+                .raceWith(getIntakeCommand()),
                 "Exit Aliance Left");
         } else {
             addAction(
                 getAutoAlignmentCommand(TargetPoses.RAMP_RIGHT_NEUTRAL, 1.0)
-                .alongWith(this.intake.setIntakeMinLength()),
+                .raceWith(getIntakeCommand()),
                 "Exit Aliance Right");
         }
     }
@@ -84,18 +85,26 @@ public class AutoRoutineBuilder {
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(
                     SequentialPathGenerator.getSequentialPath(
-                        new double[]{4.0, 4.0}, 
-                        new double[]{4.0, 4.0}, 
+                        new double[]{4.0, 2.0}, 
+                        new double[]{2.0, 2.0}, 
                         TargetPoses.NEUTRAL_EDGE_LEFT, 
                         TargetPoses.NEUTRAL_EDGE_MID_FROM_LEFT)
                     .raceWith(getIntakeCommand()),
                     "Sweep Edge Left");
-            }
-            else{
+            } else if(sweepAlignment == autoOptions.SWEEP_FAR){
                 addAction(
                     SequentialPathGenerator.getSequentialPath(
-                        new double[]{4.0, 4.0}, 
-                        new double[]{4.0, 4.0}, 
+                        new double[]{4.0, 2.0}, 
+                        new double[]{2.0, 2.0}, 
+                        TargetPoses.NEUTRAL_FAR_LEFT, 
+                        TargetPoses.NEUTRAL_FAR_MID_FROM_LEFT)
+                    .raceWith(getIntakeCommand()),
+                    "Sweep Far Left");
+            }else{
+                addAction(
+                    SequentialPathGenerator.getSequentialPath(
+                        new double[]{4.0, 2.0}, 
+                        new double[]{2.0, 2.0}, 
                         TargetPoses.NEUTRAL_CENTER_LEFT, 
                         TargetPoses.NEUTRAL_CENTER_MID_FROM_LEFT)
                     .raceWith(getIntakeCommand()),
@@ -106,18 +115,26 @@ public class AutoRoutineBuilder {
             if(sweepAlignment == autoOptions.SWEEP_EDGE){
                 addAction(
                     SequentialPathGenerator.getSequentialPath(
-                        new double[]{4.0, 4.0}, 
-                        new double[]{4.0, 4.0}, 
+                        new double[]{4.0, 2.0}, 
+                        new double[]{2.0, 2.0}, 
                         TargetPoses.NEUTRAL_EDGE_RIGHT, 
                         TargetPoses.NEUTRAL_EDGE_MID_FROM_RIGHT)
                     .raceWith(getIntakeCommand()),
                     "Sweep Edge Right");
-            }
-            else{
+            }else if(sweepAlignment == autoOptions.SWEEP_FAR){
                 addAction(
                     SequentialPathGenerator.getSequentialPath(
-                        new double[]{4.0, 4.0}, 
-                        new double[]{4.0, 4.0}, 
+                        new double[]{4.0, 2.0}, 
+                        new double[]{2.0, 2.0}, 
+                        TargetPoses.NEUTRAL_FAR_RIGHT, 
+                        TargetPoses.NEUTRAL_FAR_MID_FROM_RIGHT)
+                    .raceWith(getIntakeCommand()),
+                    "Sweep Far Right");
+            } else{
+                addAction(
+                    SequentialPathGenerator.getSequentialPath(
+                        new double[]{4.0, 2.0}, 
+                        new double[]{2.0, 2.0}, 
                         TargetPoses.NEUTRAL_CENTER_RIGHT, 
                         TargetPoses.NEUTRAL_CENTER_MID_FROM_RIGHT)
                     .raceWith(getIntakeCommand()),
@@ -131,17 +148,17 @@ public class AutoRoutineBuilder {
             if(returnLocation == autoOptions.TRENCH){
                 addAction(
                     SequentialPathGenerator.getSequentialPath(
-                        new double[]{2.0, 0.0}, 
+                        new double[]{4.0, 0.0}, 
                         TargetPoses.TRENCH_LEFT_NEUTRAL, 
                         TargetPoses.TRENCH_LEFT_ALLIANCE)
-                    .alongWith()
+                    .alongWith(getChurnCommand())
                     , "Return Left Through Trench");
             
             }
             else{
                 addAction(
                     SequentialPathGenerator.getSequentialPath(
-                        new double[]{2.0, 0.0}, 
+                        new double[]{4.0, 0.0}, 
                         TargetPoses.RAMP_LEFT_NEUTRAL, 
                         TargetPoses.RAMP_LEFT_ALLIANCE)
                     .alongWith(getChurnCommand())
@@ -204,10 +221,11 @@ public class AutoRoutineBuilder {
       
         addAction(
             getAutoAlignmentCommand(TargetPoses.HUMAN_PLAYER,0.0)
-            .alongWith(intake.setIntakeMaxLength())
+            .alongWith(getIntakeCommand())
             , "Align To Human Player");
         addAction(Commands.waitSeconds(2), "Wait For HP");
         addAlignScorePosition(endScorePosition);
+        addAction(getChurnCommand(), "Churn");
         addShootCommand();
     }
 
@@ -256,7 +274,7 @@ public class AutoRoutineBuilder {
     public Command getShootCommand() {
         return intake.setIntakeMaxLength() // extend intake for maximum storage space
             // Run the spinner up to speed until it is at speed
-            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)) // Auto aim at the hub
+            .alongWith(DriveCommands.autoJoystickDriveAtAngle(drive)).alongWith(getChurnCommand()) // Auto aim at the hub
             .andThen(shooter.runSpinnerAdaptive(drive))
             .until(() -> Math.abs(shooter.getSpinnerClosedLoopError()) < 1 && shooter.getLeftSpinnerVelocity().magnitude() > 30) // Run only the spin up and auto aim commands until the spinner is at speed
             .andThen(
@@ -268,7 +286,7 @@ public class AutoRoutineBuilder {
                 .alongWith(shooter.runKicker()).withTimeout(4)
                 // wait 2 seconds to fire majority of fuel, then retract intake to shove extra balls into the system
                 .alongWith(
-                    Commands.waitSeconds(2)
+                    Commands.waitSeconds(1)
                     .andThen(intake.setIntakeMinLength())).withTimeout(4))
             .andThen(
                 indexer.stopIndexer()

@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.control.OperatorController;
 import frc.robot.RobotContainer;
 import frc.robot.state.HubState;
 import frc.robot.state.MatchState;
@@ -40,7 +40,7 @@ public class Leds extends SubsystemBase{
 	private AddressableLED led;
 	private AddressableLEDBuffer ledBuffer;
 	private Limelights limelights;
-	private CommandXboxController controller;
+	private OperatorController controller;
 	private Shooter shooter;
 	private Drive drive;
 	private AddressableLEDBufferView leftHalf;
@@ -53,7 +53,7 @@ public class Leds extends SubsystemBase{
 	private Time targetWaitTime = Seconds.zero();
 	private Boolean isBlueActive = false;
 
-	public Leds(Limelights limelights, CommandXboxController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
+	public Leds(Limelights limelights, OperatorController controller, Shooter shooter, Drive drive, RebuiltStateMachine stateMachine){
 		this.led = new AddressableLED(0);
 		this.ledBuffer = new AddressableLEDBuffer(numLeds);
 
@@ -99,7 +99,7 @@ public class Leds extends SubsystemBase{
 	@Override
 	public void periodic(){
 		if (stateMachine.currentState().robotState() == RobotState.AUTO) {
-			LEDPattern baseColor = LEDPattern.rainbow(255, 255);
+			LEDPattern baseColor = LEDPattern.gradient(GradientType.kContinuous, Color.kOrangeRed, Color.kBlack, Color.kWhite);
 			baseColor.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), Meters.of(0.02)).applyTo(this.ledBuffer);
 		} else if(
 			this.timeUntilTransition.hasElapsed(targetWaitTime) && 
@@ -128,7 +128,7 @@ public class Leds extends SubsystemBase{
 		}
 
 		if (stateMachine.currentState().shooterState() != ShooterState.STOPPED){
-			LEDPattern baseColor = LEDPattern.gradient(GradientType.kContinuous, Color.kRed, Color.kViolet);
+			LEDPattern baseColor = LEDPattern.gradient(GradientType.kContinuous, Color.kBlue, Color.kViolet);
 			if (stateMachine.currentState().shooterState() == ShooterState.AT_SPEED) 
 			{
 				baseColor = LEDPattern.gradient(GradientType.kContinuous, Color.kRed, Color.kOrangeRed, Color.kOrange);
@@ -153,6 +153,11 @@ public class Leds extends SubsystemBase{
 			LEDPattern.solid(Color.kBlack).applyTo(this.rightLimelight);
 		}
 		
+		if (controller.enableButtonBoxSwitch.getAsBoolean()) {
+			LEDPattern
+			.rainbow(255, 255)
+			.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), Meters.of(0.02)).applyTo(this.ledBuffer);
+		} 
 
 		this.led.setData(this.ledBuffer);
 	}

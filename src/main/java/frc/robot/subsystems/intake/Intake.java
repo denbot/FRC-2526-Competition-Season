@@ -16,12 +16,14 @@ import static edu.wpi.first.units.Units.*;
 public class Intake extends SubsystemBase {
   public final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  private RebuiltStateMachine stateMachine;
 
   private AngularVelocity intakeVelocitySetpoint = RotationsPerSecond.of(80);
   private Angle intakeExtensionSetpoint = Rotations.zero();
 
   public Intake(IntakeIO io, RebuiltStateMachine stateMachine) {
     this.io = io;
+    this.stateMachine = stateMachine;
 
     stateMachine
             .state(HopperState.IDLE)
@@ -131,6 +133,9 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake Velocity Setpoint", intakeVelocitySetpoint);
     Logger.recordOutput("Intake Extension Setpoint", intakeExtensionSetpoint);
+    Logger.recordOutput("State Machine/Hopper State", this.stateMachine.currentState().hopperState());
+    Logger.recordOutput("State Machine/Intake State", this.stateMachine.currentState().intakeState());
+
   }
 
   public Command runIntake(AngularVelocity speed) {

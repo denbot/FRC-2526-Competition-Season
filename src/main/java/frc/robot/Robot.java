@@ -158,6 +158,11 @@ public class Robot extends LoggedRobot {
     robotContainer.stopIntermission();
 
     robotContainer.stopJingle();
+
+    // schedule auto match if enabled
+    if (robotContainer.getButtonBoxAutoEnable()) {
+      CommandScheduler.getInstance().schedule(robotContainer.getButtonBoxAutoCommand());
+    }
   }
 
   /** This function is called periodically during operator control. */

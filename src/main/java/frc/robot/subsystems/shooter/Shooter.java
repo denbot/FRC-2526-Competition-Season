@@ -24,6 +24,7 @@ import static edu.wpi.first.units.Units.*;
 public class Shooter extends SubsystemBase{
     private final ShooterIO io;
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+    private RebuiltStateMachine stateMachine;
 
     private InterpolatingDoubleTreeMap shooterTable = new InterpolatingDoubleTreeMap();
     private AngularVelocity spinnerVelocitySetpoint = RotationsPerSecond.of(60);
@@ -38,6 +39,7 @@ public class Shooter extends SubsystemBase{
     public Shooter(ShooterIO io, RebuiltStateMachine stateMachine, Drive drive){
         this.io = io;
         this.drive = drive;
+        this.stateMachine = stateMachine;
 
     this.shooterTable.put(2.5, 42.0);
     this.shooterTable.put(3.15, 45.0);
@@ -111,6 +113,8 @@ public class Shooter extends SubsystemBase{
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
         Logger.recordOutput("Kicker Velocity Setpoint", kickerVelocitySetpoint);
+        Logger.recordOutput("State Machine/Kicker State", this.stateMachine.currentState().kickerState());
+        Logger.recordOutput("State Machine/Shooter State", this.stateMachine.currentState().shooterState());
     }
     
     private Command setShooterCommandAdaptive() {

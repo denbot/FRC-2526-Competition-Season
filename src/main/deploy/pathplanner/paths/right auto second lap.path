@@ -3,57 +3,89 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.1701423487544496,
-        "y": 2.1691970198675508
+        "x": 2.822,
+        "y": 2.67
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.482158956109135,
-        "y": 0.3499762752075919
+        "x": 2.2577743834407777,
+        "y": 1.090879727503874
       },
       "isLocked": false,
       "linkedName": "shooting point right"
     },
     {
       "anchor": {
-        "x": 6.5276158940397355,
-        "y": 0.666390728476822
+        "x": 4.1,
+        "y": 0.639
       },
       "prevControl": {
-        "x": 4.160877483443709,
-        "y": 0.7680298013245064
+        "x": 3.283649289099526,
+        "y": 0.682109004739334
       },
       "nextControl": {
-        "x": 7.4248330678164205,
-        "y": 0.6278599296029757
+        "x": 4.483284524579335,
+        "y": 0.6187599069052341
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.5276158940397355,
-        "y": 3.082811387900356
+        "x": 6.93744075829384,
+        "y": 1.209
       },
       "prevControl": {
-        "x": 7.9832577638053825,
-        "y": 3.7097524683014007
+        "x": 6.706824538921994,
+        "y": 0.37363267848424986
       },
       "nextControl": {
-        "x": 5.2036298932384355,
-        "y": 2.5125741399762744
+        "x": 7.1897763331290365,
+        "y": 2.123041925790714
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.1701423487544496,
-        "y": 2.1691970198675508
+        "x": 6.496836492890996,
+        "y": 3.616
       },
       "prevControl": {
-        "x": 4.2568208778173195,
-        "y": 2.512574139976275
+        "x": 6.979142187951853,
+        "y": 3.7110268032449114
+      },
+      "nextControl": {
+        "x": 6.123430069025023,
+        "y": 3.5424291939023846
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.7,
+        "y": 2.67
+      },
+      "prevControl": {
+        "x": 5.934424628041625,
+        "y": 2.7568624992015884
+      },
+      "nextControl": {
+        "x": 4.869387755102041,
+        "y": 2.362229199372056
+      },
+      "isLocked": false,
+      "linkedName": "ramp point right"
+    },
+    {
+      "anchor": {
+        "x": 2.822,
+        "y": 2.67
+      },
+      "prevControl": {
+        "x": 3.7301535930378726,
+        "y": 2.7083010873610234
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,34 +94,34 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.6160962072155556,
+      "waypointRelativePos": 0.85,
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 0.8676923076923129,
+      "waypointRelativePos": 1.5,
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 1.4538461538461473,
-      "rotationDegrees": 89.98780595109795
+      "waypointRelativePos": 2.05,
+      "rotationDegrees": 100.0
     },
     {
-      "waypointRelativePos": 1.9010175763181947,
-      "rotationDegrees": 92.0247131788084
+      "waypointRelativePos": 2.65,
+      "rotationDegrees": 100.0
     },
     {
-      "waypointRelativePos": 2.2839962997224776,
-      "rotationDegrees": -93.4666401999052
+      "waypointRelativePos": 3.45,
+      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.1232361241768578,
-      "maxWaypointRelativePos": 2.026340545625587,
+      "minWaypointRelativePos": 1.85,
+      "maxWaypointRelativePos": 2.95,
       "constraints": {
         "maxVelocity": 2.0,
-        "maxAcceleration": 3.0,
+        "maxAcceleration": 4.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -101,7 +133,7 @@
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 1.1158441558441348,
+      "waypointRelativePos": 1.8,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -112,7 +144,7 @@
     },
     {
       "name": "Churn",
-      "waypointRelativePos": 1.907808090310434,
+      "waypointRelativePos": 3.4000000000000004,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -123,7 +155,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 4.5,
     "maxAcceleration": 4.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

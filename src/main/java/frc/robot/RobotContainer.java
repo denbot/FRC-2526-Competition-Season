@@ -166,8 +166,6 @@ public class RobotContainer {
           break;
       }
   
-      leds = new Leds(limelights, controller, shooter, drive, stateMachine);
-  
       // Set up auto routines
       autoBuilder = new AutoRoutineBuilder(intake, shooter, indexer, drive);
       operatorController = new OperatorController(autoBuilder);
@@ -176,7 +174,7 @@ public class RobotContainer {
       NamedCommands.registerCommand("Shoot", autoBuilder.getShootCommand());
       autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
   
-      // Mute controller disconnected warnings
+      // Mute controller disconnected warning
       DriverStation.silenceJoystickConnectionWarning(true);
   
       // Set up SysId routines
@@ -198,6 +196,8 @@ public class RobotContainer {
       // Configure the button bindings
       configureButtonBindings();
   
+      leds = new Leds(limelights, operatorController, shooter, drive, stateMachine);
+      
       IntakeState.setup(
               stateMachine,
               controller.leftTrigger(),
@@ -305,8 +305,19 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
+      return getButtonBoxAutoEnable() ? getButtonBoxAutoCommand() : getPathplannerAutoCommand();
+    }
+  
+    public Command getPathplannerAutoCommand() {
       return autoChooser.get();
-      //.andThen(autoBuilder.getAutoRoutine());
+    }
+    
+    public Command getButtonBoxAutoCommand() {
+      return autoBuilder.getAutoRoutine();
+    }
+
+    public boolean getButtonBoxAutoEnable(){
+      return operatorController.enableButtonBoxSwitch.getAsBoolean();
     }
   
     public void checkColor(){
